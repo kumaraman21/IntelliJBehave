@@ -1,8 +1,23 @@
+<!--
+  ~ Copyright 2000-2011 JetBrains s.r.o.
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
 <idea-plugin version="2">
-  <name>Plugin name here</name>
-  <description>short description of the plugin</description>
+  <name>IntelliJBehave</name>
+  <description>IntelliJ IDEA Plugin for JBehave</description>
   <version>1.0</version>
-  <vendor>YourCompany</vendor>
+  <vendor>Aman Kumar</vendor>
   <idea-version since-build="8000"/>
 
   <application-components>
@@ -15,6 +30,10 @@
 
   <actions>
     <!-- Add your actions here -->
+    <action id="IntelliJBehave.NewJBehaveStory" class="com.github.kumaraman21.intellijbehave.CreateStoryAction" text="JBhehave Story" description="Create New JBehave Story">
+      <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
+    </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
