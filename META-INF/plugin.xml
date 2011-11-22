@@ -21,7 +21,9 @@
   <idea-version since-build="8000"/>
 
   <application-components>
-    <!-- Add your application components here -->
+    <component>
+      <implementation-class>com.github.kumaraman21.intellijbehave.JBehaveTemplateLoaderComponent</implementation-class>
+    </component>
   </application-components>
 
   <project-components>
@@ -29,7 +31,6 @@
   </project-components>
 
   <actions>
-    <!-- Add your actions here -->
     <action id="IntelliJBehave.NewJBehaveStory" class="com.github.kumaraman21.intellijbehave.CreateStoryAction" text="JBhehave Story" description="Create New JBehave Story">
       <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
       <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>

@@ -17,16 +17,23 @@ package com.github.kumaraman21.intellijbehave;
 
 import com.intellij.ide.IdeBundle;
 import com.intellij.ide.actions.CreateElementActionBase;
+import com.intellij.ide.fileTemplates.FileTemplate;
+import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.Presentation;
+import com.intellij.openapi.fileEditor.FileEditorManager;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
+import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiFile;
+import com.intellij.psi.PsiFileFactory;
+import com.intellij.psi.codeStyle.CodeStyleManager;
 import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,14 +57,31 @@ public class CreateStoryAction extends CreateElementActionBase {
 
   @Override
   protected void checkBeforeCreate(String newName, PsiDirectory directory) throws IncorrectOperationException {
-    newName = getName(newName);
+    newName = getFileName(newName);
     directory.checkCreateFile(newName);
   }
 
   @NotNull
   @Override
   protected PsiElement[] create(String newName, PsiDirectory directory) throws Exception {
-     return new PsiElement[]{directory.createFile(getName(newName))};
+    final FileTemplate template = FileTemplateManager.getInstance().getTemplate(STORY_FILE_TYPE.getName());
+
+    String fileName = getFileName(newName);
+    Project project = directory.getProject();
+
+    directory.checkCreateFile(fileName);
+    PsiFile psiFile = PsiFileFactory.getInstance(project)
+      .createFileFromText(fileName, STORY_FILE_TYPE, template.getText());
+
+    if (template.isReformatCode()) {
+      CodeStyleManager.getInstance(project).reformat(psiFile);
+    }
+    psiFile = (PsiFile)directory.add(psiFile);
+
+    final VirtualFile virtualFile = psiFile.getVirtualFile();
+    FileEditorManager.getInstance(project).openFile(virtualFile, true);
+
+    return new PsiElement[]{psiFile};
   }
 
   @Override
@@ -86,7 +110,7 @@ public class CreateStoryAction extends CreateElementActionBase {
     }
   }
 
-  private String getName(String name) {
+  private String getFileName(String name) {
       return name + "." + STORY_FILE_TYPE.getDefaultExtension();
     }
 }
