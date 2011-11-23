@@ -24,6 +24,9 @@
     <component>
       <implementation-class>com.github.kumaraman21.intellijbehave.JBehaveTemplateLoaderComponent</implementation-class>
     </component>
+    <component>
+      <implementation-class>com.github.kumaraman21.intellijbehave.JBehaveSettings</implementation-class>
+    </component>
   </application-components>
 
   <project-components>
@@ -38,6 +41,6 @@
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <!-- Add your extensions here -->
+    <projectConfigurable instance="com.github.kumaraman21.intellijbehave.JBehaveConfigurable"/>
   </extensions>
 </idea-plugin>
