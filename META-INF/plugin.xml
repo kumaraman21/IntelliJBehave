@@ -27,6 +27,9 @@
     <component>
       <implementation-class>com.github.kumaraman21.intellijbehave.JBehaveSettings</implementation-class>
     </component>
+    <component>
+      <implementation-class>com.github.kumaraman21.intellijbehave.StoryRunnerConfigurationType</implementation-class>
+      </component>
   </application-components>
 
   <project-components>
@@ -34,9 +37,15 @@
   </project-components>
 
   <actions>
-    <action id="IntelliJBehave.NewJBehaveStory" class="com.github.kumaraman21.intellijbehave.CreateStoryAction" text="JBhehave Story" description="Create New JBehave Story">
+    <action id="IntelliJBehave.NewJBehaveStory" class="com.github.kumaraman21.intellijbehave.CreateStoryAction"
+            text="JBhehave Story" description="Create New JBehave Story">
       <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
       <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
+    </action>
+    <action id="IntelliJBehave.RunJBehaveStory" class="com.github.kumaraman21.intellijbehave.RunStoryAction"
+            text="Run Story" description="Run JBehave Story">
+      <add-to-group group-id="RunMenu" anchor="first"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl F8"/>
     </action>
   </actions>
 
