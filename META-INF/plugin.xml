@@ -22,13 +22,13 @@
 
   <application-components>
     <component>
-      <implementation-class>com.github.kumaraman21.intellijbehave.JBehaveTemplateLoaderComponent</implementation-class>
+      <implementation-class>com.github.kumaraman21.intellijbehave.template.JBehaveTemplateLoaderComponent</implementation-class>
     </component>
     <component>
-      <implementation-class>com.github.kumaraman21.intellijbehave.JBehaveSettings</implementation-class>
+      <implementation-class>com.github.kumaraman21.intellijbehave.settings.JBehaveSettings</implementation-class>
     </component>
     <component>
-      <implementation-class>com.github.kumaraman21.intellijbehave.StoryRunnerConfigurationType</implementation-class>
+      <implementation-class>com.github.kumaraman21.intellijbehave.runner.StoryRunnerConfigurationType</implementation-class>
       </component>
   </application-components>
 
@@ -37,19 +37,19 @@
   </project-components>
 
   <actions>
-    <action id="IntelliJBehave.NewJBehaveStory" class="com.github.kumaraman21.intellijbehave.CreateStoryAction"
+    <action id="IntelliJBehave.NewJBehaveStory" class="com.github.kumaraman21.intellijbehave.creater.CreateStoryAction"
             text="JBhehave Story" description="Create New JBehave Story">
       <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
       <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
     </action>
-    <action id="IntelliJBehave.RunJBehaveStory" class="com.github.kumaraman21.intellijbehave.RunStoryAction"
+    <action id="IntelliJBehave.RunJBehaveStory" class="com.github.kumaraman21.intellijbehave.runner.RunStoryAction"
             text="Run Story" description="Run JBehave Story">
       <add-to-group group-id="RunMenu" anchor="first"/>
-      <keyboard-shortcut keymap="$default" first-keystroke="shift ctrl F8"/>
+      <keyboard-shortcut keymap="$default" first-keystroke="alt shift F8"/>
     </action>
   </actions>
 
   <extensions defaultExtensionNs="com.intellij">
-    <projectConfigurable instance="com.github.kumaraman21.intellijbehave.JBehaveConfigurable"/>
+    <projectConfigurable instance="com.github.kumaraman21.intellijbehave.settings.JBehaveConfigurable"/>
   </extensions>
 </idea-plugin>

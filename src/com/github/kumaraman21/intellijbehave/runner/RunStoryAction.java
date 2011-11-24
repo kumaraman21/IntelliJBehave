@@ -13,8 +13,9 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kumaraman21.intellijbehave;
+package com.github.kumaraman21.intellijbehave.runner;
 
+import com.github.kumaraman21.intellijbehave.settings.JBehaveSettings;
 import com.intellij.execution.*;
 import com.intellij.execution.application.ApplicationConfiguration;
 import com.intellij.execution.executors.DefaultRunExecutor;
@@ -28,72 +29,75 @@ import com.intellij.openapi.actionSystem.PlatformDataKeys;
 import com.intellij.openapi.application.Application;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.module.Module;
-import com.intellij.openapi.module.ModuleManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.openapi.ui.Messages;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.JavaPsiFacade;
 import com.intellij.psi.PsiClass;
 import com.intellij.psi.search.GlobalSearchScope;
-import org.apache.commons.lang.StringUtils;
+
+import static com.github.kumaraman21.intellijbehave.runner.StoryRunnerConfigurationType.JBEHAVE_STORY_RUNNER;
+import static com.intellij.openapi.ui.Messages.getErrorIcon;
+import static com.intellij.openapi.ui.Messages.showMessageDialog;
+import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class RunStoryAction extends AnAction {
-
-  private static final String MY_RUNNER = "MyRunner";
 
   public void actionPerformed(AnActionEvent e) {
     Application application = ApplicationManager.getApplication();
     JBehaveSettings component = application.getComponent(JBehaveSettings.class);
 
-    String mainClassName = component.getStoryRunner();
-    if (mainClassName == null || mainClassName.isEmpty()) {
-      say("Set the class of the runner in the My Runner settings.");
+    String storyRunnerName = component.getStoryRunner();
+    if (isBlank(storyRunnerName)) {
+      showMessageDialog("In order to run a story file you need to first set a main class in the JBehave settings.",
+                        "No main class found to run the story",
+                        getErrorIcon());
+      return;
+    }
+
+    VirtualFile file = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+    if (file == null) {
+      showMessageDialog("Select a file or focus on the story file in the editor to run it.",
+                        "Story file not selected",
+                        getErrorIcon());
       return;
     }
 
     Project project = e.getData(PlatformDataKeys.PROJECT);
-    //String moduleNameOfRunner = component.getModuleNameOfRunner();
-    final PsiClass mainClass = JavaPsiFacade.getInstance(project).findClass(mainClassName,
+    final PsiClass storyRunnerClass = JavaPsiFacade.getInstance(project).findClass(storyRunnerName,
                                                                                GlobalSearchScope.allScope(project));
-    String moduleNameOfRunner = ProjectRootManager.getInstance(project).getFileIndex().getModuleForFile(mainClass.getContainingFile().getVirtualFile()).getName();
-    if (moduleNameOfRunner == null || moduleNameOfRunner.isEmpty()) {
-      say("Specify the name of the module where the runner class can be found. Check the settings.");
+    if(storyRunnerClass == null) {
+      showMessageDialog("Could not find the specified main class ''" + storyRunnerName + "'.",
+                        "Main class not found",
+                        getErrorIcon());
+      return;
     }
 
-    VirtualFile file = e.getData(PlatformDataKeys.VIRTUAL_FILE);
-
-    if (file == null) {
-      say("Select a file or focus on the file being edited to feed it to My Runner.");
+    Module module = ProjectRootManager.getInstance(project).getFileIndex()
+      .getModuleForFile(storyRunnerClass.getContainingFile().getVirtualFile());
+    if (module == null) {
+      showMessageDialog("Could not find the module in which main class to run stories was defined.'" +
+                        "/n Resetting the main class in the JBehave settings might fix this issue.",
+                        "Module not found for main class",
+                        getErrorIcon());
       return;
     }
 
     RunManagerImpl runManager = (RunManagerImpl)RunManager.getInstance(project);
-    Module module = ModuleManager.getInstance(project).findModuleByName(moduleNameOfRunner);
-
-    if (module == null) {
-      say("Could not find the module of the runner with name '" +
-          moduleNameOfRunner +
-          "'. Check settings." +
-          "\n\nHere is the list of modules that were found:\n   " +
-          StringUtils.join(ModuleManager.getInstance(project).getModules(), "\n   "));
-      return;
-    }
-
-    RunnerAndConfigurationSettingsImpl runnerAndConfigurationSettings = findConfigurationByName(MY_RUNNER, runManager);
+    RunnerAndConfigurationSettingsImpl runnerAndConfigurationSettings = findConfigurationByName(JBEHAVE_STORY_RUNNER, runManager);
     ApplicationConfiguration conf = null;
 
     if (runnerAndConfigurationSettings != null) {
       conf = (ApplicationConfiguration)runnerAndConfigurationSettings.getConfiguration();
-      updateConfiguration(mainClassName, file, module, conf);
+      updateConfiguration(storyRunnerName, file, module, conf);
 
     }
     else {
       StoryRunnerConfigurationType type = application.getComponent(StoryRunnerConfigurationType.class);
       runnerAndConfigurationSettings =
-        (RunnerAndConfigurationSettingsImpl)runManager.createRunConfiguration(MY_RUNNER, type.getConfigurationFactories()[0]);
+        (RunnerAndConfigurationSettingsImpl)runManager.createRunConfiguration(JBEHAVE_STORY_RUNNER, type.getConfigurationFactories()[0]);
       conf = (ApplicationConfiguration)runnerAndConfigurationSettings.getConfiguration();
-      updateConfiguration(mainClassName, file, module, conf);
+      updateConfiguration(storyRunnerName, file, module, conf);
       runManager.addConfiguration(runnerAndConfigurationSettings, true);
     }
 
@@ -101,8 +105,7 @@ public class RunStoryAction extends AnAction {
 
     Executor executor = DefaultRunExecutor.getRunExecutorInstance();
     ProgramRunner runner = RunnerRegistry.getInstance().getRunner(executor.getId(), conf);
-    //TODO: remove deprecated call
-    ExecutionEnvironment environment = new ExecutionEnvironment(runner, runnerAndConfigurationSettings, e.getDataContext());
+    ExecutionEnvironment environment = new ExecutionEnvironment(runner, runnerAndConfigurationSettings, project);
 
     try {
       runner.execute(executor, environment);
@@ -123,9 +126,5 @@ public class RunStoryAction extends AnAction {
     conf.setMainClassName(mainClassName);
     conf.setProgramParameters(file.getPath());
     conf.setModule(module);
-  }
-
-  public void say(String message) {
-    Messages.showMessageDialog(message, "Info", Messages.getInformationIcon());
   }
 }
