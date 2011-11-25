@@ -13,16 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kumaraman21.intellijbehave;
+package com.github.kumaraman21.intellijbehave.language;
 
-import com.intellij.openapi.fileTypes.FileType;
+import com.intellij.openapi.fileTypes.LanguageFileType;
 import com.intellij.openapi.vfs.VirtualFile;
 import org.jetbrains.annotations.NotNull;
 
 import javax.swing.*;
 
-public class StoryFileType implements FileType {
+import static com.github.kumaraman21.intellijbehave.language.StoryLanguage.STORY_LANGUAGE;
+
+public class StoryFileType extends LanguageFileType {
   public static final StoryFileType STORY_FILE_TYPE = new StoryFileType();
+
+  protected StoryFileType() {
+    super(STORY_LANGUAGE);
+  }
 
   @NotNull
   @Override
@@ -45,16 +51,6 @@ public class StoryFileType implements FileType {
   @Override
   public Icon getIcon() {
     return null;
-  }
-
-  @Override
-  public boolean isBinary() {
-    return false;
-  }
-
-  @Override
-  public boolean isReadOnly() {
-    return false;
   }
 
   @Override

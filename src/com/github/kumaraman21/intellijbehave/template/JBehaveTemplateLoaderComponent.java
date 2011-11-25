@@ -23,7 +23,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStreamReader;
 
-import static com.github.kumaraman21.intellijbehave.StoryFileType.STORY_FILE_TYPE;
+import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
 import static com.intellij.openapi.util.io.FileUtil.loadTextAndClose;
 
 public class JBehaveTemplateLoaderComponent implements ApplicationComponent {
