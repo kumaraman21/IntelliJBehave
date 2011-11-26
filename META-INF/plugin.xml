@@ -53,5 +53,6 @@
     <projectConfigurable instance="com.github.kumaraman21.intellijbehave.settings.JBehaveConfigurable"/>
     <fileTypeFactory implementation="com.github.kumaraman21.intellijbehave.language.StoryFileTypeFactory"/>
     <lang.parserDefinition language="Story" implementationClass="com.github.kumaraman21.intellijbehave.parser.StoryParserDefinition"/>
+    <lang.commenter language="Story" implementationClass="com.github.kumaraman21.intellijbehave.commenter.StoryCommenter"/>
   </extensions>
 </idea-plugin>
