@@ -39,7 +39,7 @@ public class StoryFileType extends LanguageFileType {
   @NotNull
   @Override
   public String getDescription() {
-    return "JBehave Story File";
+    return "JBehave story files";
   }
 
   @NotNull

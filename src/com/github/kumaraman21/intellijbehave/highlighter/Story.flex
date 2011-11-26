@@ -25,7 +25,7 @@ STEP_TEXT_CHAR=[^\n\r]
 <YYINITIAL> {CRLF}"When"           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <YYINITIAL> {CRLF}"Then"            { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <YYINITIAL> {CRLF}"And"             { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
-<YYINITIAL> .                     { yybegin(YYINITIAL); return StoryTokenType.STORY_DESCRIPTION; }
+<YYINITIAL> .*                            { yybegin(YYINITIAL); return StoryTokenType.STORY_DESCRIPTION; }
 
 <IN_STEP> {WHITE_SPACE_CHAR} {STEP_TEXT_CHAR}+          { yybegin(YYINITIAL); return StoryTokenType.STEP_TEXT; }
 
