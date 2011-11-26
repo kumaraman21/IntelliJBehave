@@ -17,7 +17,6 @@ package com.github.kumaraman21.intellijbehave.highlighter;
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NonNls;
 
 import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
@@ -35,7 +34,4 @@ public class StoryTokenType extends IElementType {
   public static final IElementType STEP_TYPE = new StoryTokenType("STEP_TYPE");
   public static final IElementType STEP_TEXT = new StoryTokenType("STEP_TEXT");
   public static final IElementType COMMENT = new StoryTokenType("COMMENT");
-
-  public static final TokenSet COMMENTS = TokenSet.create(COMMENT);
-  public static final TokenSet WHITE_SPACES = TokenSet.create(WHITE_SPACE);
 }

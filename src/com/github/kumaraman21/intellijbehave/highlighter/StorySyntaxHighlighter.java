@@ -38,6 +38,9 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
   private static final TextAttributesKey STEP_TEXT_ATTRIBUTES
     = TextAttributesKey.createTextAttributesKey("STEP_TEXT_ATTRIBUTES",
                                                 SyntaxHighlighterColors.STRING.getDefaultAttributes());
+  private static final TextAttributesKey COMMENT_ATTRIBUTES
+    = TextAttributesKey.createTextAttributesKey("COMMENT_ATTRIBUTES",
+                                                SyntaxHighlighterColors.LINE_COMMENT.getDefaultAttributes());
   private static final TextAttributesKey BAD_CHARACTER_ATTRIBUTES
     = TextAttributesKey.createTextAttributesKey("BAD_CHARACTER_ATTRIBUTES",
                                                 SyntaxHighlighterColors.INVALID_STRING_ESCAPE.getDefaultAttributes());
@@ -48,6 +51,7 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
     keys.put(StoryTokenType.STORY_DESCRIPTION, STORY_DESCRIPTION_ATTRIBUTES);
     keys.put(StoryTokenType.STEP_TYPE, STEP_TYPE_ATTRIBUTES);
     keys.put(StoryTokenType.STEP_TEXT, STEP_TEXT_ATTRIBUTES);
+    keys.put(StoryTokenType.COMMENT, COMMENT_ATTRIBUTES);
     keys.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER_ATTRIBUTES);
   }
 

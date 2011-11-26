@@ -50,14 +50,13 @@ public class StoryParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public TokenSet getWhitespaceTokens() {
-    return StoryTokenType.WHITE_SPACES;
+    return TokenSet.create(StoryTokenType.WHITE_SPACE);
   }
 
   @NotNull
   @Override
   public TokenSet getCommentTokens() {
-    //TODO: implement comments
-    return TokenSet.EMPTY;
+    return TokenSet.create(StoryTokenType.COMMENT);
   }
 
   @NotNull
