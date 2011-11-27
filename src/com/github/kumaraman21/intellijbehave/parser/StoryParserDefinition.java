@@ -26,6 +26,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.FileViewProvider;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
+import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
@@ -68,6 +69,11 @@ public class StoryParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public PsiElement createElement(ASTNode node) {
+    final IElementType type = node.getElementType();
+    if (type == StoryElementType.STEP) {
+      return new StepPsiElement(node);
+    }
+
     return new ASTWrapperPsiElement(node);
   }
 
