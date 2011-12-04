@@ -16,6 +16,8 @@ public class StoryTokenType extends IElementType {
   public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
 
   public static final IElementType STORY_DESCRIPTION = new StoryTokenType("STORY_DESCRIPTION");
+  public static final IElementType SCENARIO_TEXT = new StoryTokenType("SCENARIO_TEXT");
+
   public static final IElementType STEP_TYPE = new StoryTokenType("STEP_TYPE");
   public static final IElementType STEP_TEXT = new StoryTokenType("STEP_TEXT");
   public static final IElementType COMMENT = new StoryTokenType("COMMENT");

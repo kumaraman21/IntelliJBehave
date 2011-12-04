@@ -13,8 +13,8 @@ public class StoryElementType extends IElementType {
     super(debugName, STORY_FILE_TYPE.getLanguage());
   }
 
-  @SuppressWarnings("STORY")
   public static final IFileElementType STORY_FILE = new IFileElementType(STORY_FILE_TYPE.getLanguage());
   public static final IElementType STORY = new StoryElementType("STORY");
+  public static final IElementType SCENARIO = new StoryElementType("SCENARIO");
   public static final IElementType STEP = new StoryElementType("STEP");
 }

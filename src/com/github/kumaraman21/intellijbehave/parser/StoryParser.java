@@ -21,25 +21,41 @@ public class StoryParser implements PsiParser {
 
   private void parseStory(PsiBuilder builder) {
     final PsiBuilder.Marker storyMarker = builder.mark();
-    parseStoryDescriptionLines(builder);
-    parseSteps(builder);
+    parseStoryDescriptionLinesIfPresent(builder);
+    parseScenarios(builder);
     storyMarker.done(StoryElementType.STORY);
   }
 
-  private void parseStoryDescriptionLines(PsiBuilder builder) {
+  private void parseStoryDescriptionLinesIfPresent(PsiBuilder builder) {
     if(builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
       while(builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
        parseStoryDescriptionLine(builder);
       }
      }
-    else {
-      builder.advanceLexer();
-      builder.error("Story description and scenario text expected");
-    }
   }
 
   private void parseStoryDescriptionLine(PsiBuilder builder) {
    builder.advanceLexer();
+  }
+
+  private void parseScenarios(PsiBuilder builder) {
+    if(builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
+      while(builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
+        parseScenario(builder);
+      }
+    }
+    else {
+      builder.advanceLexer();
+      builder.error("Scenario expected");
+    }
+  }
+
+  private void parseScenario(PsiBuilder builder) {
+    final PsiBuilder.Marker stepMarker = builder.mark();
+    builder.advanceLexer();
+    parseSteps(builder);
+    parseStoryDescriptionLinesIfPresent(builder);
+    stepMarker.done(StoryElementType.SCENARIO);
   }
 
   private void parseSteps(PsiBuilder builder) {
@@ -49,7 +65,6 @@ public class StoryParser implements PsiParser {
       }
     }
     else {
-      builder.advanceLexer();
       builder.error("Step expected");
     }
   }
@@ -70,7 +85,6 @@ public class StoryParser implements PsiParser {
       builder.advanceLexer();
     }
     else {
-      builder.advanceLexer();
       builder.error("Step text expected");
     }
   }

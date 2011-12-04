@@ -15,21 +15,28 @@ import com.intellij.psi.tree.IElementType;
 
 CRLF= \n | \r | \r\n
 WHITE_SPACE_CHAR=[\ \n\r\t\f]
-STEP_TEXT_CHAR=[^\n\r]
+TEXT_CHAR=[^\n\r]
 COMMENT=("!--")[^\r\n]*
 
+%state IN_SCENARIO
 %state IN_STEP
 
 %%
 
-<YYINITIAL> {CRLF}+"Given"           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
-<YYINITIAL> {CRLF}+"When"           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
-<YYINITIAL> {CRLF}+"Then"            { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
-<YYINITIAL> {CRLF}+"And"             { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
-<YYINITIAL> {COMMENT}                { yybegin(YYINITIAL); return StoryTokenType.COMMENT; }
-<YYINITIAL> .*                               { yybegin(YYINITIAL); return StoryTokenType.STORY_DESCRIPTION; }
+<YYINITIAL> {CRLF}+"Scenario:" {TEXT_CHAR}+           { yybegin(IN_SCENARIO); return StoryTokenType.SCENARIO_TEXT; }
+<IN_SCENARIO> {CRLF}+"Scenario:" {TEXT_CHAR}+      { yybegin(IN_SCENARIO); return StoryTokenType.SCENARIO_TEXT; }
+<IN_STEP> {CRLF}+"Scenario:" {TEXT_CHAR}+              { yybegin(IN_SCENARIO); return StoryTokenType.SCENARIO_TEXT; }
 
-<IN_STEP> {WHITE_SPACE_CHAR} {STEP_TEXT_CHAR}+          { yybegin(YYINITIAL); return StoryTokenType.STEP_TEXT; }
+<IN_SCENARIO> {CRLF}+"Given" {WHITE_SPACE_CHAR}           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
+<IN_SCENARIO> {CRLF}+"When" {WHITE_SPACE_CHAR}           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
+<IN_SCENARIO> {CRLF}+"Then" {WHITE_SPACE_CHAR}            { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
+<IN_SCENARIO> {CRLF}+"And" {WHITE_SPACE_CHAR}             { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
+
+<IN_SCENARIO> {COMMENT}                { return StoryTokenType.COMMENT; }
+<YYINITIAL> .*                                    { return StoryTokenType.STORY_DESCRIPTION; }
+<IN_SCENARIO> .*                               { return StoryTokenType.STORY_DESCRIPTION; }
+
+<IN_STEP> {TEXT_CHAR}+          { yybegin(IN_SCENARIO); return StoryTokenType.STEP_TEXT; }
 
 {WHITE_SPACE_CHAR}+                         { return StoryTokenType.WHITE_SPACE; }
 .                                                          { return StoryTokenType.BAD_CHARACTER; }

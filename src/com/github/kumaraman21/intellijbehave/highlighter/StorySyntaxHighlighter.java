@@ -2,6 +2,7 @@ package com.github.kumaraman21.intellijbehave.highlighter;
 
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.SyntaxHighlighterColors;
+import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
@@ -12,11 +13,14 @@ import java.util.Map;
 
 public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
 
-  private static final Map<IElementType, TextAttributesKey> keys;
+  private static final Map<IElementType, TextAttributesKey> KEYS;
 
   private static final TextAttributesKey STORY_DESCRIPTION_ATTRIBUTES
     = TextAttributesKey.createTextAttributesKey("STORY_DESCRIPTION_ATTRIBUTES",
                                                 SyntaxHighlighterColors.NUMBER.getDefaultAttributes());
+  private static final TextAttributesKey SCENARIO_TEXT_ATTRIBUTES
+    = TextAttributesKey.createTextAttributesKey("SCENARIO_TEXT_ATTRIBUTES",
+                                                CodeInsightColors.STATIC_FIELD_ATTRIBUTES.getDefaultAttributes());
   private static final TextAttributesKey STEP_TYPE_ATTRIBUTES
     = TextAttributesKey.createTextAttributesKey("STEP_TYPE_ATTRIBUTES",
                                                 SyntaxHighlighterColors.KEYWORD.getDefaultAttributes());
@@ -31,13 +35,14 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
                                                 SyntaxHighlighterColors.INVALID_STRING_ESCAPE.getDefaultAttributes());
 
   static {
-    keys = new THashMap<IElementType, TextAttributesKey>();
+    KEYS = new THashMap<IElementType, TextAttributesKey>();
 
-    keys.put(StoryTokenType.STORY_DESCRIPTION, STORY_DESCRIPTION_ATTRIBUTES);
-    keys.put(StoryTokenType.STEP_TYPE, STEP_TYPE_ATTRIBUTES);
-    keys.put(StoryTokenType.STEP_TEXT, STEP_TEXT_ATTRIBUTES);
-    keys.put(StoryTokenType.COMMENT, COMMENT_ATTRIBUTES);
-    keys.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER_ATTRIBUTES);
+    KEYS.put(StoryTokenType.STORY_DESCRIPTION, STORY_DESCRIPTION_ATTRIBUTES);
+    KEYS.put(StoryTokenType.SCENARIO_TEXT, SCENARIO_TEXT_ATTRIBUTES);
+    KEYS.put(StoryTokenType.STEP_TYPE, STEP_TYPE_ATTRIBUTES);
+    KEYS.put(StoryTokenType.STEP_TEXT, STEP_TEXT_ATTRIBUTES);
+    KEYS.put(StoryTokenType.COMMENT, COMMENT_ATTRIBUTES);
+    KEYS.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER_ATTRIBUTES);
   }
 
   @NotNull
@@ -49,6 +54,6 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
   @NotNull
   @Override
   public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-    return new TextAttributesKey[]{keys.get(tokenType)};
+    return new TextAttributesKey[]{KEYS.get(tokenType)};
   }
 }
