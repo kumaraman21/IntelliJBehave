@@ -33,6 +33,13 @@ public class StepTypeMappings {
     STEP_TYPE_TO_ANNOTATION_MAPPING.put(StepType.THEN, Then.class.getName());
   }
 
+  public static final Map<String, StepType> ANNOTATION_TO_STEP_TYPE_MAPPING = new HashMap<String, StepType>();
+  static {
+      ANNOTATION_TO_STEP_TYPE_MAPPING.put(Given.class.getName(), StepType.GIVEN);
+      ANNOTATION_TO_STEP_TYPE_MAPPING.put(When.class.getName(), StepType.WHEN);
+      ANNOTATION_TO_STEP_TYPE_MAPPING.put(Then.class.getName(), StepType.THEN);
+    }
+
   public static final Map<StoryElementType, StepType> STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING = new HashMap<StoryElementType, StepType>();
   static {
     STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING.put(StoryElementType.GIVEN_STEP, StepType.GIVEN);

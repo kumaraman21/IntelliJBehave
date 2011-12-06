@@ -27,14 +27,11 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
-import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
-import org.jbehave.core.parsers.StepMatcher;
-import org.jbehave.core.parsers.StepPatternParser;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.STEP_TYPE_TO_ANNOTATION_MAPPING;
-import static org.apache.commons.lang.StringUtils.*;
+import static org.apache.commons.lang.StringUtils.substringAfter;
+import static org.apache.commons.lang.StringUtils.trim;
 
 public class StepPsiReference implements PsiReference {
 
@@ -93,18 +90,11 @@ private static class StepAnnotationFinder implements ContentIterator {
 
         for (PsiMethod method : methods) {
           PsiAnnotation[] annotations = method.getModifierList().getApplicableAnnotations();
+          DeclaredAnnotationSet declaredAnnotations = new DeclaredAnnotationSet(annotations);
 
-          for (PsiAnnotation annotation : annotations) {
-            if(annotation.getQualifiedName().equalsIgnoreCase(STEP_TYPE_TO_ANNOTATION_MAPPING.get(stepType))) {
-              StepPatternParser stepPatternParser = new RegexPrefixCapturingPatternParser();
-              String annotationText = removeStart(removeEnd(annotation.getParameterList().getAttributes()[0].getValue().getText(), "\""), "\"");
-              StepMatcher stepMatcher = stepPatternParser.parseStep(stepType, annotationText);
-
-              if(stepMatcher.matches(stepText)) {
-                matchingAnnotation = annotation;
-                return false;
-              }
-            }
+          matchingAnnotation = declaredAnnotations.getMatchingAnnotation(stepType, stepText);
+          if(matchingAnnotation != null) {
+            return false;
           }
         }
       }
