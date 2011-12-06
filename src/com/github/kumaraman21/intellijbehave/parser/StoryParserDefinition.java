@@ -31,6 +31,8 @@ import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING;
+
 public class StoryParserDefinition implements ParserDefinition {
   @NotNull
   @Override
@@ -70,8 +72,8 @@ public class StoryParserDefinition implements ParserDefinition {
   @Override
   public PsiElement createElement(ASTNode node) {
     final IElementType type = node.getElementType();
-    if (type == StoryElementType.STEP) {
-      return new StepPsiElement(node);
+    if (type == StoryElementType.GIVEN_STEP || type == StoryElementType.WHEN_STEP || type == StoryElementType.THEN_STEP) {
+      return new StepPsiElement(node, STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING.get(type));
     }
 
     return new ASTWrapperPsiElement(node);

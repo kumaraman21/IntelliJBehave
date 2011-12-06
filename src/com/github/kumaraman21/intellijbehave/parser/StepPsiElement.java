@@ -19,15 +19,23 @@ import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
 import com.intellij.psi.PsiReference;
+import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 
 public class StepPsiElement extends ASTWrapperPsiElement {
-  public StepPsiElement(@NotNull ASTNode node) {
+  private StepType stepType;
+
+  public StepPsiElement(@NotNull ASTNode node, StepType stepType) {
     super(node);
+    this.stepType = stepType;
   }
 
   @Override
   public PsiReference getReference() {
     return new StepPsiReference(this);
+  }
+
+  public StepType getStepType() {
+    return stepType;
   }
 }

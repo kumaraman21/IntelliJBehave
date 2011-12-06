@@ -27,18 +27,13 @@ import com.intellij.openapi.util.TextRange;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import com.intellij.util.IncorrectOperationException;
-import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Then;
-import org.jbehave.core.annotations.When;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
 import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.STEP_TYPE_TO_ANNOTATION_MAPPING;
 import static org.apache.commons.lang.StringUtils.*;
 
 public class StepPsiReference implements PsiReference {
@@ -65,7 +60,7 @@ public class StepPsiReference implements PsiReference {
     DataContext dataContext = DataManager.getInstance().getDataContext();
     final Project project = DataKeys.PROJECT.getData(dataContext);
 
-    StepType stepType = StepType.valueOf(trim(substringBefore(stepPsiElement.getText(), " ")).toUpperCase());
+    StepType stepType = stepPsiElement.getStepType();
     String stepText = trim(substringAfter(stepPsiElement.getText(), " "));
 
     StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(project, stepType, stepText);
@@ -75,14 +70,6 @@ public class StepPsiReference implements PsiReference {
   }
 
 private static class StepAnnotationFinder implements ContentIterator {
-
-  private static final Map<StepType, String> STEP_TYPE_TO_ANNOTATION_MAPPING = new HashMap<StepType, String>();
-
-  static {
-    STEP_TYPE_TO_ANNOTATION_MAPPING.put(StepType.GIVEN, Given.class.getName());
-    STEP_TYPE_TO_ANNOTATION_MAPPING.put(StepType.WHEN, When.class.getName());
-    STEP_TYPE_TO_ANNOTATION_MAPPING.put(StepType.THEN, Then.class.getName());
-  }
 
   private Project project;
   private StepType stepType;

@@ -22,6 +22,8 @@ import com.intellij.lang.PsiParser;
 import com.intellij.psi.tree.IElementType;
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING;
+
 public class StoryParser implements PsiParser {
   @NotNull
   @Override
@@ -75,20 +77,35 @@ public class StoryParser implements PsiParser {
 
   private void parseSteps(PsiBuilder builder) {
     if(builder.getTokenType() == StoryTokenType.STEP_TYPE) {
+
+      StoryElementType previousStepElementType = null;
       while(builder.getTokenType() == StoryTokenType.STEP_TYPE) {
-        parseStep(builder);
+        previousStepElementType = parseStep(builder, previousStepElementType);
       }
     }
     else {
-      builder.error("Step expected");
+      builder.error("At least one step expected");
     }
   }
 
-  private void parseStep(PsiBuilder builder) {
+  private StoryElementType parseStep(PsiBuilder builder, StoryElementType previousStepElementType) {
     final PsiBuilder.Marker stepMarker = builder.mark();
+
+    StoryElementType currentStepElementType = null;
+
+    String stepTypeText = builder.getTokenText().trim().toUpperCase();
+    if(stepTypeText.equalsIgnoreCase("And")) {
+      currentStepElementType = previousStepElementType;
+    }
+    else {
+      currentStepElementType = STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING.get(stepTypeText);
+    }
+
     parseStepType(builder);
     parseStepText(builder);
-    stepMarker.done(StoryElementType.STEP);
+    stepMarker.done(currentStepElementType);
+
+    return currentStepElementType;
   }
 
   private void parseStepType(PsiBuilder builder) {
