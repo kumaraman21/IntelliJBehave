@@ -82,8 +82,8 @@ private static class StepAnnotationFinder implements ContentIterator {
   @Override
   public boolean processFile(VirtualFile virtualFile) {
     PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-    if (psiFile instanceof PsiJavaFile) {
-      PsiClass[] psiClasses = ((PsiJavaFile)psiFile).getClasses();
+    if (psiFile instanceof PsiClassOwner) {
+      PsiClass[] psiClasses = ((PsiClassOwner)psiFile).getClasses();
 
       for (PsiClass psiClass : psiClasses) {
         PsiMethod[] methods = psiClass.getMethods();
