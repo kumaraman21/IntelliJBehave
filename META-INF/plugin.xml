@@ -16,7 +16,7 @@
 <idea-plugin version="2">
   <name>IntelliJBehave</name>
   <description>IntelliJ IDEA Plugin for JBehave</description>
-  <version>1.0</version>
+  <version>0.9.0</version>
   <vendor>Aman Kumar</vendor>
   <idea-version since-build="8000"/>
 

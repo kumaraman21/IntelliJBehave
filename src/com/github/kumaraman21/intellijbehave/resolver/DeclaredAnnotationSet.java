@@ -29,8 +29,7 @@ import java.util.Set;
 
 import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
 import static com.google.common.collect.Sets.newHashSet;
-import static org.apache.commons.lang.StringUtils.removeEnd;
-import static org.apache.commons.lang.StringUtils.removeStart;
+import static org.apache.commons.lang.StringUtils.*;
 
 public class DeclaredAnnotationSet {
 
@@ -80,7 +79,7 @@ public class DeclaredAnnotationSet {
   }
 
   private static String getTextFromValue(PsiElement value) {
-    return removeStart(removeEnd(value.getText(), "\""), "\"");
+    return remove(removeStart(removeEnd(value.getText(), "\""), "\""), "\\");
   }
 
   private static class DeclaredAnnotation {
