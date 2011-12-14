@@ -40,7 +40,7 @@ public class StoryAnnotator implements Annotator {
 
     StepPsiElement parentStepElement = (StepPsiElement)parentElement;
     if(parentStepElement.getReference().resolve() == null) {
-      annotationHolder.createErrorAnnotation(psiElement, "No definition found for step");
+      annotationHolder.createErrorAnnotation(psiElement, "No definition found for the step");
     }
   }
 }
