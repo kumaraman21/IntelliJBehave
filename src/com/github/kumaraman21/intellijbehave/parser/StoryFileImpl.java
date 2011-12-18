@@ -15,12 +15,22 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
+import com.github.kumaraman21.intellijbehave.utility.NodeToPsiElement;
+import com.github.kumaraman21.intellijbehave.utility.NodeToStepPsiElement;
 import com.intellij.extapi.psi.PsiFileBase;
+import com.intellij.lang.ASTNode;
 import com.intellij.openapi.fileTypes.FileType;
 import com.intellij.psi.FileViewProvider;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.List;
+
 import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Lists.transform;
+import static java.util.Arrays.asList;
 
 public class StoryFileImpl extends PsiFileBase {
 
@@ -32,5 +42,39 @@ public class StoryFileImpl extends PsiFileBase {
   @Override
   public FileType getFileType() {
     return STORY_FILE_TYPE;
+  }
+
+  @NotNull
+  public List<StepPsiElement> getSteps() {
+
+    List<ASTNode> stepNodes = newArrayList();
+
+    for (PsiElement scenario : getScenarios()) {
+      ASTNode[] stepNodesOfScenario = scenario.getNode().getChildren(StoryElementType.STEPS_TOKEN_SET);
+      stepNodes.addAll(asList(stepNodesOfScenario));
+    }
+
+    return transform(stepNodes, new NodeToStepPsiElement());
+  }
+
+  @NotNull
+  public List<PsiElement> getScenarios() {
+    PsiElement story = getStory();
+    if (story == null) {
+      return newArrayList();
+    }
+
+    ASTNode[] scenarioNodes = story.getNode().getChildren(TokenSet.create(StoryElementType.SCENARIO));
+    return transform(asList(scenarioNodes), new NodeToPsiElement());
+  }
+
+  public PsiElement getStory() {
+    ASTNode[] storyNodes = this.getNode().getChildren(TokenSet.create(StoryElementType.STORY));
+
+    if(storyNodes.length > 0) {
+      return storyNodes[0].getPsi();
+    }
+
+    return null;
   }
 }

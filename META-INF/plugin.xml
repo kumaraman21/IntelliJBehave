@@ -27,10 +27,11 @@
     <li> Error Highlighting in story if step was not defined</li>
     <li> Create new story files from a configurable story template</li>
     <li> Comment/uncomment lines in story files</li>
+    <li> Find unused steps through code inspection</li>
     <li> Run *.story files</li>
     </ul>
   ]]></description>
-  <version>1.0</version>
+  <version>1.1</version>
   <vendor url="https://github.com/kumaraman21" email="kumaraman21@gmail.com">Aman Kumar</vendor>
   <idea-version since-build="8000"/>
 
@@ -69,5 +70,6 @@
     <lang.parserDefinition language="Story" implementationClass="com.github.kumaraman21.intellijbehave.parser.StoryParserDefinition"/>
     <annotator language="Story" implementationClass="com.github.kumaraman21.intellijbehave.resolver.StoryAnnotator"/>
     <lang.commenter language="Story" implementationClass="com.github.kumaraman21.intellijbehave.commenter.StoryCommenter"/>
+    <inspectionToolProvider implementation="com.github.kumaraman21.intellijbehave.codeInspector.UnusedStepsInspectionProvider"/>
   </extensions>
 </idea-plugin>

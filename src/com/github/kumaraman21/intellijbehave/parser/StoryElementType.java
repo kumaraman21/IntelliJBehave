@@ -17,6 +17,7 @@ package com.github.kumaraman21.intellijbehave.parser;
 
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
+import com.intellij.psi.tree.TokenSet;
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
@@ -35,4 +36,6 @@ public class StoryElementType extends IElementType {
   public static final StoryElementType GIVEN_STEP = new StoryElementType("GIVEN_STEP");
   public static final StoryElementType WHEN_STEP = new StoryElementType("WHEN_STEP");
   public static final StoryElementType THEN_STEP = new StoryElementType("THEN_STEP");
+
+  public static final TokenSet STEPS_TOKEN_SET = TokenSet.create(GIVEN_STEP, WHEN_STEP, THEN_STEP);
 }

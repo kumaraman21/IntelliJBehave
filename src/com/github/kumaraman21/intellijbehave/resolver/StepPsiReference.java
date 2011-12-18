@@ -16,9 +16,6 @@
 package com.github.kumaraman21.intellijbehave.resolver;
 
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.ProjectRootManager;
@@ -30,6 +27,7 @@ import com.intellij.util.IncorrectOperationException;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 
+import static com.github.kumaraman21.intellijbehave.utility.ProjectFinder.getCurrentProject;
 import static org.apache.commons.lang.StringUtils.substringAfter;
 import static org.apache.commons.lang.StringUtils.trim;
 
@@ -53,9 +51,7 @@ public class StepPsiReference implements PsiReference {
 
   @Override
   public PsiElement resolve() {
-    //Todo: remove deprecated api use
-    DataContext dataContext = DataManager.getInstance().getDataContext();
-    final Project project = DataKeys.PROJECT.getData(dataContext);
+    final Project project = getCurrentProject();
 
     StepType stepType = stepPsiElement.getStepType();
     String stepText = trim(substringAfter(stepPsiElement.getText(), " "));
