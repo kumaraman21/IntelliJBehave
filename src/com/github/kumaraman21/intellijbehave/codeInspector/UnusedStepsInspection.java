@@ -80,9 +80,14 @@ public class UnusedStepsInspection extends BaseJavaLocalInspectionTool {
     return new JavaElementVisitor() {
 
       @Override
-      public void visitAnnotation(PsiAnnotation annotation) {
-        super.visitAnnotation(annotation);
+      public void visitElement(PsiElement element) {
+        super.visitElement(element);
 
+        if(! (element instanceof PsiAnnotation)) {
+          return;
+        }
+
+        PsiAnnotation annotation = (PsiAnnotation)element;
         if(! JBEHAVE_ANNOTATIONS.contains(annotation.getQualifiedName())) {
           return;
         }
