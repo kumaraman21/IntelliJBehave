@@ -70,6 +70,9 @@
     <lang.parserDefinition language="Story" implementationClass="com.github.kumaraman21.intellijbehave.parser.StoryParserDefinition"/>
     <annotator language="Story" implementationClass="com.github.kumaraman21.intellijbehave.resolver.StoryAnnotator"/>
     <lang.commenter language="Story" implementationClass="com.github.kumaraman21.intellijbehave.commenter.StoryCommenter"/>
-    <inspectionToolProvider implementation="com.github.kumaraman21.intellijbehave.codeInspector.UnusedStepsInspectionProvider"/>
+
+    <!--code inspections-->
+    <inspectionToolProvider id="unusedStepsInspection" order="FIRST" implementation="com.github.kumaraman21.intellijbehave.codeInspector.UnusedStepsInspectionProvider"/>
+    <inspectionToolProvider id="undefinedStepsInspection" order="LAST" implementation="com.github.kumaraman21.intellijbehave.codeInspector.UndefinedStepsInspectionProvider"/>
   </extensions>
 </idea-plugin>
