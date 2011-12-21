@@ -56,6 +56,7 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
     KEYS.put(StoryTokenType.SCENARIO_TEXT, SCENARIO_TEXT_ATTRIBUTES);
     KEYS.put(StoryTokenType.STEP_TYPE, STEP_TYPE_ATTRIBUTES);
     KEYS.put(StoryTokenType.STEP_TEXT, STEP_TEXT_ATTRIBUTES);
+    KEYS.put(StoryTokenType.TABLE_ROW, STEP_TEXT_ATTRIBUTES);
     KEYS.put(StoryTokenType.COMMENT, COMMENT_ATTRIBUTES);
     KEYS.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER_ATTRIBUTES);
   }

@@ -15,31 +15,21 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
-import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
 import com.intellij.lang.annotation.AnnotationHolder;
 import com.intellij.lang.annotation.Annotator;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.impl.source.tree.LeafPsiElement;
 import org.jetbrains.annotations.NotNull;
 
 public class StoryAnnotator implements Annotator {
   @Override
   public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder annotationHolder) {
-    if(! (psiElement instanceof LeafPsiElement)) {
-      return;
-    }
-    if(! (((LeafPsiElement)psiElement).getElementType() == StoryTokenType.STEP_TEXT)) {
+    if(! (psiElement instanceof StepPsiElement)) {
       return;
     }
 
-    PsiElement parentElement = psiElement.getParent();
-    if(! (parentElement instanceof StepPsiElement)) {
-      return;
-    }
-
-    StepPsiElement parentStepElement = (StepPsiElement)parentElement;
-    if(parentStepElement.getReference().resolve() == null) {
+    StepPsiElement stepPsiElement = (StepPsiElement) psiElement;
+    if(stepPsiElement.getReference().resolve() == null) {
       annotationHolder.createErrorAnnotation(psiElement, "No definition found for the step");
     }
   }

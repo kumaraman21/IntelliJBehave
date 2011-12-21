@@ -19,12 +19,22 @@ import com.intellij.ide.DataManager;
 import com.intellij.openapi.actionSystem.DataContext;
 import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.project.Project;
+import org.jetbrains.annotations.NotNull;
 
 public class ProjectFinder {
 
+  @NotNull
   public static Project getCurrentProject() {
-    //Todo: remove deprecated api use
-    DataContext dataContext = DataManager.getInstance().getDataContext();
-    return DataKeys.PROJECT.getData(dataContext);
+    Project project = null;
+
+    // Perhaps because of using deprecated API here, project is null sometimes
+    // Keep trying till we get non null project
+    while(project == null) {
+      //Todo: remove deprecated api use
+      DataContext dataContext = DataManager.getInstance().getDataContext();
+      project = DataKeys.PROJECT.getData(dataContext);
+    }
+
+    return project;
   }
 }

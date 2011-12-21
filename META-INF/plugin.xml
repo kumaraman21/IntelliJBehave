@@ -31,7 +31,7 @@
     <li> Run *.story files</li>
     </ul>
   ]]></description>
-  <version>1.1</version>
+  <version>1.2</version>
   <vendor url="https://github.com/kumaraman21" email="kumaraman21@gmail.com">Aman Kumar</vendor>
   <idea-version since-build="8000"/>
 

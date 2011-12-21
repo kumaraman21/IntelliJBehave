@@ -91,7 +91,7 @@ public class StoryParser implements PsiParser {
   private StoryElementType parseStep(PsiBuilder builder, StoryElementType previousStepElementType) {
     final PsiBuilder.Marker stepMarker = builder.mark();
 
-    StoryElementType currentStepElementType = null;
+    StoryElementType currentStepElementType;
 
     String stepTypeText = builder.getTokenText().trim().toUpperCase();
     if(stepTypeText.equalsIgnoreCase("And")) {
@@ -103,6 +103,7 @@ public class StoryParser implements PsiParser {
 
     parseStepType(builder);
     parseStepText(builder);
+    parseTableIfPresent(builder);
     stepMarker.done(currentStepElementType);
 
     return currentStepElementType;
@@ -119,5 +120,17 @@ public class StoryParser implements PsiParser {
     else {
       builder.error("Step text expected");
     }
+  }
+
+  private void parseTableIfPresent(PsiBuilder builder) {
+    if(builder.getTokenType() == StoryTokenType.TABLE_ROW) {
+      while(builder.getTokenType() == StoryTokenType.TABLE_ROW) {
+       parseTableRow(builder);
+      }
+     }
+  }
+
+  private void parseTableRow(PsiBuilder builder) {
+    builder.advanceLexer();
   }
 }

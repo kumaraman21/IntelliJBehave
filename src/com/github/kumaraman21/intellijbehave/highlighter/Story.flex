@@ -31,12 +31,13 @@ COMMENT=("!--")[^\r\n]*
 <IN_SCENARIO> {CRLF}+"When" {WHITE_SPACE_CHAR}           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <IN_SCENARIO> {CRLF}+"Then" {WHITE_SPACE_CHAR}            { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <IN_SCENARIO> {CRLF}+"And" {WHITE_SPACE_CHAR}             { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
+<IN_SCENARIO> {CRLF}+"|" {TEXT_CHAR}*                            { yybegin(IN_SCENARIO); return StoryTokenType.TABLE_ROW; }
 
 <IN_SCENARIO> {COMMENT}                { return StoryTokenType.COMMENT; }
 <YYINITIAL> .*                                    { return StoryTokenType.STORY_DESCRIPTION; }
 <IN_SCENARIO> .*                               { return StoryTokenType.STORY_DESCRIPTION; }
 
-<IN_STEP> {TEXT_CHAR}+          { yybegin(IN_SCENARIO); return StoryTokenType.STEP_TEXT; }
+<IN_STEP> {TEXT_CHAR}*          { yybegin(IN_SCENARIO); return StoryTokenType.STEP_TEXT; }
 
 {WHITE_SPACE_CHAR}+                         { return StoryTokenType.WHITE_SPACE; }
 .                                                          { return StoryTokenType.BAD_CHARACTER; }
