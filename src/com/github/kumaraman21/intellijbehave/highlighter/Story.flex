@@ -31,7 +31,7 @@ COMMENT=("!--")[^\r\n]*
 <IN_SCENARIO> {CRLF}+"When" {WHITE_SPACE_CHAR}           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <IN_SCENARIO> {CRLF}+"Then" {WHITE_SPACE_CHAR}            { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <IN_SCENARIO> {CRLF}+"And" {WHITE_SPACE_CHAR}             { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
-<IN_SCENARIO> {CRLF}+"|" {TEXT_CHAR}*                            { yybegin(IN_SCENARIO); return StoryTokenType.TABLE_ROW; }
+<IN_SCENARIO> {CRLF}+{WHITE_SPACE_CHAR}* "|" {TEXT_CHAR}*      { yybegin(IN_SCENARIO); return StoryTokenType.TABLE_ROW; }
 
 <IN_SCENARIO> {COMMENT}                { return StoryTokenType.COMMENT; }
 <YYINITIAL> .*                                    { return StoryTokenType.STORY_DESCRIPTION; }
