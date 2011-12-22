@@ -17,7 +17,7 @@ package com.github.kumaraman21.intellijbehave.resolver;
 
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteralExpression;
+import com.intellij.psi.PsiLiteral;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Aliases;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
@@ -53,7 +53,7 @@ public class DeclaredAnnotationSet {
 
         PsiElement[] values = annotation.getParameterList().getAttributes()[0].getValue().getChildren();
         for (PsiElement value : values) {
-          if(value instanceof PsiLiteralExpression) {
+          if(value instanceof PsiLiteral) {
             String annotationText = getTextFromValue(value);
             declaredAnnotations.add(new DeclaredAnnotation(stepType, annotationText, annotation));
           }
