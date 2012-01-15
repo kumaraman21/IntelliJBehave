@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Aman Kumar
+ * Copyright 2011-12 Aman Kumar
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,26 +15,14 @@
  */
 package com.github.kumaraman21.intellijbehave.utility;
 
-import com.intellij.ide.DataManager;
-import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
 import com.intellij.openapi.project.Project;
+import com.intellij.openapi.project.ProjectManager;
 import org.jetbrains.annotations.NotNull;
 
 public class ProjectFinder {
 
   @NotNull
   public static Project getCurrentProject() {
-    Project project = null;
-
-    // Perhaps because of using deprecated API here, project is null sometimes
-    // Keep trying till we get non null project
-    while(project == null) {
-      //Todo: remove deprecated api use
-      DataContext dataContext = DataManager.getInstance().getDataContext();
-      project = DataKeys.PROJECT.getData(dataContext);
-    }
-
-    return project;
+    return ProjectManager.getInstance().getOpenProjects()[0];
   }
 }

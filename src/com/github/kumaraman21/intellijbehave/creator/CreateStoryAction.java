@@ -1,5 +1,5 @@
 /*
- * Copyright 2011 Aman Kumar
+ * Copyright 2011-12 Aman Kumar
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -34,7 +34,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
 import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.codeStyle.CodeStyleManager;
-import com.intellij.util.IncorrectOperationException;
 import org.jetbrains.annotations.NotNull;
 
 import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
@@ -42,23 +41,15 @@ import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY
 public class CreateStoryAction extends CreateElementActionBase {
 
   public CreateStoryAction() {
-    super(IdeBundle.message("action.create.new.filetype", STORY_FILE_TYPE.getName()),
-          STORY_FILE_TYPE.getDescription(), STORY_FILE_TYPE.getIcon());
+    super("Create New Story File", STORY_FILE_TYPE.getDescription(), STORY_FILE_TYPE.getIcon());
   }
 
   @NotNull
   @Override
   protected PsiElement[] invokeDialog(Project project, PsiDirectory directory) {
     CreateElementActionBase.MyInputValidator validator = new CreateElementActionBase.MyInputValidator(project, directory);
-    Messages.showInputDialog(project, IdeBundle.message("prompt.enter.new.filetype.name", STORY_FILE_TYPE.getName()),
-                             IdeBundle.message("title.new.filetype", STORY_FILE_TYPE.getName()), Messages.getQuestionIcon(), "", validator);
+    Messages.showInputDialog(project, "Enter a new file name:", "New Story File", Messages.getQuestionIcon(), "", validator);
     return validator.getCreatedElements();
-  }
-
-  @Override
-  protected void checkBeforeCreate(String newName, PsiDirectory directory) throws IncorrectOperationException {
-    newName = getFileName(newName);
-    directory.checkCreateFile(newName);
   }
 
   @NotNull
@@ -86,17 +77,17 @@ public class CreateStoryAction extends CreateElementActionBase {
 
   @Override
   protected String getErrorTitle() {
-    return IdeBundle.message("title.cannot.create.filetype", STORY_FILE_TYPE.getName());
+    return "Cannot Create Story File";
   }
 
   @Override
   protected String getCommandName() {
-    return IdeBundle.message("command.name.create.new.file", STORY_FILE_TYPE.getName());
+    return "Create Story File";
   }
 
   @Override
   protected String getActionName(PsiDirectory directory, String newName) {
-    return IdeBundle.message("progress.creating.filetype.in.directory", STORY_FILE_TYPE.getName(), newName, directory.getName());
+    return IdeBundle.message("progress.creating.file", STORY_FILE_TYPE.getName(), newName, directory.getName());
   }
 
   public void update(final AnActionEvent e) {

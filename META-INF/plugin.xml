@@ -1,5 +1,5 @@
 <!--
-  ~ Copyright 2011 Aman Kumar
+  ~ Copyright 2011-12 Aman Kumar
   ~
   ~ Licensed under the Apache License, Version 2.0 (the "License");
   ~ you may not use this file except in compliance with the License.
@@ -53,7 +53,7 @@
 
   <actions>
     <action id="IntelliJBehave.NewJBehaveStory" class="com.github.kumaraman21.intellijbehave.creator.CreateStoryAction"
-            text="JBhehave Story" description="Create New JBehave Story">
+            text="JBehave Story" description="Create New JBehave Story">
       <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
       <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
     </action>
