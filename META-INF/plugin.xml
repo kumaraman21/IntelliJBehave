@@ -27,7 +27,7 @@
     <li> Error Highlighting in story if step was not defined</li>
     <li> Create new story files from a configurable story template</li>
     <li> Comment/uncomment lines in story files</li>
-    <li> Find unused steps through code inspection</li>
+    <li> Code inspections to report unused steps definitions and undefined step usages </li>
     <li> Run *.story files</li>
     </ul>
   ]]></description>
