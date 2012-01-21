@@ -31,7 +31,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.kumaraman21.intellijbehave.utility.ProjectFinder.getCurrentProject;
+import static com.github.kumaraman21.intellijbehave.utility.ProjectUtils.getCurrentProject;
 import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Sets.newHashSet;
 

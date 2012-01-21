@@ -16,19 +16,21 @@
 package com.github.kumaraman21.intellijbehave.resolver;
 
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ContentIterator;
-import com.intellij.openapi.roots.ProjectRootManager;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.openapi.vfs.VirtualFile;
-import com.intellij.psi.*;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
+import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
+import org.jbehave.core.parsers.StepMatcher;
+import org.jbehave.core.parsers.StepPatternParser;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.kumaraman21.intellijbehave.utility.ProjectFinder.getCurrentProject;
-import static org.apache.commons.lang.StringUtils.substringAfter;
+import java.util.List;
+
+import static com.github.kumaraman21.intellijbehave.utility.ProjectUtils.getProjectFileIndex;
+import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.lang.StringUtils.trim;
 
 public class StepPsiReference implements PsiReference {
@@ -51,51 +53,70 @@ public class StepPsiReference implements PsiReference {
 
   @Override
   public PsiElement resolve() {
-    final Project project = getCurrentProject();
-
     StepType stepType = stepPsiElement.getStepType();
-    String stepText = trim(substringAfter(stepPsiElement.getText(), " "));
+    String stepText = stepPsiElement.getStepText();
 
-    StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(project, stepType, stepText);
-    ProjectRootManager.getInstance(project).getFileIndex().iterateContent(stepAnnotationFinder);
+    StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(stepType, stepText);
+    getProjectFileIndex().iterateContent(stepAnnotationFinder);
 
     return stepAnnotationFinder.getMatchingAnnotation();
   }
 
-private static class StepAnnotationFinder implements ContentIterator {
+  @NotNull
+  @Override
+  public Object[] getVariants() {
+    StepType stepType = stepPsiElement.getStepType();
+    String actualStepPrefix = stepPsiElement.getActualStepPrefix();
 
-  private Project project;
+    StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix);
+    getProjectFileIndex().iterateContent(stepSuggester);
+
+    return stepSuggester.getSuggestions().toArray();
+  }
+
+  private static class StepSuggester extends StepDefinitionIterator {
+
+    private List<String> suggestions = newArrayList();
+    private String actualStepPrefix;
+
+    public StepSuggester(StepType stepType, String actualStepPrefix) {
+      super(stepType);
+      this.actualStepPrefix = actualStepPrefix;
+    }
+
+    @Override
+    public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
+      suggestions.add(actualStepPrefix + " " + stepDefinitionAnnotation.getAnnotationText());
+      return true;
+    }
+
+    public List<String> getSuggestions() {
+      return suggestions;
+    }
+  }
+
+private static class StepAnnotationFinder extends StepDefinitionIterator {
+
   private StepType stepType;
   private String stepText;
   private PsiElement matchingAnnotation;
+  private StepPatternParser stepPatternParser = new RegexPrefixCapturingPatternParser();
 
-  private StepAnnotationFinder(Project project, StepType stepType, String stepText) {
-    this.project = project;
+  private StepAnnotationFinder(StepType stepType, String stepText) {
+    super(stepType);
     this.stepType = stepType;
     this.stepText = stepText;
   }
 
   @Override
-  public boolean processFile(VirtualFile virtualFile) {
-    PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-    if (psiFile instanceof PsiClassOwner) {
-      PsiClass[] psiClasses = ((PsiClassOwner)psiFile).getClasses();
+  public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
+    StepMatcher stepMatcher = stepPatternParser.parseStep(stepType, stepDefinitionAnnotation.getAnnotationText());
 
-      for (PsiClass psiClass : psiClasses) {
-        PsiMethod[] methods = psiClass.getMethods();
+    if(stepMatcher.matches(stepText)) {
+      matchingAnnotation = stepDefinitionAnnotation.getAnnotation();
 
-        for (PsiMethod method : methods) {
-          PsiAnnotation[] annotations = method.getModifierList().getApplicableAnnotations();
-          DeclaredAnnotationSet declaredAnnotations = new DeclaredAnnotationSet(annotations);
-
-          matchingAnnotation = declaredAnnotations.getMatchingAnnotation(stepType, stepText);
-          if(matchingAnnotation != null) {
-            return false;
-          }
-        }
-      }
+      return false;
     }
-
     return true;
   }
 
@@ -123,12 +144,6 @@ private static class StepAnnotationFinder implements ContentIterator {
   @Override
   public boolean isReferenceTo(PsiElement psiElement) {
     return psiElement instanceof StepPsiElement && Comparing.equal(resolve(), psiElement);
-  }
-
-  @NotNull
-  @Override
-  public Object[] getVariants() {
-    return new Object[0];
   }
 
   @Override

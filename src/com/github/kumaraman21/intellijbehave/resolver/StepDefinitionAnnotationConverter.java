@@ -20,9 +20,6 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Aliases;
-import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
-import org.jbehave.core.parsers.StepMatcher;
-import org.jbehave.core.parsers.StepPatternParser;
 import org.jbehave.core.steps.StepType;
 
 import java.util.Set;
@@ -31,11 +28,11 @@ import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANN
 import static com.google.common.collect.Sets.newHashSet;
 import static org.apache.commons.lang.StringUtils.*;
 
-public class DeclaredAnnotationSet {
+public class StepDefinitionAnnotationConverter {
 
-  private Set<DeclaredAnnotation> declaredAnnotations = newHashSet();
+  public Set<StepDefinitionAnnotation> convertFrom(PsiAnnotation[] annotations) {
 
-  public DeclaredAnnotationSet(PsiAnnotation[] annotations) {
+    Set<StepDefinitionAnnotation> stepDefinitionAnnotations = newHashSet();
     StepType stepType = null;
 
     for (PsiAnnotation annotation : annotations) {
@@ -43,11 +40,11 @@ public class DeclaredAnnotationSet {
       if(ANNOTATION_TO_STEP_TYPE_MAPPING.keySet().contains(annotation.getQualifiedName())) {
         stepType = ANNOTATION_TO_STEP_TYPE_MAPPING.get(annotation.getQualifiedName());
         String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
-        declaredAnnotations.add(new DeclaredAnnotation(stepType, annotationText, annotation));
+        stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
       }
       else if(annotation.getQualifiedName().equals(Alias.class.getName())) {
         String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
-        declaredAnnotations.add(new DeclaredAnnotation(stepType, annotationText, annotation));
+        stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
       }
       else if(annotation.getQualifiedName().equals(Aliases.class.getName())) {
 
@@ -55,55 +52,16 @@ public class DeclaredAnnotationSet {
         for (PsiElement value : values) {
           if(value instanceof PsiLiteral) {
             String annotationText = getTextFromValue(value);
-            declaredAnnotations.add(new DeclaredAnnotation(stepType, annotationText, annotation));
+            stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
           }
         }
       }
     }
-  }
 
-  public PsiElement getMatchingAnnotation(StepType stepType, String stepText) {
-    StepPatternParser stepPatternParser = new RegexPrefixCapturingPatternParser();
-
-    for (DeclaredAnnotation declaredAnnotation : declaredAnnotations) {
-      if(stepType == declaredAnnotation.getStepType()) {
-        StepMatcher stepMatcher = stepPatternParser.parseStep(stepType, declaredAnnotation.getAnnotationText());
-
-        if(stepMatcher.matches(stepText)) {
-         return declaredAnnotation.getAnnotation();
-        }
-      }
-    }
-
-    return null;
+    return stepDefinitionAnnotations;
   }
 
   private static String getTextFromValue(PsiElement value) {
     return remove(removeStart(removeEnd(value.getText(), "\""), "\""), "\\");
-  }
-
-  private static class DeclaredAnnotation {
-
-    private StepType stepType;
-    private String annotationText;
-    private PsiAnnotation annotation;
-
-    public DeclaredAnnotation(StepType stepType, String annotationText, PsiAnnotation annotation) {
-      this.stepType = stepType;
-      this.annotationText = annotationText;
-      this.annotation = annotation;
-    }
-
-    public String getAnnotationText() {
-      return annotationText;
-    }
-
-    public StepType getStepType() {
-      return stepType;
-    }
-
-    public PsiAnnotation getAnnotation() {
-      return annotation;
-    }
   }
 }

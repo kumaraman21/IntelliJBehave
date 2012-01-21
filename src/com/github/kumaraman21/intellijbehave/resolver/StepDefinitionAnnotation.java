@@ -13,39 +13,31 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.github.kumaraman21.intellijbehave.parser;
+package com.github.kumaraman21.intellijbehave.resolver;
 
-import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiAnnotation;
 import org.jbehave.core.steps.StepType;
-import org.jetbrains.annotations.NotNull;
 
-import static org.apache.commons.lang.StringUtils.*;
-
-public class StepPsiElement extends ASTWrapperPsiElement {
+public class StepDefinitionAnnotation {
   private StepType stepType;
+  private String annotationText;
+  private PsiAnnotation annotation;
 
-  public StepPsiElement(@NotNull ASTNode node, StepType stepType) {
-    super(node);
+  public StepDefinitionAnnotation(StepType stepType, String annotationText, PsiAnnotation annotation) {
     this.stepType = stepType;
+    this.annotationText = annotationText;
+    this.annotation = annotation;
   }
 
-  @Override
-  public PsiReference getReference() {
-    return new StepPsiReference(this);
+  public String getAnnotationText() {
+    return annotationText;
   }
 
   public StepType getStepType() {
     return stepType;
   }
 
-  public String getStepText() {
-    return trim(substringAfter(getText(), " "));
-  }
-
-  public String getActualStepPrefix() {
-    return substringBefore(getText(), " ");
+  public PsiAnnotation getAnnotation() {
+    return annotation;
   }
 }

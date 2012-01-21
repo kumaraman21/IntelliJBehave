@@ -17,12 +17,19 @@ package com.github.kumaraman21.intellijbehave.utility;
 
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.project.ProjectManager;
+import com.intellij.openapi.roots.ProjectFileIndex;
+import com.intellij.openapi.roots.ProjectRootManager;
 import org.jetbrains.annotations.NotNull;
 
-public class ProjectFinder {
+public class ProjectUtils {
 
   @NotNull
   public static Project getCurrentProject() {
     return ProjectManager.getInstance().getOpenProjects()[0];
+  }
+
+  @NotNull
+  public static ProjectFileIndex getProjectFileIndex() {
+    return ProjectRootManager.getInstance(getCurrentProject()).getFileIndex();
   }
 }
