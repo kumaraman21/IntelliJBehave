@@ -76,11 +76,13 @@ public class StoryParser implements PsiParser {
   }
 
   private void parseSteps(PsiBuilder builder) {
+    parseStoryDescriptionLinesIfPresent(builder);
     if(builder.getTokenType() == StoryTokenType.STEP_TYPE) {
 
       StoryElementType previousStepElementType = null;
       while(builder.getTokenType() == StoryTokenType.STEP_TYPE) {
         previousStepElementType = parseStep(builder, previousStepElementType);
+        parseStoryDescriptionLinesIfPresent(builder);
       }
     }
     else {
