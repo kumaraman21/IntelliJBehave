@@ -39,4 +39,6 @@ public class StoryTokenType extends IElementType {
   public static final IElementType TABLE_ROW = new StoryTokenType("TABLE_ROW");
 
   public static final IElementType COMMENT = new StoryTokenType("COMMENT");
+
+  public static final IElementType EXAMPLE = new StoryTokenType("EXAMPLE");
 }

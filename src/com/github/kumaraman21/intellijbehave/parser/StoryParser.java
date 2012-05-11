@@ -44,24 +44,23 @@ public class StoryParser implements PsiParser {
   }
 
   private void parseStoryDescriptionLinesIfPresent(PsiBuilder builder) {
-    if(builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
-      while(builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
-       parseStoryDescriptionLine(builder);
+    if (builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
+      while (builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
+        parseStoryDescriptionLine(builder);
       }
-     }
+    }
   }
 
   private void parseStoryDescriptionLine(PsiBuilder builder) {
-   builder.advanceLexer();
+    builder.advanceLexer();
   }
 
   private void parseScenarios(PsiBuilder builder) {
-    if(builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
-      while(builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
+    if (builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
+      while (builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
         parseScenario(builder);
       }
-    }
-    else {
+    } else {
       builder.advanceLexer();
       builder.error("Scenario expected");
     }
@@ -72,20 +71,20 @@ public class StoryParser implements PsiParser {
     builder.advanceLexer();
     parseSteps(builder);
     parseStoryDescriptionLinesIfPresent(builder);
+    parseExampleIfPresent(builder);
     stepMarker.done(StoryElementType.SCENARIO);
   }
 
   private void parseSteps(PsiBuilder builder) {
     parseStoryDescriptionLinesIfPresent(builder);
-    if(builder.getTokenType() == StoryTokenType.STEP_TYPE) {
+    if (builder.getTokenType() == StoryTokenType.STEP_TYPE) {
 
       StoryElementType previousStepElementType = null;
-      while(builder.getTokenType() == StoryTokenType.STEP_TYPE) {
+      while (builder.getTokenType() == StoryTokenType.STEP_TYPE) {
         previousStepElementType = parseStep(builder, previousStepElementType);
         parseStoryDescriptionLinesIfPresent(builder);
       }
-    }
-    else {
+    } else {
       builder.error("At least one step expected");
     }
   }
@@ -96,10 +95,9 @@ public class StoryParser implements PsiParser {
     StoryElementType currentStepElementType;
 
     String stepTypeText = builder.getTokenText().trim().toUpperCase();
-    if(stepTypeText.equalsIgnoreCase("And")) {
+    if (stepTypeText.equalsIgnoreCase("And")) {
       currentStepElementType = previousStepElementType;
-    }
-    else {
+    } else {
       currentStepElementType = STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING.get(stepTypeText);
     }
 
@@ -116,20 +114,25 @@ public class StoryParser implements PsiParser {
   }
 
   private void parseStepText(PsiBuilder builder) {
-    if(builder.getTokenType() == StoryTokenType.STEP_TEXT) {
+    if (builder.getTokenType() == StoryTokenType.STEP_TEXT) {
       builder.advanceLexer();
-    }
-    else {
+    } else {
       builder.error("Step text expected");
     }
   }
 
   private void parseTableIfPresent(PsiBuilder builder) {
-    if(builder.getTokenType() == StoryTokenType.TABLE_ROW) {
-      while(builder.getTokenType() == StoryTokenType.TABLE_ROW) {
-       parseTableRow(builder);
+    if (builder.getTokenType() == StoryTokenType.TABLE_ROW) {
+      while (builder.getTokenType() == StoryTokenType.TABLE_ROW) {
+        parseTableRow(builder);
       }
-     }
+    }
+  }
+
+  private void parseExampleIfPresent(PsiBuilder builder) {
+    if (builder.getTokenType() == StoryTokenType.EXAMPLE) {
+      builder.advanceLexer();
+    }
   }
 
   private void parseTableRow(PsiBuilder builder) {

@@ -36,6 +36,9 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
   private static final TextAttributesKey SCENARIO_TEXT_ATTRIBUTES
     = TextAttributesKey.createTextAttributesKey("SCENARIO_TEXT_ATTRIBUTES",
                                                 CodeInsightColors.STATIC_FIELD_ATTRIBUTES.getDefaultAttributes());
+  private static final TextAttributesKey EXAMPLE_TYPE_ATTRIBUTES
+      = TextAttributesKey.createTextAttributesKey("EXAMPLE_TYPE_ATTRIBUTES",
+                                                SyntaxHighlighterColors.NUMBER.getDefaultAttributes());
   private static final TextAttributesKey STEP_TYPE_ATTRIBUTES
     = TextAttributesKey.createTextAttributesKey("STEP_TYPE_ATTRIBUTES",
                                                 SyntaxHighlighterColors.KEYWORD.getDefaultAttributes());
@@ -48,7 +51,6 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
   private static final TextAttributesKey BAD_CHARACTER_ATTRIBUTES
     = TextAttributesKey.createTextAttributesKey("BAD_CHARACTER_ATTRIBUTES",
                                                 SyntaxHighlighterColors.INVALID_STRING_ESCAPE.getDefaultAttributes());
-
   static {
     KEYS = new THashMap<IElementType, TextAttributesKey>();
 
@@ -56,6 +58,7 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
     KEYS.put(StoryTokenType.SCENARIO_TEXT, SCENARIO_TEXT_ATTRIBUTES);
     KEYS.put(StoryTokenType.STEP_TYPE, STEP_TYPE_ATTRIBUTES);
     KEYS.put(StoryTokenType.STEP_TEXT, STEP_TEXT_ATTRIBUTES);
+    KEYS.put(StoryTokenType.EXAMPLE, EXAMPLE_TYPE_ATTRIBUTES);
     KEYS.put(StoryTokenType.TABLE_ROW, STEP_TEXT_ATTRIBUTES);
     KEYS.put(StoryTokenType.COMMENT, COMMENT_ATTRIBUTES);
     KEYS.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER_ATTRIBUTES);
