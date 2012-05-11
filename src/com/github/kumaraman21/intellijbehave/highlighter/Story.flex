@@ -17,6 +17,7 @@ CRLF= \n | \r | \r\n
 WHITE_SPACE_CHAR=[\ \n\r\t\f]
 TEXT_CHAR=[^\n\r]
 COMMENT=("!--")[^\r\n]*
+ROW = {WHITE_SPACE_CHAR}* "|" {TEXT_CHAR}*
 
 %state IN_SCENARIO
 %state IN_STEP
@@ -31,8 +32,8 @@ COMMENT=("!--")[^\r\n]*
 <IN_SCENARIO> {CRLF}+"When" {WHITE_SPACE_CHAR}           { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <IN_SCENARIO> {CRLF}+"Then" {WHITE_SPACE_CHAR}            { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
 <IN_SCENARIO> {CRLF}+"And" {WHITE_SPACE_CHAR}             { yybegin(IN_STEP); return StoryTokenType.STEP_TYPE; }
-<IN_SCENARIO> {CRLF}+{WHITE_SPACE_CHAR}* "|" {TEXT_CHAR}*      { yybegin(IN_SCENARIO); return StoryTokenType.TABLE_ROW; }
-<IN_SCENARIO> {CRLF}+"Examples:" ({CRLF}+ {WHITE_SPACE_CHAR}* "|" {TEXT_CHAR}*)+ { yybegin(IN_SCENARIO); return StoryTokenType.EXAMPLE; }
+<IN_SCENARIO> {CRLF}+{ROW}      { yybegin(IN_SCENARIO); return StoryTokenType.TABLE_ROW; }
+<IN_SCENARIO> {CRLF}+"Examples:" {ROW}+ { yybegin(IN_SCENARIO); return StoryTokenType.EXAMPLE; }
 
 <IN_SCENARIO> {COMMENT}                { return StoryTokenType.COMMENT; }
 <YYINITIAL> .*                                    { return StoryTokenType.STORY_DESCRIPTION; }
