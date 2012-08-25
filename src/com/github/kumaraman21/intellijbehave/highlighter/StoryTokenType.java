@@ -15,28 +15,38 @@
  */
 package com.github.kumaraman21.intellijbehave.highlighter;
 
+import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
+
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
-import org.jetbrains.annotations.NonNls;
 
-import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
+import org.jetbrains.annotations.NonNls;
 
 public class StoryTokenType extends IElementType {
 
-  public StoryTokenType(@NonNls String debugName) {
-    super(debugName, STORY_FILE_TYPE.getLanguage());
-  }
 
-  public static final IElementType WHITE_SPACE = TokenType.WHITE_SPACE;
-  public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
 
-  public static final IElementType STORY_DESCRIPTION = new StoryTokenType("STORY_DESCRIPTION");
-  public static final IElementType SCENARIO_TEXT = new StoryTokenType("SCENARIO_TEXT");
+    public static final IElementType WHITE_SPACE = TokenType.WHITE_SPACE;
+    public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
 
-  public static final IElementType STEP_TYPE = new StoryTokenType("STEP_TYPE");
-  public static final IElementType STEP_TEXT = new StoryTokenType("STEP_TEXT");
+    public static final IElementType STORY_DESCRIPTION = new StoryTokenType("STORY_DESCRIPTION");
+    public static final IElementType SCENARIO_TYPE = new StoryTokenType("SCENARIO_TYPE");
+    public static final IElementType SCENARIO_TEXT = new StoryTokenType("SCENARIO_TEXT");
 
-  public static final IElementType TABLE_ROW = new StoryTokenType("TABLE_ROW");
+    public static final IElementType STEP_TYPE = new StoryTokenType("STEP_TYPE");
+    public static final IElementType STEP_TEXT = new StoryTokenType("STEP_TEXT");
 
-  public static final IElementType COMMENT = new StoryTokenType("COMMENT");
+    public static final IElementType TABLE_ROW = new StoryTokenType("TABLE_ROW");
+    public static final IElementType TABLE_DELIM = new StoryTokenType("TABLE_DELIM");
+    public static final IElementType TABLE_CELL = new StoryTokenType("TABLE_CELL");
+
+    public static final IElementType COMMENT = new StoryTokenType("COMMENT");
+
+    public static final IElementType META = new StoryTokenType("META");
+    public static final IElementType META_KEY = new StoryTokenType("META_KEY");
+    public static final IElementType META_TEXT = new StoryTokenType("META_TEXT");
+
+    public StoryTokenType(@NonNls String debugName) {
+        super(debugName, STORY_FILE_TYPE.getLanguage());
+    }
 }

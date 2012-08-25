@@ -25,13 +25,15 @@ import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY
 
 public class StoryElementType extends IElementType {
 
-  public StoryElementType(@NotNull @NonNls String debugName) {
+
+    public StoryElementType(@NotNull @NonNls String debugName) {
     super(debugName, STORY_FILE_TYPE.getLanguage());
   }
 
   public static final IFileElementType STORY_FILE = new IFileElementType(STORY_FILE_TYPE.getLanguage());
   public static final StoryElementType STORY = new StoryElementType("STORY");
   public static final StoryElementType SCENARIO = new StoryElementType("SCENARIO");
+  public static final StoryElementType META = new StoryElementType("META");
 
   public static final StoryElementType GIVEN_STEP = new StoryElementType("GIVEN_STEP");
   public static final StoryElementType WHEN_STEP = new StoryElementType("WHEN_STEP");

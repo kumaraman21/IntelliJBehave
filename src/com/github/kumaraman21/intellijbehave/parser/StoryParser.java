@@ -44,11 +44,9 @@ public class StoryParser implements PsiParser {
   }
 
   private void parseStoryDescriptionLinesIfPresent(PsiBuilder builder) {
-    if(builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
-      while(builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
-       parseStoryDescriptionLine(builder);
-      }
-     }
+    while(builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
+      parseStoryDescriptionLine(builder);
+    }
   }
 
   private void parseStoryDescriptionLine(PsiBuilder builder) {
@@ -70,9 +68,21 @@ public class StoryParser implements PsiParser {
   private void parseScenario(PsiBuilder builder) {
     final PsiBuilder.Marker stepMarker = builder.mark();
     builder.advanceLexer();
+    parseMeta(builder);
     parseSteps(builder);
     parseStoryDescriptionLinesIfPresent(builder);
     stepMarker.done(StoryElementType.SCENARIO);
+  }
+
+  private void parseMeta(PsiBuilder builder) {
+      if(builder.getTokenType() == StoryTokenType.META) {
+          final PsiBuilder.Marker stepMarker = builder.mark();
+          while(builder.getTokenType() == StoryTokenType.META) {
+              builder.advanceLexer();
+          }
+
+          stepMarker.done(StoryElementType.META);
+      }
   }
 
   private void parseSteps(PsiBuilder builder) {
@@ -117,7 +127,9 @@ public class StoryParser implements PsiParser {
 
   private void parseStepText(PsiBuilder builder) {
     if(builder.getTokenType() == StoryTokenType.STEP_TEXT) {
-      builder.advanceLexer();
+      while(builder.getTokenType() == StoryTokenType.STEP_TEXT) {
+        builder.advanceLexer();
+      }
     }
     else {
       builder.error("Step text expected");
@@ -127,9 +139,9 @@ public class StoryParser implements PsiParser {
   private void parseTableIfPresent(PsiBuilder builder) {
     if(builder.getTokenType() == StoryTokenType.TABLE_ROW) {
       while(builder.getTokenType() == StoryTokenType.TABLE_ROW) {
-       parseTableRow(builder);
+        parseTableRow(builder);
       }
-     }
+    }
   }
 
   private void parseTableRow(PsiBuilder builder) {

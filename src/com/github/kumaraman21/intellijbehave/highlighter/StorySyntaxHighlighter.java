@@ -22,54 +22,54 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashMap;
-import org.jetbrains.annotations.NotNull;
 
+import org.jetbrains.annotations.NotNull;
 import java.util.Map;
 
 public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
 
-  private static final Map<IElementType, TextAttributesKey> KEYS;
+    private Map<IElementType, TextAttributesKey> textAttributeKeys;
 
-  private static final TextAttributesKey STORY_DESCRIPTION_ATTRIBUTES
-    = TextAttributesKey.createTextAttributesKey("STORY_DESCRIPTION_ATTRIBUTES",
-                                                SyntaxHighlighterColors.NUMBER.getDefaultAttributes());
-  private static final TextAttributesKey SCENARIO_TEXT_ATTRIBUTES
-    = TextAttributesKey.createTextAttributesKey("SCENARIO_TEXT_ATTRIBUTES",
-                                                CodeInsightColors.STATIC_FIELD_ATTRIBUTES.getDefaultAttributes());
-  private static final TextAttributesKey STEP_TYPE_ATTRIBUTES
-    = TextAttributesKey.createTextAttributesKey("STEP_TYPE_ATTRIBUTES",
-                                                SyntaxHighlighterColors.KEYWORD.getDefaultAttributes());
-  private static final TextAttributesKey STEP_TEXT_ATTRIBUTES
-    = TextAttributesKey.createTextAttributesKey("STEP_TEXT_ATTRIBUTES",
-                                                SyntaxHighlighterColors.STRING.getDefaultAttributes());
-  private static final TextAttributesKey COMMENT_ATTRIBUTES
-    = TextAttributesKey.createTextAttributesKey("COMMENT_ATTRIBUTES",
-                                                SyntaxHighlighterColors.LINE_COMMENT.getDefaultAttributes());
-  private static final TextAttributesKey BAD_CHARACTER_ATTRIBUTES
-    = TextAttributesKey.createTextAttributesKey("BAD_CHARACTER_ATTRIBUTES",
-                                                SyntaxHighlighterColors.INVALID_STRING_ESCAPE.getDefaultAttributes());
+    @NotNull
+    @Override
+    public Lexer getHighlightingLexer() {
+        return new StorySyntaxHighlightingLexer();
+    }
 
-  static {
-    KEYS = new THashMap<IElementType, TextAttributesKey>();
+    @NotNull
+    @Override
+    public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
+        return new TextAttributesKey[]{getKeys().get(tokenType)};
+    }
 
-    KEYS.put(StoryTokenType.STORY_DESCRIPTION, STORY_DESCRIPTION_ATTRIBUTES);
-    KEYS.put(StoryTokenType.SCENARIO_TEXT, SCENARIO_TEXT_ATTRIBUTES);
-    KEYS.put(StoryTokenType.STEP_TYPE, STEP_TYPE_ATTRIBUTES);
-    KEYS.put(StoryTokenType.STEP_TEXT, STEP_TEXT_ATTRIBUTES);
-    KEYS.put(StoryTokenType.TABLE_ROW, STEP_TEXT_ATTRIBUTES);
-    KEYS.put(StoryTokenType.COMMENT, COMMENT_ATTRIBUTES);
-    KEYS.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER_ATTRIBUTES);
-  }
+    private Map<IElementType, TextAttributesKey> getKeys() {
+        if (textAttributeKeys == null) {
 
-  @NotNull
-  @Override
-  public Lexer getHighlightingLexer() {
-    return new StorySyntaxHighlightingLexer();
-  }
+            TextAttributesKey storyDescription = createKey("JBEHAVE.STORY_DESCRIPTION", SyntaxHighlighterColors.NUMBER);
+            TextAttributesKey scenarioText = createKey("JBEHAVE.SCENARIO_TEXT", CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
+            TextAttributesKey stepType = createKey("JBEHAVE.STEP_TYPE", SyntaxHighlighterColors.KEYWORD);
+            TextAttributesKey stepText = createKey("JBEHAVE.STEP_TEXT", SyntaxHighlighterColors.STRING);
+            TextAttributesKey comment = createKey("JBEHAVE.COMMENT", SyntaxHighlighterColors.LINE_COMMENT);
+            TextAttributesKey badCharacter = createKey("JBEHAVE.BAD_CHARACTER", SyntaxHighlighterColors.INVALID_STRING_ESCAPE);
+            TextAttributesKey meta = createKey("JBEHAVE.META", SyntaxHighlighterColors.LINE_COMMENT);
+            TextAttributesKey tableRow = createKey("JBEHAVE.TABLE_ROW", SyntaxHighlighterColors.STRING);
 
-  @NotNull
-  @Override
-  public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-    return new TextAttributesKey[]{KEYS.get(tokenType)};
-  }
+            textAttributeKeys = new THashMap<IElementType, TextAttributesKey>();
+            textAttributeKeys.put(StoryTokenType.STORY_DESCRIPTION, storyDescription);
+            textAttributeKeys.put(StoryTokenType.SCENARIO_TEXT, scenarioText);
+            textAttributeKeys.put(StoryTokenType.STEP_TYPE, stepType);
+            textAttributeKeys.put(StoryTokenType.STEP_TEXT, stepText);
+            textAttributeKeys.put(StoryTokenType.TABLE_ROW, tableRow);
+            textAttributeKeys.put(StoryTokenType.META, meta);
+            textAttributeKeys.put(StoryTokenType.COMMENT, comment);
+            textAttributeKeys.put(StoryTokenType.BAD_CHARACTER, badCharacter);
+        }
+        return textAttributeKeys;
+    }
+
+    private static TextAttributesKey createKey(String externalName, TextAttributesKey textAttributesKey) {
+        return TextAttributesKey.createTextAttributesKey(externalName, textAttributesKey.getDefaultAttributes());
+    }
+
+
 }
