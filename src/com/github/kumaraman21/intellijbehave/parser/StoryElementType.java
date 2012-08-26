@@ -32,6 +32,7 @@ public class StoryElementType extends IElementType {
 
   public static final IFileElementType STORY_FILE = new IFileElementType(STORY_FILE_TYPE.getLanguage());
   public static final StoryElementType STORY = new StoryElementType("STORY");
+  public static final StoryElementType STORY_DESCRIPTION = new StoryElementType("STORY_DESCRIPTION");
   public static final StoryElementType SCENARIO = new StoryElementType("SCENARIO");
   public static final StoryElementType META = new StoryElementType("META");
 

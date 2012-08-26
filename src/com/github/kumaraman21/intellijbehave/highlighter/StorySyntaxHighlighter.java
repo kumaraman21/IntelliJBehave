@@ -16,6 +16,7 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
 import com.intellij.lexer.Lexer;
+import com.intellij.openapi.editor.HighlighterColors;
 import com.intellij.openapi.editor.SyntaxHighlighterColors;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -23,12 +24,16 @@ import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashMap;
 
+import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
 import java.util.Map;
 
 public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
 
-    private Map<IElementType, TextAttributesKey> textAttributeKeys;
+    private static final Map<IElementType, TextAttributesKey> ATTRIBUTES = new THashMap<IElementType, TextAttributesKey>();
 
     @NotNull
     @Override
@@ -39,37 +44,86 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
     @NotNull
     @Override
     public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
-        return new TextAttributesKey[]{getKeys().get(tokenType)};
+        return pack(ATTRIBUTES.get(tokenType));
     }
 
-    private Map<IElementType, TextAttributesKey> getKeys() {
-        if (textAttributeKeys == null) {
+    @NonNls
+    public static final String STORY_DESCRIPTION_ID = "JBEHAVE.STORY_DESCRIPTION";
+    @NonNls
+    public static final String SCENARIO_TYPE_ID = "JBEHAVE.SCENARIO_TYPE";
+    @NonNls
+    public static final String SCENARIO_TEXT_ID = "JBEHAVE.SCENARIO_TEXT";
+    @NonNls
+    public static final String STEP_TYPE_ID = "JBEHAVE.STEP_TYPE";
+    @NonNls
+    public static final String STEP_TEXT_ID = "JBEHAVE.STEP_TEXT";
+    @NonNls
+    public static final String TABLE_DELIM_ID = "JBEHAVE.TABLE_DELIM";
+    @NonNls
+    public static final String TABLE_CELL_ID = "JBEHAVE.TABLE_CELL";
+    @NonNls
+    public static final String META_TYPE_ID = "JBEHAVE.META_TYPE";
+    @NonNls
+    public static final String META_KEY_ID = "JBEHAVE.META_KEY";
+    @NonNls
+    public static final String META_TEXT_ID = "JBEHAVE.META_TEXT";
+    @NonNls
+    public static final String LINE_COMMENT_ID = "JBEHAVE.COMMENT";
+    @NonNls
+    public static final String BAD_CHARACTER_ID = "JBEHAVE.BAD_CHARACTER";
 
-            TextAttributesKey storyDescription = createKey("JBEHAVE.STORY_DESCRIPTION", SyntaxHighlighterColors.NUMBER);
-            TextAttributesKey scenarioText = createKey("JBEHAVE.SCENARIO_TEXT", CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
-            TextAttributesKey stepType = createKey("JBEHAVE.STEP_TYPE", SyntaxHighlighterColors.KEYWORD);
-            TextAttributesKey stepText = createKey("JBEHAVE.STEP_TEXT", SyntaxHighlighterColors.STRING);
-            TextAttributesKey comment = createKey("JBEHAVE.COMMENT", SyntaxHighlighterColors.LINE_COMMENT);
-            TextAttributesKey badCharacter = createKey("JBEHAVE.BAD_CHARACTER", SyntaxHighlighterColors.INVALID_STRING_ESCAPE);
-            TextAttributesKey meta = createKey("JBEHAVE.META", SyntaxHighlighterColors.LINE_COMMENT);
-            TextAttributesKey tableRow = createKey("JBEHAVE.TABLE_ROW", SyntaxHighlighterColors.STRING);
+    // Registering TextAttributes
+    static {
+        createKey(STORY_DESCRIPTION_ID, SyntaxHighlighterColors.NUMBER);
+        createKey(SCENARIO_TYPE_ID, CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
+        createKey(SCENARIO_TEXT_ID, CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
+        createKey(STEP_TYPE_ID, SyntaxHighlighterColors.KEYWORD);
+        createKey(STEP_TEXT_ID, HighlighterColors.TEXT);
+        createKey(TABLE_DELIM_ID, SyntaxHighlighterColors.BRACES);
+        createKey(TABLE_CELL_ID, SyntaxHighlighterColors.STRING);
+        createKey(META_TYPE_ID, SyntaxHighlighterColors.KEYWORD);
+        createKey(META_KEY_ID,  SyntaxHighlighterColors.STRING);
+        createKey(META_TEXT_ID, SyntaxHighlighterColors.STRING);
+        createKey(LINE_COMMENT_ID, SyntaxHighlighterColors.LINE_COMMENT);
+        createKey(BAD_CHARACTER_ID, SyntaxHighlighterColors.INVALID_STRING_ESCAPE);
+    }
 
-            textAttributeKeys = new THashMap<IElementType, TextAttributesKey>();
-            textAttributeKeys.put(StoryTokenType.STORY_DESCRIPTION, storyDescription);
-            textAttributeKeys.put(StoryTokenType.SCENARIO_TEXT, scenarioText);
-            textAttributeKeys.put(StoryTokenType.STEP_TYPE, stepType);
-            textAttributeKeys.put(StoryTokenType.STEP_TEXT, stepText);
-            textAttributeKeys.put(StoryTokenType.TABLE_ROW, tableRow);
-            textAttributeKeys.put(StoryTokenType.META, meta);
-            textAttributeKeys.put(StoryTokenType.COMMENT, comment);
-            textAttributeKeys.put(StoryTokenType.BAD_CHARACTER, badCharacter);
-        }
-        return textAttributeKeys;
+    public static TextAttributesKey STORY_DESCRIPTION = TextAttributesKey.createTextAttributesKey(STORY_DESCRIPTION_ID);
+    public static TextAttributesKey SCENARIO_TYPE = TextAttributesKey.createTextAttributesKey(SCENARIO_TYPE_ID);
+    public static TextAttributesKey SCENARIO_TEXT = TextAttributesKey.createTextAttributesKey(SCENARIO_TEXT_ID);
+    public static TextAttributesKey STEP_TYPE = TextAttributesKey.createTextAttributesKey(STEP_TYPE_ID);
+    public static TextAttributesKey STEP_TEXT = TextAttributesKey.createTextAttributesKey(STEP_TEXT_ID);
+    public static TextAttributesKey TABLE_DELIM = TextAttributesKey.createTextAttributesKey(TABLE_DELIM_ID);
+    public static TextAttributesKey TABLE_CELL = TextAttributesKey.createTextAttributesKey(TABLE_CELL_ID);
+    public static TextAttributesKey META_TYPE = TextAttributesKey.createTextAttributesKey(META_TYPE_ID);
+    public static TextAttributesKey META_KEY = TextAttributesKey.createTextAttributesKey(META_KEY_ID);
+    public static TextAttributesKey META_TEXT = TextAttributesKey.createTextAttributesKey(META_TEXT_ID);
+    public static TextAttributesKey LINE_COMMENT = TextAttributesKey.createTextAttributesKey(LINE_COMMENT_ID);
+    public static TextAttributesKey BAD_CHARACTER = TextAttributesKey.createTextAttributesKey(BAD_CHARACTER_ID);
+
+    public static List<TextAttributesKey> ALL = Collections.unmodifiableList(Arrays.asList(//
+            STORY_DESCRIPTION, SCENARIO_TYPE, SCENARIO_TEXT,//
+            STEP_TYPE, STEP_TEXT, TABLE_DELIM, TABLE_CELL,//
+            META_TYPE, META_KEY, META_TEXT, //
+            LINE_COMMENT, BAD_CHARACTER
+            ));
+
+    static {
+        ATTRIBUTES.put(StoryTokenType.STORY_DESCRIPTION, STORY_DESCRIPTION);
+        ATTRIBUTES.put(StoryTokenType.SCENARIO_TYPE, SCENARIO_TYPE);
+        ATTRIBUTES.put(StoryTokenType.SCENARIO_TEXT, SCENARIO_TEXT);
+        ATTRIBUTES.put(StoryTokenType.STEP_TYPE, STEP_TYPE);
+        ATTRIBUTES.put(StoryTokenType.STEP_TEXT, STEP_TEXT);
+        ATTRIBUTES.put(StoryTokenType.TABLE_DELIM, TABLE_DELIM);
+        ATTRIBUTES.put(StoryTokenType.TABLE_CELL, TABLE_CELL);
+        ATTRIBUTES.put(StoryTokenType.META, META_TYPE);
+        ATTRIBUTES.put(StoryTokenType.META_KEY, META_KEY);
+        ATTRIBUTES.put(StoryTokenType.META_TEXT, META_TEXT);
+        ATTRIBUTES.put(StoryTokenType.COMMENT, LINE_COMMENT);
+        ATTRIBUTES.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER);
     }
 
     private static TextAttributesKey createKey(String externalName, TextAttributesKey textAttributesKey) {
         return TextAttributesKey.createTextAttributesKey(externalName, textAttributesKey.getDefaultAttributes());
     }
-
-
 }

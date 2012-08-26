@@ -36,7 +36,6 @@ public class StoryTokenType extends IElementType {
     public static final IElementType STEP_TYPE = new StoryTokenType("STEP_TYPE");
     public static final IElementType STEP_TEXT = new StoryTokenType("STEP_TEXT");
 
-    public static final IElementType TABLE_ROW = new StoryTokenType("TABLE_ROW");
     public static final IElementType TABLE_DELIM = new StoryTokenType("TABLE_DELIM");
     public static final IElementType TABLE_CELL = new StoryTokenType("TABLE_CELL");
 

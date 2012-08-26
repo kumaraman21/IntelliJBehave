@@ -87,7 +87,7 @@ TableCellChar  = [^\r\n\|]
     | "!--"
     | "|" ) {InputChar}+  { yystatePush(IN_DIRECTIVE); yypushback(yytext().length());       }
     {CRLF}                { yystatePush(IN_STORY); yypushback(yytext().length());           }
-    .                     { return StoryTokenType.STORY_DESCRIPTION;                        }
+    {InputChar}+          { return StoryTokenType.STORY_DESCRIPTION;                        }
 }
 
 <IN_DIRECTIVE> {

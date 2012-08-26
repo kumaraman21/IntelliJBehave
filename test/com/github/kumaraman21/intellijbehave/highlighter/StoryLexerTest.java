@@ -1,9 +1,12 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
+import static com.github.kumaraman21.intellijbehave.highlighter.Samples.COMPLEX_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.highlighter.Samples.SIMPLE_SAMPLE;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import com.intellij.psi.tree.IElementType;
 
+import org.junit.Ignore;
 import org.junit.Test;
 
 /**
@@ -11,36 +14,102 @@ import org.junit.Test;
  */
 public class StoryLexerTest {
 
-    private static final String SAMPLE_1 =
-            "Scenario: An unknown user cannot be logged\n" + //
-            "\n" + //
-            "Meta:\n" + //
-            "@skip\n" + //
-            "\n" + //
-            "Given i am the user with nickname: \"weird\"\n" + //
-            "When i try to login using the password \"soweird\"\n" + //
-            "Then i get an error message of type \"Wrong Credentials\"\n";
     private StoryLexer storyLexer;
 
     @Test
+    @Ignore
     public void traceAll () {
-        traceAll(SAMPLE_1);
+        //traceAll(SIMPLE_SAMPLE);
+        traceAll(COMPLEX_SAMPLE);
     }
 
     @Test
-    public void simpleStory () {
+    public void parseSimpleSample () {
         storyLexer = new StoryLexer();
-        storyLexer.start(SAMPLE_1);
+        storyLexer.start(SIMPLE_SAMPLE);
 
-        assertThat(storyLexer.getTokenType()).isEqualTo(StoryTokenType.SCENARIO_TEXT);
-        assertThat(storyLexer.getTokenSequence()).isEqualTo("Scenario: An unknown user cannot be logged");
-
-        advanceAndAssert(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
-        advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "Scenario: ");
+        assertToken(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
+        advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "An unknown user cannot be logged");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.META, "Meta:");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.META_KEY, "@skip");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i am the user with nickname: \"weird\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "When ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i try to login using the password \"soweird\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+    }
+
+    @Test
+    public void parseComplexSample () {
+        storyLexer = new StoryLexer();
+        storyLexer.start(COMPLEX_SAMPLE);
+
+        assertToken(StoryTokenType.STORY_DESCRIPTION, "Narrative: ");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STORY_DESCRIPTION, "In order to play a game");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STORY_DESCRIPTION, "As a player");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STORY_DESCRIPTION, "I want to be able to create and manage my account");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
+        advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "An unknown user cannot be logged");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.META, "Meta:");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.META_KEY, "@skip");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i am the user with nickname: \"weird\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "When ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i try to login using the password \"soweird\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
+        advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "A known user cannot be logged using a wrong password");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "the following existing users:");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, " nickname ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, " password ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "   Travis ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "   PacMan ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i am the user with nickname: \"Travis\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "When ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i try to login using the password \"McCallum\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
     }
 
     private void advanceAndAssert(IElementType storyTokenType) {
@@ -50,8 +119,12 @@ public class StoryLexerTest {
 
     private void advanceAndAssert(IElementType storyTokenType, String content) {
         storyLexer.advance();
-        assertThat(storyLexer.getTokenType()).isEqualTo(storyTokenType);
+        assertToken(storyTokenType, content);
+    }
+
+    private void assertToken(IElementType storyTokenType, String content) {
         assertThat(storyLexer.getTokenSequence()).isEqualTo(content);
+        assertThat(storyLexer.getTokenType()).isEqualTo(storyTokenType);
     }
 
     private void traceAll(String content) {
@@ -84,83 +157,5 @@ public class StoryLexerTest {
         return tokenSequence.toString().replace("\n","\\n").replace("\r", "\\r");
     }
 
-    public static final String SAMPLE_2 = "Narrative: \n" + //
-            "In order to play a game\n" + //
-            "As a player\n" + //
-            "I want to be able to create and manage my account\n" + //
-            "\n" + //
-            "Scenario: An unknown user cannot be logged\n" + //
-            "\n" + //
-            "Meta:\n" + //
-            "@skip\n" + //
-            "\n" + //
-            "Given i am the user with nickname: \"weird\"\n" + //
-            "When i try to login using the password \"soweird\"\n" + //
-            "Then i get an error message of type \"Wrong Credentials\"\n" + //
-            "\n" + //
-            "\n" + //
-            "Scenario: A known user cannot be logged using a wrong password\n" + //
-            "\n" + //
-            "Given the following existing users:\n" + //
-            "| nickname | password |\n" + //
-            "|   Travis |   PacMan |\n" + //
-            "Given i am the user with nickname: \"Travis\"\n" + //
-            "When i try to login using the password \"McCallum\"\n" + //
-            "Then i get an error message of type \"Wrong Credentials\"\n" + //
-            "\n" + //
-            "\n" + //
-            "Scenario: A known user can be logged using the right password\n" + //
-            "\n" + //
-            "Given the following existing users:\n" + //
-            "| nickname | password |\n" + //
-            "|   Travis |   PacMan |\n" + //
-            "Given i am the user with nickname: \"Travis\"\n" + //
-            "When i try to login using the password \"PacMan\"\n" + //
-            "Then i get logged\n" + //
-            "And a welcome message is displayed\n" + //
-            "\n" + //
-            "\n" + //
-            "Scenario: A user can create a new account\n" + //
-            "\n" + //
-            "Given i'm on the login page\n" + //
-            "And the \"create account\" behavior is allowed\n" + //
-            "When i create a new account with the following data:\n" + //
-            "| nickname | password1 | password2 |      email       |\n" + //
-            "|   Travis |   PacMan  |   PacMan  | travis@subsp.ace |\n" + //
-            "Then i get logged\n" + //
-            "And a welcome message is displayed\n" + //
-            "\n" + //
-            "\n" + //
-            "Scenario: Email is required to create a new account\n" + //
-            "\n" + //
-            "Given i'm on the login page\n" + //
-            "And the \"create account\" behavior is allowed\n" + //
-            "When i create a new account with the following data:\n" + //
-            "| nickname | password |      email       |\n" + //
-            "|   Travis |   PacMan |                  |\n" + //
-            "Then i get an error message of type \"Email Missing\"\n" + //
-            "\n" + //
-            "\n" + //
-            "Scenario: Two identical passwords input are required to create a new account\n" + //
-            "\n" + //
-            "Given i'm on the login page\n" + //
-            "And the \"create account\" behavior is allowed\n" + //
-            "When i create a new account with the following data:\n" + //
-            "| nickname | password1 | password2 |      email       |\n" + //
-            "|   Travis |   PacMan  |   PocMan  | travis@subsp.ace |\n" + //
-            "Then i get an error message of type \"Password Double-Check Failed\"\n" + //
-            "\n" + //
-            "\n" + //
-            "Scenario: Nickname must be unique on account creation\n" + //
-            "\n" + //
-            "Given the following existing users:\n" + //
-            "| nickname | password |\n" + //
-            "|   Travis |   PacMan |\n" + //
-            "Given i'm on the login page\n" + //
-            "And the \"create account\" behavior is allowed\n" + //
-            "When i create a new account with the following data:\n" + //
-            "| nickname | password1 | password2 |      email       |\n" + //
-            "|   Travis |   PucMan  |   PucMan  | travis@subsp.ace |\n" + //
-            "Then i get an error message of type \"Nickname Already Used\"\n" + //
-            "\n";
+
 }
