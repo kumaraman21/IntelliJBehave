@@ -51,4 +51,13 @@ public class Samples {
                     "Then i get logged\n" + //
                     "And a welcome message is displayed\n" + //
                     "\n";
+
+    public static final String META_SAMPLE =
+            "Scenario: An unknown user cannot be logged\n" + //
+                    "\n" + //
+                    "Meta:\n" + //
+                    "@author carmen\n" + //
+                    "@skip\n" + //
+                    "\n" + //
+                    "Given i am the user with nickname: \"weird\"\n";
 }

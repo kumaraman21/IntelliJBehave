@@ -1,6 +1,7 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.COMPLEX_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.highlighter.Samples.META_SAMPLE;
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.SIMPLE_SAMPLE;
 import static org.fest.assertions.api.Assertions.assertThat;
 
@@ -20,11 +21,37 @@ public class StoryLexerTest {
     @Ignore
     public void traceAll () {
         //traceAll(SIMPLE_SAMPLE);
-        traceAll(COMPLEX_SAMPLE);
+        //traceAll(COMPLEX_SAMPLE);
+        traceAll(META_SAMPLE);
     }
 
     @Test
     public void parseSimpleSample () {
+        storyLexer = new StoryLexer();
+        storyLexer.start(SIMPLE_SAMPLE);
+
+        assertToken(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
+        advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "An unknown user cannot be logged");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.META, "Meta:");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.META_KEY, "@skip");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i am the user with nickname: \"weird\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "When ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i try to login using the password \"soweird\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+    }
+
+    @Test
+    public void parseMetaSample () {
         storyLexer = new StoryLexer();
         storyLexer.start(SIMPLE_SAMPLE);
 
