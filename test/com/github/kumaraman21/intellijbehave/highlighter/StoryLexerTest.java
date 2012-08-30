@@ -1,6 +1,8 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.COMPLEX_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.highlighter.Samples.LONG_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.highlighter.Samples.EXAMPLES_SAMPLE;
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.META_SAMPLE;
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.SIMPLE_SAMPLE;
 import static org.fest.assertions.api.Assertions.assertThat;
@@ -21,8 +23,10 @@ public class StoryLexerTest {
     @Ignore
     public void traceAll () {
         //traceAll(SIMPLE_SAMPLE);
-        //traceAll(COMPLEX_SAMPLE);
-        traceAll(META_SAMPLE);
+        //traceAll(LONG_SAMPLE);
+        //traceAll(META_SAMPLE);
+        //traceAll(EXAMPLES_SAMPLE);
+        traceAll(COMPLEX_SAMPLE);
     }
 
     @Test
@@ -53,7 +57,7 @@ public class StoryLexerTest {
     @Test
     public void parseMetaSample () {
         storyLexer = new StoryLexer();
-        storyLexer.start(SIMPLE_SAMPLE);
+        storyLexer.start(META_SAMPLE);
 
         assertToken(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
         advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "An unknown user cannot be logged");
@@ -61,24 +65,21 @@ public class StoryLexerTest {
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.META, "Meta:");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.META_KEY, "@author");
+        advanceAndAssert(StoryTokenType.META_TEXT, " carmen");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.META_KEY, "@skip");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
         advanceAndAssert(StoryTokenType.STEP_TEXT, "i am the user with nickname: \"weird\"");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "When ");
-        advanceAndAssert(StoryTokenType.STEP_TEXT, "i try to login using the password \"soweird\"");
-        advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then ");
-        advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");
-        advanceAndAssert(StoryTokenType.WHITE_SPACE);
     }
 
     @Test
-    public void parseComplexSample () {
+    public void parseLongSample() {
         storyLexer = new StoryLexer();
-        storyLexer.start(COMPLEX_SAMPLE);
+        storyLexer.start(LONG_SAMPLE);
 
         assertToken(StoryTokenType.STORY_DESCRIPTION, "Narrative: ");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
@@ -137,6 +138,62 @@ public class StoryLexerTest {
         advanceAndAssert(StoryTokenType.STEP_TYPE, "Then ");
         advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
+
+        // ...
+    }
+
+    @Test
+    public void parseExamples() {
+        storyLexer = new StoryLexer();
+        storyLexer.start(EXAMPLES_SAMPLE);
+
+        assertToken(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
+        advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "An unknown user cannot be logged");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i am the user with nickname: \"<input>\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "When ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i try to login using the password \"soweird\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.EXAMPLE_TYPE, "Examples:");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "  login   ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "   password   ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "  Travis  ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "   Pacman     ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "  Vlad    ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.TABLE_CELL, "   Thundercat ");
+        advanceAndAssert(StoryTokenType.TABLE_DELIM);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.SCENARIO_TYPE, "Scenario: ");
+        advanceAndAssert(StoryTokenType.SCENARIO_TEXT, "A known user can be logged using the right password");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given ");
+        advanceAndAssert(StoryTokenType.STEP_TEXT, "the following existing users:");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+
+        // ...
+
+
     }
 
     private void advanceAndAssert(IElementType storyTokenType) {

@@ -33,7 +33,8 @@ public class StepPsiElement extends ASTWrapperPsiElement {
   }
 
   @Override
-  public PsiReference getReference() {
+  @NotNull
+  public StepPsiReference getReference() {
     return new StepPsiReference(this);
   }
 
@@ -48,4 +49,8 @@ public class StepPsiElement extends ASTWrapperPsiElement {
   public String getActualStepPrefix() {
     return substringBefore(getText(), " ");
   }
+
+    public int getStepTextOffset() {
+        return getText().indexOf(' ') + 1;
+    }
 }

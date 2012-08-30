@@ -69,19 +69,36 @@ public class IntelliJBehaveBaseTestCase extends PsiTestCase {
         });
     }
 
-    public void testCase1 () {
-        PsiBuilder builder = new PsiBuilderImpl(myProject, null, new StoryParserDefinition(), new StoryLexer(), null, Samples.SIMPLE_SAMPLE, null, null);
-
-        StoryParser parser = new StoryParser();
-        ASTNode astNode = parser.parse(StoryElementType.STORY_FILE, builder);
-        System.out.println("IntelliJBehaveBaseTestCase.testCase1: " + DebugUtil.treeToString(astNode, false));
+    public void testCase_Simple () {
+        ASTNode astNode = doParse(Samples.SIMPLE_SAMPLE);
+        System.out.println("IntelliJBehaveBaseTestCase.testCase_Simple: " + DebugUtil.treeToString(astNode, false));
     }
 
-    public void testCase2 () {
-        PsiBuilder builder = new PsiBuilderImpl(myProject, null, new StoryParserDefinition(), new StoryLexer(), null, Samples.COMPLEX_SAMPLE, null, null);
+    public void testCase_Long () {
+        ASTNode astNode = doParse(Samples.LONG_SAMPLE);
+        System.out.println("IntelliJBehaveBaseTestCase.testCase_Long: " + DebugUtil.treeToString(astNode, false));
+    }
+
+    public void testCase_Meta () {
+        ASTNode astNode = doParse(Samples.META_SAMPLE);
+        System.out.println("IntelliJBehaveBaseTestCase.testCase_Meta: " + DebugUtil.treeToString(astNode, false));
+    }
+
+    public void testCase_Examples () {
+        ASTNode astNode = doParse(Samples.EXAMPLES_SAMPLE);
+        System.out.println("IntelliJBehaveBaseTestCase.testCase_Examples: " + DebugUtil.treeToString(astNode, false));
+    }
+
+    public void testCase_Complex() {
+        ASTNode astNode = doParse(Samples.COMPLEX_SAMPLE);
+        System.out.println("IntelliJBehaveBaseTestCase.testCase_Complex: " + DebugUtil.treeToString(astNode, false));
+    }
+
+    private ASTNode doParse(String content) {
+        PsiBuilder builder = new PsiBuilderImpl(myProject, null, new StoryParserDefinition(), new StoryLexer(), null, content, null, null);
 
         StoryParser parser = new StoryParser();
-        ASTNode astNode = parser.parse(StoryElementType.STORY_FILE, builder);
-        System.out.println("IntelliJBehaveBaseTestCase.testCase2: " + DebugUtil.treeToString(astNode, false));
+        return parser.parse(StoryElementType.STORY_FILE, builder);
     }
+
 }

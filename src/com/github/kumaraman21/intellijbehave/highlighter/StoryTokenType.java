@@ -44,6 +44,7 @@ public class StoryTokenType extends IElementType {
     public static final IElementType META = new StoryTokenType("META");
     public static final IElementType META_KEY = new StoryTokenType("META_KEY");
     public static final IElementType META_TEXT = new StoryTokenType("META_TEXT");
+    public static final IElementType EXAMPLE_TYPE = new StoryTokenType("EXAMPLE_TYPE");
 
     public StoryTokenType(@NonNls String debugName) {
         super(debugName, STORY_FILE_TYPE.getLanguage());

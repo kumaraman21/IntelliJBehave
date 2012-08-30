@@ -40,15 +40,25 @@ public class StoryParser implements PsiParser {
     private void parseStory(PsiBuilder builder) {
         final PsiBuilder.Marker storyMarker = builder.mark();
 
-        skipWhitespaces(builder);
+        skipWhitespacesOrComments(builder);
         parseStoryDescriptionLinesIfPresent(builder);
         parseScenarios(builder);
         storyMarker.done(StoryElementType.STORY);
     }
 
-    private static void skipWhitespaces(PsiBuilder builder) {
-        while(builder.getTokenType() == StoryTokenType.WHITE_SPACE) {
-            builder.advanceLexer();
+    private static void skipWhitespacesOrComments(PsiBuilder builder) {
+        while(builder.getTokenType() == StoryTokenType.WHITE_SPACE
+                || builder.getTokenType() == StoryTokenType.COMMENT) {
+            if(builder.getTokenType() == StoryTokenType.COMMENT) {
+                PsiBuilder.Marker commentMark = builder.mark();
+                while(builder.getTokenType() == StoryTokenType.COMMENT) {
+                    builder.advanceLexer();
+                }
+                commentMark.done(StoryElementType.COMMENT);
+            }
+            else {
+                builder.advanceLexer();
+            }
         }
     }
 
@@ -60,7 +70,7 @@ public class StoryParser implements PsiParser {
         PsiBuilder.Marker marker = builder.mark();
         while (builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
             parseStoryDescriptionLine(builder);
-            skipWhitespaces(builder);
+            skipWhitespacesOrComments(builder);
         }
         marker.done(StoryElementType.STORY_DESCRIPTION);
     }
@@ -73,7 +83,7 @@ public class StoryParser implements PsiParser {
         if (builder.getTokenType() == StoryTokenType.SCENARIO_TYPE) {
             while(builder.getTokenType() == StoryTokenType.SCENARIO_TYPE) {
                 parseScenario(builder);
-                skipWhitespaces(builder);
+                skipWhitespacesOrComments(builder);
             }
         }
         else {
@@ -85,14 +95,17 @@ public class StoryParser implements PsiParser {
     private void parseScenario(PsiBuilder builder) {
         final PsiBuilder.Marker stepMarker = builder.mark();
         builder.advanceLexer();
-        skipWhitespaces(builder);
+        skipWhitespacesOrComments(builder);
         while (builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
             parseScenarioText(builder);
-            skipWhitespaces(builder);
+            skipWhitespacesOrComments(builder);
         }
         parseMeta(builder);
         parseSteps(builder);
+        skipWhitespacesOrComments(builder);
         parseStoryDescriptionLinesIfPresent(builder);
+        skipWhitespacesOrComments(builder);
+        parseExamples(builder);
         stepMarker.done(StoryElementType.SCENARIO);
     }
 
@@ -107,7 +120,7 @@ public class StoryParser implements PsiParser {
                     || builder.getTokenType() == StoryTokenType.META_TEXT
                     || builder.getTokenType() == StoryTokenType.META_KEY) {
                 builder.advanceLexer();
-                skipWhitespaces(builder);
+                skipWhitespacesOrComments(builder);
             }
             stepMarker.done(StoryElementType.META);
         }
@@ -120,7 +133,7 @@ public class StoryParser implements PsiParser {
             StoryElementType previousStepElementType = null;
             while (builder.getTokenType() == StoryTokenType.STEP_TYPE) {
                 previousStepElementType = parseStep(builder, previousStepElementType);
-                skipWhitespaces(builder);
+                skipWhitespacesOrComments(builder);
                 parseStoryDescriptionLinesIfPresent(builder);
             }
         }
@@ -144,9 +157,9 @@ public class StoryParser implements PsiParser {
 
         parseStepType(builder);
         parseStepText(builder);
-        skipWhitespaces(builder);
+        skipWhitespacesOrComments(builder);
         parseTableIfPresent(builder);
-        skipWhitespaces(builder);
+        skipWhitespacesOrComments(builder);
         stepMarker.done(currentStepElementType);
 
         return currentStepElementType;
@@ -160,7 +173,7 @@ public class StoryParser implements PsiParser {
         if (builder.getTokenType() == StoryTokenType.STEP_TEXT) {
             while (builder.getTokenType() == StoryTokenType.STEP_TEXT) {
                 builder.advanceLexer();
-                skipWhitespaces(builder);
+                skipWhitespacesOrComments(builder);
             }
         }
         else {
@@ -168,17 +181,33 @@ public class StoryParser implements PsiParser {
         }
     }
 
+    private void parseExamples(PsiBuilder builder) {
+        if (builder.getTokenType() == StoryTokenType.EXAMPLE_TYPE) {
+            final PsiBuilder.Marker stepMarker = builder.mark();
+            builder.advanceLexer();
+            skipWhitespacesOrComments(builder);
+            if (builder.getTokenType() == StoryTokenType.TABLE_DELIM) {
+                parseTableIfPresent(builder);
+            }
+            else {
+                builder.error("Table row expected");
+            }
+
+            stepMarker.done(StoryElementType.EXAMPLES);
+        }
+    }
+
     private void parseTableIfPresent(PsiBuilder builder) {
         if (builder.getTokenType() == StoryTokenType.TABLE_DELIM) {
             while (builder.getTokenType() == StoryTokenType.TABLE_DELIM
                     || builder.getTokenType() == StoryTokenType.TABLE_CELL) {
-                parseTableRow(builder);
-                skipWhitespaces(builder);
+                parseTableToken(builder);
+                skipWhitespacesOrComments(builder);
             }
         }
     }
 
-    private void parseTableRow(PsiBuilder builder) {
+    private void parseTableToken(PsiBuilder builder) {
         builder.advanceLexer();
     }
 }

@@ -11,6 +11,7 @@ public enum LexicalState {
     ,IN_STEP(_StoryLexer.IN_STEP)
     ,IN_META(_StoryLexer.IN_META)
     ,IN_TABLE(_StoryLexer.IN_TABLE)
+    ,IN_EXAMPLES(_StoryLexer.IN_EXAMPLES)
     ;
 
     private final int lexerId;

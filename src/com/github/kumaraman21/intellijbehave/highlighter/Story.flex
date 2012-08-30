@@ -66,7 +66,7 @@ InputChar      = [^\r\n]
 WhiteSpace     = {CRLF} | {BlankChar}
 NonWhiteSpace  = [^ \n\r\t\f]
 TableCellChar  = [^\r\n\|]
-
+NonMetaKey     = [^@\r\n]
 
 %state IN_DIRECTIVE
 %state IN_STORY
@@ -74,6 +74,7 @@ TableCellChar  = [^\r\n\|]
 %state IN_STEP
 %state IN_META
 %state IN_TABLE
+%state IN_EXAMPLES
 %eof{
     return;
 %eof}
@@ -83,6 +84,7 @@ TableCellChar  = [^\r\n\|]
 <YYINITIAL> {
     ( "Scenario: "
     | "Meta:"
+    | "Examples:"
     | "Given " | "When " | "Then " | "And "
     | "!--"
     | "|" ) {InputChar}+  { yystatePush(IN_DIRECTIVE); yypushback(yytext().length());       }
@@ -93,6 +95,7 @@ TableCellChar  = [^\r\n\|]
 <IN_DIRECTIVE> {
     "Scenario: "                             { yystatePopNPush(2, IN_SCENARIO); return StoryTokenType.SCENARIO_TYPE; }
     "Meta:"                                  { yystatePopNPush(2, IN_META);     return StoryTokenType.META;          }
+    "Examples:"                              { yystatePopNPush(2, IN_EXAMPLES); return StoryTokenType.EXAMPLE_TYPE;  }
     ("Given " | "When " | "Then " | "And ")  { yystatePopNPush(2, IN_STEP);     return StoryTokenType.STEP_TYPE;     }
     "!--" {InputChar}*                       { yystatePop();                    return StoryTokenType.COMMENT;       }
     "|"                                      { yystatePopNPush(1, IN_TABLE);    return StoryTokenType.TABLE_DELIM;   }
@@ -103,6 +106,7 @@ TableCellChar  = [^\r\n\|]
     {CRLF}
         ( "Scenario: "
         | "Meta:"
+        | "Examples:"
         | "Given " | "When " | "Then " | "And "
         | "!--"
         | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
@@ -115,6 +119,7 @@ TableCellChar  = [^\r\n\|]
     {CRLF}
         ( "Scenario: "
         | "Meta:"
+        | "Examples:"
         | "Given " | "When " | "Then " | "And "
         | "!--"
         | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
@@ -128,10 +133,11 @@ TableCellChar  = [^\r\n\|]
     {CRLF}
         ( "Scenario: "
         | "Meta:"
+        | "Examples:"
         | "Given " | "When " | "Then " | "And "
         | "!--"
         | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
-    {InputChar}+                                     { return StoryTokenType.META_TEXT;     }
+    {NonMetaKey}+                                    { return StoryTokenType.META_TEXT;     }
     {CRLF}                                           { return StoryTokenType.WHITE_SPACE;   }
 }
 
@@ -140,11 +146,23 @@ TableCellChar  = [^\r\n\|]
     {CRLF}
         ( "Scenario: "
         | "Meta:"
+        | "Examples:"
         | "Given " | "When " | "Then " | "And "
         | "!--"
         | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
     {InputChar}+                                     { return StoryTokenType.STEP_TEXT;     }
     {CRLF}                                           { return StoryTokenType.WHITE_SPACE;   }
+}
+
+<IN_EXAMPLES> {
+    {CRLF}
+        ( "Scenario: "
+        | "Meta:"
+        | "Examples:"
+        | "Given " | "When " | "Then " | "And "
+        | "!--"
+        | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
+    {WhiteSpace}                                     { return StoryTokenType.WHITE_SPACE;   }
 }
 
 <IN_TABLE>  {

@@ -24,6 +24,9 @@ bin/
 test-output/
 out/
 
+# Exported plugin for deployment
+IntelliJBehave.zip
+
 # other scm
 .svn
 .CVS
