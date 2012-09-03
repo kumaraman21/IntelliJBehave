@@ -1,6 +1,5 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
-import static com.github.kumaraman21.intellijbehave.highlighter.Samples.COMPLEX_SAMPLE;
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.EXAMPLES_SAMPLE;
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.LONG_SAMPLE;
 import static com.github.kumaraman21.intellijbehave.highlighter.Samples.META_SAMPLE;
@@ -16,13 +15,13 @@ import org.junit.Test;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class StoryLocalizedLexerTest {
+public class StoryLocalizedLexer_SamplesTest {
 
     private StoryLocalizedLexer storyLexer;
 
     @Test
     @Ignore
-    public void traceAll () {
+    public void traceAll() {
         //traceAll(SIMPLE_SAMPLE);
         traceAll(LONG_SAMPLE);
         //traceAll(META_SAMPLE);
@@ -31,7 +30,7 @@ public class StoryLocalizedLexerTest {
     }
 
     @Test
-    public void parseSimpleSample () {
+    public void parseSimpleSample() {
         storyLexer = new StoryLocalizedLexer(new LocalizedKeywordsProvider());
         storyLexer.start(SIMPLE_SAMPLE);
 
@@ -54,7 +53,7 @@ public class StoryLocalizedLexerTest {
     }
 
     @Test
-    public void parseMetaSample () {
+    public void parseMetaSample() {
         storyLexer = new StoryLocalizedLexer(new LocalizedKeywordsProvider());
         storyLexer.start(META_SAMPLE);
 
@@ -184,8 +183,6 @@ public class StoryLocalizedLexerTest {
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
 
         // ...
-
-
     }
 
     private void advanceAndAssert(IElementType storyTokenType) {
@@ -211,27 +208,27 @@ public class StoryLocalizedLexerTest {
         do {
             tokenType = storyLexer.getTokenType();
             System.out.println(
-                    rightPad(""+storyLexer.getPosition(), 3) + " " +
-                    "[" + rightPad(tokenType, "STORY_DESCRIPTION".length()) + "]" +
-                    rightPad(storyLexer.lexerState(), "IN_DIRECTIVE".length()) +
-                    ": >>" + escape(storyLexer.getTokenSequence()) + "<<");
+                    rightPad("" + storyLexer.getPosition(), 3) + " " +
+                            "[" + rightPad(tokenType, "STORY_DESCRIPTION".length()) + "]" +
+                            rightPad(storyLexer.lexerState(), "IN_DIRECTIVE".length()) +
+                            ": >>" + escape(storyLexer.getTokenSequence()) + "<<");
 
             storyLexer.advance();
             tokenType = storyLexer.getTokenType();
         }
-        while(tokenType!=null);
+        while (tokenType != null);
     }
 
     private String rightPad(Object object, int length) {
         StringBuilder builder = new StringBuilder(object.toString());
-        while(builder.length()<length) {
+        while (builder.length() < length) {
             builder.append(" ");
         }
         return builder.toString();
     }
 
     private String escape(CharSequence tokenSequence) {
-        return tokenSequence.toString().replace("\n","\\n").replace("\r", "\\r");
+        return tokenSequence.toString().replace("\n", "\\n").replace("\r", "\\r");
     }
 
 

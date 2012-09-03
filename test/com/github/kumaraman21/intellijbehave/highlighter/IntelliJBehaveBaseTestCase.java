@@ -21,9 +21,6 @@ import com.intellij.testFramework.fixtures.TestFixtureBuilder;
  */
 public class IntelliJBehaveBaseTestCase extends PsiTestCase {
 
-    protected static final String SOURCE_FILE_EXT = ".clj";
-    protected static final String TEST_FILE_EXT = ".test";
-
     private Project myProject;
     protected IdeaProjectTestFixture myFixture;
     protected CodeStyleSettings mySettings;
@@ -94,8 +91,17 @@ public class IntelliJBehaveBaseTestCase extends PsiTestCase {
         System.out.println("IntelliJBehaveBaseTestCase.testCase_Complex: " + DebugUtil.treeToString(astNode, false));
     }
 
+    private boolean localizedParser = true;
+
     private ASTNode doParse(String content) {
-        PsiBuilder builder = new PsiBuilderImpl(myProject, null, new StoryParserDefinition(), new StoryLexer(), null, content, null, null);
+        PsiBuilder builder = new PsiBuilderImpl(myProject,
+                null,
+                new StoryParserDefinition(),
+                localizedParser ? new StoryLocalizedLexer() : new StoryLexer(),
+                null,
+                content,
+                null,
+                null);
 
         StoryParser parser = new StoryParser();
         return parser.parse(StoryElementType.STORY_FILE, builder);

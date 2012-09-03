@@ -41,7 +41,7 @@ public class StoryParser implements PsiParser {
         final PsiBuilder.Marker storyMarker = builder.mark();
 
         skipWhitespacesOrComments(builder);
-        parseStoryDescriptionLinesIfPresent(builder);
+        parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
         parseScenarios(builder);
         storyMarker.done(StoryElementType.STORY);
     }
@@ -62,13 +62,17 @@ public class StoryParser implements PsiParser {
         }
     }
 
-    private void parseStoryDescriptionLinesIfPresent(PsiBuilder builder) {
-        if(builder.getTokenType() != StoryTokenType.STORY_DESCRIPTION) {
+    private void parseStoryDescriptionOrNarrativesLinesIfPresent(PsiBuilder builder) {
+        if(builder.getTokenType() != StoryTokenType.STORY_DESCRIPTION
+                && builder.getTokenType() != StoryTokenType.NARRATIVE_TYPE
+                && builder.getTokenType() != StoryTokenType.NARRATIVE_TEXT) {
             return;
         }
 
         PsiBuilder.Marker marker = builder.mark();
-        while (builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION) {
+        while (builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION
+                || builder.getTokenType() == StoryTokenType.NARRATIVE_TYPE
+                || builder.getTokenType() == StoryTokenType.NARRATIVE_TEXT) {
             parseStoryDescriptionLine(builder);
             skipWhitespacesOrComments(builder);
         }
@@ -103,7 +107,7 @@ public class StoryParser implements PsiParser {
         parseMeta(builder);
         parseSteps(builder);
         skipWhitespacesOrComments(builder);
-        parseStoryDescriptionLinesIfPresent(builder);
+        parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
         skipWhitespacesOrComments(builder);
         parseExamples(builder);
         stepMarker.done(StoryElementType.SCENARIO);
@@ -127,14 +131,14 @@ public class StoryParser implements PsiParser {
     }
 
     private void parseSteps(PsiBuilder builder) {
-        parseStoryDescriptionLinesIfPresent(builder);
+        parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
         if (builder.getTokenType() == StoryTokenType.STEP_TYPE) {
 
             StoryElementType previousStepElementType = null;
             while (builder.getTokenType() == StoryTokenType.STEP_TYPE) {
                 previousStepElementType = parseStep(builder, previousStepElementType);
                 skipWhitespacesOrComments(builder);
-                parseStoryDescriptionLinesIfPresent(builder);
+                parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
             }
         }
         else {

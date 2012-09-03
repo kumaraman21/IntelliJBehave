@@ -8,6 +8,8 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ArrayUtil;
 
 import org.jbehave.core.i18n.LocalizedKeywords;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -26,27 +28,33 @@ public class StoryLocalizedLexer extends LexerBase {
         IN_TABLE,
         IN_STEP_TABLE,
         IN_META,
-        IN_EXAMPLES, IN_OTHER_TABLE;
+        IN_EXAMPLES, IN_OTHER_TABLE
     }
+
+    private static final Pattern LANGUAGE_PATTERN = Pattern.compile("language:[ ]*([^ ]+)");
 
     private final LocalizedKeywordsProvider kwProvider;
     //
     private LocalizedKeywords keywords;
     private CharTree<JBKeyword> charTree;
     private CharSequence buffer = ArrayUtil.EMPTY_CHAR_SEQUENCE;
-    private int startOffset;
+    //private int startOffset;
     private int endOffset;
     private State state = State.YYINITIAL;
     private int position;
     private IElementType tokenType;
     private int currentTokenStart;
 
-    public StoryLocalizedLexer(LocalizedKeywordsProvider kwProvider) {
-        this.kwProvider = kwProvider;
-        updateLocale("en");
+    public StoryLocalizedLexer() {
+        this(new LocalizedKeywordsProvider());
     }
 
-    private void updateLocale(String locale) {
+    public StoryLocalizedLexer(LocalizedKeywordsProvider kwProvider) {
+        this.kwProvider = kwProvider;
+        changeLocale("en");
+    }
+
+    public void changeLocale(String locale) {
         keywords = kwProvider.getKeywords(locale);
         charTree = new CharTree<JBKeyword>('/', null);
         for (JBKeyword kw : JBKeyword.values()) {
@@ -55,14 +63,10 @@ public class StoryLocalizedLexer extends LexerBase {
         }
     }
 
-    public CharTree<JBKeyword> getCharTree() {
-        return charTree;
-    }
-
     @Override
     public void start(CharSequence buffer, int startOffset, int endOffset, int initialState) {
         this.buffer = buffer;
-        this.startOffset = startOffset;
+        //this.startOffset = startOffset;
         this.position = startOffset;
         this.endOffset = endOffset;
         this.state = State.values()[initialState];
@@ -120,14 +124,17 @@ public class StoryLocalizedLexer extends LexerBase {
     }
 
     private void locateToken() {
-        if (tokenType != null || position>=endOffset) {
+        if (tokenType != null || position >= endOffset) {
             return;
         }
 
         this.currentTokenStart = position;
 
-        if(consume(keywords.ignorable())) {
+        if (consume(keywords.ignorable())) {
             consume(INPUT_CHAR);
+            if (state == State.YYINITIAL) {
+                checkForLanguageDefinition(tokenText());
+            }
             tokenType = StoryTokenType.COMMENT;
             return;
         }
@@ -310,15 +317,15 @@ public class StoryLocalizedLexer extends LexerBase {
                     }
                     return;
                 }
-                else if(consume(keywords.examplesTableHeaderSeparator())) {
+                else if (consume(keywords.examplesTableHeaderSeparator())) {
                     tokenType = StoryTokenType.TABLE_DELIM;
                     return;
                 }
-                else if(consume(keywords.examplesTableValueSeparator())) {
+                else if (consume(keywords.examplesTableValueSeparator())) {
                     tokenType = StoryTokenType.TABLE_DELIM;
                     return;
                 }
-                else if(consumeUntil(INPUT_CHAR, keywords.examplesTableHeaderSeparator(), keywords.examplesTableValueSeparator())) {
+                else if (consumeUntil(INPUT_CHAR, keywords.examplesTableHeaderSeparator(), keywords.examplesTableValueSeparator())) {
                     tokenType = StoryTokenType.TABLE_CELL;
                     return;
                 }
@@ -329,19 +336,32 @@ public class StoryLocalizedLexer extends LexerBase {
         }
     }
 
+    private void checkForLanguageDefinition(CharSequence charSeq) {
+        Matcher matcher = LANGUAGE_PATTERN.matcher(charSeq);
+        if (matcher.find()) {
+            String locale = matcher.group(1);
+            changeLocale(locale);
+        }
+    }
+
+    private CharSequence tokenText() {
+        return buffer.subSequence(this.currentTokenStart, this.position);
+    }
+
     private boolean matchesAhead(String text) {
-        if(position + text.length() > endOffset) {
+        if (position + text.length() > endOffset) {
             return false;
         }
-        for(int i=0;i<text.length();i++) {
-            if(text.charAt(i) != buffer.charAt(position+i))
+        for (int i = 0; i < text.length(); i++) {
+            if (text.charAt(i) != buffer.charAt(position + i)) {
                 return false;
+            }
         }
         return true;
     }
 
     private boolean consume(String data) {
-        if(matchesAhead(data)) {
+        if (matchesAhead(data)) {
             position += data.length();
             return true;
         }
@@ -350,7 +370,7 @@ public class StoryLocalizedLexer extends LexerBase {
 
     private boolean consumeUntil(CharFilter filter, String stopWord) {
         int previousPosition = position;
-        while (position<endOffset && !matchesAhead(stopWord) && filter.accept(buffer.charAt(position))) {
+        while (position < endOffset && !matchesAhead(stopWord) && filter.accept(buffer.charAt(position))) {
             position++;
         }
         return position != previousPosition;
@@ -358,7 +378,9 @@ public class StoryLocalizedLexer extends LexerBase {
 
     private boolean consumeUntil(CharFilter filter, String stopWord1, String stopWord2) {
         int previousPosition = position;
-        while (position<endOffset && !(matchesAhead(stopWord1) || matchesAhead(stopWord2)) && filter.accept(buffer.charAt(position))) {
+        while (position < endOffset && !(matchesAhead(stopWord1) || matchesAhead(stopWord2))
+                && filter.accept(buffer.charAt(position)))
+        {
             position++;
         }
         return position != previousPosition;
@@ -366,7 +388,7 @@ public class StoryLocalizedLexer extends LexerBase {
 
     private boolean consume(CharFilter filter) {
         int previousPosition = position;
-        while (position<endOffset && filter.accept(buffer.charAt(position))) {
+        while (position < endOffset && filter.accept(buffer.charAt(position))) {
             position++;
         }
         return position != previousPosition;
