@@ -15,6 +15,15 @@ public class Samples {
                     "When i try to login using the password \"soweird\"\n" + //
                     "Then i get an error message of type \"Wrong Credentials\"\n";
 
+    public static final String SIMPLE_FR =
+                    "!-- language:fr\n" +
+                    "Scénario: une simple sortie\n" +
+                    "Etant donné que nous allons promener notre chienne\n" +
+                    "!-- un commentaire qui n'a rien à voir\n" +
+                    "Quand on sera dehors\n" +
+                    "Alors elle pourra se soulager!\n" +
+                    "Et elle sera super contente\n";
+
     public static final String LONG_SAMPLE =
             "Narrative: \n" + //
                     "In order to play a game\n" + //

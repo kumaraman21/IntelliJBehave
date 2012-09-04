@@ -2,14 +2,12 @@ package com.github.kumaraman21.intellijbehave.highlighter;
 
 import com.github.kumaraman21.intellijbehave.utility.CharTree;
 import com.github.kumaraman21.intellijbehave.utility.JBKeyword;
-import com.github.kumaraman21.intellijbehave.utility.LocalizedKeywordsProvider;
+import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.intellij.lexer.LexerBase;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ArrayUtil;
 
 import org.jbehave.core.i18n.LocalizedKeywords;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -31,9 +29,7 @@ public class StoryLocalizedLexer extends LexerBase {
         IN_EXAMPLES, IN_OTHER_TABLE
     }
 
-    private static final Pattern LANGUAGE_PATTERN = Pattern.compile("language:[ ]*([^ ]+)");
-
-    private final LocalizedKeywordsProvider kwProvider;
+    private final LocalizedStorySupport kwSupport;
     //
     private LocalizedKeywords keywords;
     private CharTree<JBKeyword> charTree;
@@ -46,16 +42,16 @@ public class StoryLocalizedLexer extends LexerBase {
     private int currentTokenStart;
 
     public StoryLocalizedLexer() {
-        this(new LocalizedKeywordsProvider());
+        this(new LocalizedStorySupport());
     }
 
-    public StoryLocalizedLexer(LocalizedKeywordsProvider kwProvider) {
-        this.kwProvider = kwProvider;
+    public StoryLocalizedLexer(LocalizedStorySupport kwSupport) {
+        this.kwSupport = kwSupport;
         changeLocale("en");
     }
 
     public void changeLocale(String locale) {
-        keywords = kwProvider.getKeywords(locale);
+        keywords = kwSupport.getKeywords(locale);
         charTree = new CharTree<JBKeyword>('/', null);
         for (JBKeyword kw : JBKeyword.values()) {
             String asString = kw.asString(keywords);
@@ -133,7 +129,12 @@ public class StoryLocalizedLexer extends LexerBase {
         if (consume(keywords.ignorable())) {
             consume(INPUT_CHAR);
             if (state == State.YYINITIAL) {
-                checkForLanguageDefinition(tokenText());
+                String locale = LocalizedStorySupport.checkForLanguageDefinition(tokenText());
+                if(locale!=null) {
+                    changeLocale(locale);
+                    tokenType = StoryTokenType.COMMENT_WITH_LOCALE;
+                    return;
+                }
             }
             tokenType = StoryTokenType.COMMENT;
             return;
@@ -336,14 +337,6 @@ public class StoryLocalizedLexer extends LexerBase {
         }
     }
 
-    private void checkForLanguageDefinition(CharSequence charSeq) {
-        Matcher matcher = LANGUAGE_PATTERN.matcher(charSeq);
-        if (matcher.find()) {
-            String locale = matcher.group(1);
-            changeLocale(locale);
-        }
-    }
-
     private CharSequence tokenText() {
         return buffer.subSequence(this.currentTokenStart, this.position);
     }
@@ -433,11 +426,17 @@ public class StoryLocalizedLexer extends LexerBase {
     private IElementType tokenType(JBKeyword value) {
         switch (value) {
             case Given:
+                state = State.IN_STEP;
+                return StoryTokenType.STEP_TYPE_GIVEN;
             case When:
+                state = State.IN_STEP;
+                return StoryTokenType.STEP_TYPE_WHEN;
             case Then:
+                state = State.IN_STEP;
+                return StoryTokenType.STEP_TYPE_THEN;
             case And:
                 state = State.IN_STEP;
-                return StoryTokenType.STEP_TYPE;
+                return StoryTokenType.STEP_TYPE_AND;
             case Ignorable:
             case ExamplesTableIgnorableSeparator:
                 return StoryTokenType.COMMENT;

@@ -2,7 +2,7 @@ package com.github.kumaraman21.intellijbehave.highlighter;
 
 import static org.fest.assertions.api.Assertions.assertThat;
 
-import com.github.kumaraman21.intellijbehave.utility.LocalizedKeywordsProvider;
+import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.intellij.psi.tree.IElementType;
 
 import org.jetbrains.annotations.Nullable;
@@ -17,7 +17,7 @@ public class StoryLocalizedLexer_MalformedTest {
 
     @Test
     public void parse_tableWithoutPreamble() {
-        storyLexer = new StoryLocalizedLexer(new LocalizedKeywordsProvider());
+        storyLexer = new StoryLocalizedLexer(new LocalizedStorySupport());
         storyLexer.start("| Travis | Pacman |");
 
         assertToken(StoryTokenType.TABLE_DELIM, "|");
@@ -30,26 +30,29 @@ public class StoryLocalizedLexer_MalformedTest {
 
     @Test
     public void parse_scenarioWithoutText() {
-        storyLexer = new StoryLocalizedLexer(new LocalizedKeywordsProvider());
+        storyLexer = new StoryLocalizedLexer(new LocalizedStorySupport());
         storyLexer.start("Scenario:\n" +
                 "Given\n" +
                 "When\n" +
-                "Then\n");
+                "Then\n" +
+                "And\n");
 
         assertToken(StoryTokenType.SCENARIO_TYPE, "Scenario:");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given");
+        advanceAndAssert(StoryTokenType.STEP_TYPE_GIVEN, "Given");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "When");
+        advanceAndAssert(StoryTokenType.STEP_TYPE_WHEN, "When");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then");
+        advanceAndAssert(StoryTokenType.STEP_TYPE_THEN, "Then");
+        advanceAndAssert(StoryTokenType.WHITE_SPACE);
+        advanceAndAssert(StoryTokenType.STEP_TYPE_AND, "And");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(null);
     }
 
     @Test
     public void parse_scenarioWithStepAsText() {
-        storyLexer = new StoryLocalizedLexer(new LocalizedKeywordsProvider());
+        storyLexer = new StoryLocalizedLexer(new LocalizedStorySupport());
         storyLexer.start("Scenario: Given a nice\n" +
                 "Given\n" +
                 "When\n" +
@@ -58,11 +61,11 @@ public class StoryLocalizedLexer_MalformedTest {
         assertToken(StoryTokenType.SCENARIO_TYPE, "Scenario:");
         advanceAndAssert(StoryTokenType.SCENARIO_TEXT, " Given a nice");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "Given");
+        advanceAndAssert(StoryTokenType.STEP_TYPE_GIVEN, "Given");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "When");
+        advanceAndAssert(StoryTokenType.STEP_TYPE_WHEN, "When");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.STEP_TYPE, "Then");
+        advanceAndAssert(StoryTokenType.STEP_TYPE_THEN, "Then");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(null);
     }

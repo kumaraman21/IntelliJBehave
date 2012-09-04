@@ -101,18 +101,17 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
     public static TextAttributesKey LINE_COMMENT = TextAttributesKey.createTextAttributesKey(LINE_COMMENT_ID);
     public static TextAttributesKey BAD_CHARACTER = TextAttributesKey.createTextAttributesKey(BAD_CHARACTER_ID);
 
-    public static List<TextAttributesKey> ALL = Collections.unmodifiableList(Arrays.asList(//
-            STORY_DESCRIPTION, SCENARIO_TYPE, SCENARIO_TEXT,//
-            STEP_TYPE, STEP_TEXT, TABLE_DELIM, TABLE_CELL,//
-            META_TYPE, META_KEY, META_TEXT, //
-            LINE_COMMENT, BAD_CHARACTER
-            ));
-
     static {
         ATTRIBUTES.put(StoryTokenType.STORY_DESCRIPTION, STORY_DESCRIPTION);
+        ATTRIBUTES.put(StoryTokenType.NARRATIVE_TYPE, STORY_DESCRIPTION);
+        ATTRIBUTES.put(StoryTokenType.NARRATIVE_TEXT, STORY_DESCRIPTION);
         ATTRIBUTES.put(StoryTokenType.SCENARIO_TYPE, SCENARIO_TYPE);
         ATTRIBUTES.put(StoryTokenType.SCENARIO_TEXT, SCENARIO_TEXT);
         ATTRIBUTES.put(StoryTokenType.STEP_TYPE, STEP_TYPE);
+        ATTRIBUTES.put(StoryTokenType.STEP_TYPE_GIVEN, STEP_TYPE);
+        ATTRIBUTES.put(StoryTokenType.STEP_TYPE_WHEN, STEP_TYPE);
+        ATTRIBUTES.put(StoryTokenType.STEP_TYPE_THEN, STEP_TYPE);
+        ATTRIBUTES.put(StoryTokenType.STEP_TYPE_AND, STEP_TYPE);
         ATTRIBUTES.put(StoryTokenType.STEP_TEXT, STEP_TEXT);
         ATTRIBUTES.put(StoryTokenType.TABLE_DELIM, TABLE_DELIM);
         ATTRIBUTES.put(StoryTokenType.TABLE_CELL, TABLE_CELL);
@@ -120,6 +119,7 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
         ATTRIBUTES.put(StoryTokenType.META_KEY, META_KEY);
         ATTRIBUTES.put(StoryTokenType.META_TEXT, META_TEXT);
         ATTRIBUTES.put(StoryTokenType.COMMENT, LINE_COMMENT);
+        ATTRIBUTES.put(StoryTokenType.COMMENT_WITH_LOCALE, LINE_COMMENT);
         ATTRIBUTES.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER);
     }
 

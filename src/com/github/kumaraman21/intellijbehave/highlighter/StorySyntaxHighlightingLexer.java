@@ -19,6 +19,6 @@ import com.intellij.lexer.LayeredLexer;
 
 public class StorySyntaxHighlightingLexer extends LayeredLexer {
   public StorySyntaxHighlightingLexer() {
-    super(new StoryLexer());
+    super(new StoryLexerFactory().createLexer());
   }
 }

@@ -15,42 +15,64 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
+import static org.apache.commons.lang.StringUtils.trim;
+
+import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-import com.intellij.psi.PsiReference;
+
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
-
-import static org.apache.commons.lang.StringUtils.*;
+import org.jetbrains.annotations.Nullable;
 
 public class StepPsiElement extends ASTWrapperPsiElement {
-  private StepType stepType;
+    private StepType stepType;
 
-  public StepPsiElement(@NotNull ASTNode node, StepType stepType) {
-    super(node);
-    this.stepType = stepType;
-  }
+    public StepPsiElement(@NotNull ASTNode node, StepType stepType) {
+        super(node);
+        this.stepType = stepType;
+    }
 
-  @Override
-  @NotNull
-  public StepPsiReference getReference() {
-    return new StepPsiReference(this);
-  }
+    @Override
+    @NotNull
+    public StepPsiReference getReference() {
+        return new StepPsiReference(this);
+    }
 
-  public StepType getStepType() {
-    return stepType;
-  }
+    public StepType getStepType() {
+        return stepType;
+    }
 
-  public String getStepText() {
-    return trim(substringAfter(getText(), " "));
-  }
+    public boolean isAndStep() {
+        ASTNode keyword = getKeyword();
+        return keyword != null && keyword.getElementType() == StoryTokenType.STEP_TYPE_AND;
+    }
 
-  public String getActualStepPrefix() {
-    return substringBefore(getText(), " ");
-  }
+    @Nullable
+    public ASTNode getKeyword() {
+        return getNode().findChildByType(StoryTokenType.STEP_TYPES);
+    }
+
+    public String getStepText() {
+        int offset = getStepTextOffset();
+        if(offset==0) {
+            return trim(getText());
+        }
+        return trim(getText().substring(offset));
+    }
+
+    @Nullable
+    public String getActualStepPrefix() {
+        ASTNode keyword = getKeyword();
+        if (keyword == null) { // that's weird!
+            return null;
+        }
+        return keyword.getText();
+    }
 
     public int getStepTextOffset() {
-        return getText().indexOf(' ') + 1;
+        String stepPrefix = getActualStepPrefix();
+        return stepPrefix != null ? stepPrefix.length() : 0;
     }
 }

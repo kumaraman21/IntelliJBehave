@@ -15,26 +15,36 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
-import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.isStepType;
 
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
+import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
+import com.intellij.openapi.util.Key;
 import com.intellij.psi.tree.IElementType;
 
 import org.jetbrains.annotations.NotNull;
 
 public class StoryParser implements PsiParser {
+
+    public static final Key<String> LOCALE_KEY = new Key<String>("locale");
+
     @NotNull
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
         builder.setDebugMode(true);
         final PsiBuilder.Marker rootMarker = builder.mark();
+
+        String locale = skipWhitespacesOrComments(builder, true);
+        builder.putUserData(LOCALE_KEY, locale);
         parseStory(builder);
 
         rootMarker.done(root);
-        return builder.getTreeBuilt();
+        ASTNode treeBuilt = builder.getTreeBuilt();
+        treeBuilt.putUserData(LOCALE_KEY, locale);
+        return treeBuilt;
     }
 
     private void parseStory(PsiBuilder builder) {
@@ -46,12 +56,25 @@ public class StoryParser implements PsiParser {
         storyMarker.done(StoryElementType.STORY);
     }
 
-    private static void skipWhitespacesOrComments(PsiBuilder builder) {
+    private void skipWhitespacesOrComments(PsiBuilder builder) {
+        skipWhitespacesOrComments(builder, false);
+    }
+
+    private String skipWhitespacesOrComments(PsiBuilder builder, boolean checkForLocale) {
+        String storyLocale = "en";
+
         while(builder.getTokenType() == StoryTokenType.WHITE_SPACE
                 || builder.getTokenType() == StoryTokenType.COMMENT) {
             if(builder.getTokenType() == StoryTokenType.COMMENT) {
                 PsiBuilder.Marker commentMark = builder.mark();
                 while(builder.getTokenType() == StoryTokenType.COMMENT) {
+                    if(checkForLocale) {
+                        String commentText = builder.getTokenText();
+                        String locale = LocalizedStorySupport.checkForLanguageDefinition(commentText);
+                        if(locale!=null) {
+                            storyLocale = locale;
+                        }
+                    }
                     builder.advanceLexer();
                 }
                 commentMark.done(StoryElementType.COMMENT);
@@ -60,6 +83,8 @@ public class StoryParser implements PsiParser {
                 builder.advanceLexer();
             }
         }
+
+        return storyLocale;
     }
 
     private void parseStoryDescriptionOrNarrativesLinesIfPresent(PsiBuilder builder) {
@@ -132,10 +157,9 @@ public class StoryParser implements PsiParser {
 
     private void parseSteps(PsiBuilder builder) {
         parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
-        if (builder.getTokenType() == StoryTokenType.STEP_TYPE) {
-
+        if (isStepType(builder.getTokenType())) {
             StoryElementType previousStepElementType = null;
-            while (builder.getTokenType() == StoryTokenType.STEP_TYPE) {
+            while (isStepType(builder.getTokenType())) {
                 previousStepElementType = parseStep(builder, previousStepElementType);
                 skipWhitespacesOrComments(builder);
                 parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
@@ -146,17 +170,33 @@ public class StoryParser implements PsiParser {
         }
     }
 
+
     private StoryElementType parseStep(PsiBuilder builder, StoryElementType previousStepElementType) {
         final PsiBuilder.Marker stepMarker = builder.mark();
-
         StoryElementType currentStepElementType;
 
-        String stepTypeText = builder.getTokenText().trim().toUpperCase();
-        if (stepTypeText.equals("AND")) {
-            currentStepElementType = previousStepElementType;
+        // TODO find a nicer way to perform the switch
+        IElementType tokenType = builder.getTokenType();
+        if(tokenType == StoryTokenType.STEP_TYPE_GIVEN) {
+            currentStepElementType = StoryElementType.GIVEN_STEP;
+        }
+        else if(tokenType == StoryTokenType.STEP_TYPE_WHEN) {
+            currentStepElementType = StoryElementType.WHEN_STEP;
+        }
+        else if(tokenType == StoryTokenType.STEP_TYPE_THEN) {
+            currentStepElementType = StoryElementType.THEN_STEP;
         }
         else {
-            currentStepElementType = STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING.get(stepTypeText);
+            // should be the AND
+            if(tokenType != StoryTokenType.STEP_TYPE_AND) {
+                // throw...
+            }
+            currentStepElementType = previousStepElementType;
+        }
+
+        if(currentStepElementType==null) {
+            // yuk!
+            currentStepElementType = StoryElementType.GIVEN_STEP;
         }
 
         parseStepType(builder);

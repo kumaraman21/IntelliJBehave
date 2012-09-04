@@ -91,13 +91,16 @@ public class IntelliJBehaveBaseTestCase extends PsiTestCase {
         System.out.println("IntelliJBehaveBaseTestCase.testCase_Complex: " + DebugUtil.treeToString(astNode, false));
     }
 
-    private boolean localizedParser = true;
+    public void testCase_SimpleFR() {
+        ASTNode astNode = doParse(Samples.SIMPLE_FR);
+        System.out.println("IntelliJBehaveBaseTestCase.testCase_Complex: " + DebugUtil.treeToString(astNode, false));
+    }
 
     private ASTNode doParse(String content) {
         PsiBuilder builder = new PsiBuilderImpl(myProject,
                 null,
                 new StoryParserDefinition(),
-                localizedParser ? new StoryLocalizedLexer() : new StoryLexer(),
+                new StoryLexerFactory().createLexer(),
                 null,
                 content,
                 null,

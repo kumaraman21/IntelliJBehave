@@ -40,17 +40,4 @@ public class StepTypeMappings {
       ANNOTATION_TO_STEP_TYPE_MAPPING.put(Then.class.getName(), StepType.THEN);
     }
 
-  public static final Map<StoryElementType, StepType> STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING = new HashMap<StoryElementType, StepType>();
-  static {
-    STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING.put(StoryElementType.GIVEN_STEP, StepType.GIVEN);
-    STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING.put(StoryElementType.WHEN_STEP, StepType.WHEN);
-    STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING.put(StoryElementType.THEN_STEP, StepType.THEN);
-  }
-
-  public static final Map<String, StoryElementType> STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING = new HashMap<String, StoryElementType>();
-  static {
-    STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING.put(StepType.GIVEN.name(), StoryElementType.GIVEN_STEP );
-    STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING.put(StepType.WHEN.name(), StoryElementType.WHEN_STEP);
-    STEP_TEXT_TO_STORY_ELEMENT_TYPE_MAPPING.put(StepType.THEN.name(), StoryElementType.THEN_STEP);
-  }
 }

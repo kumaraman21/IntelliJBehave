@@ -19,12 +19,11 @@ import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY
 
 import com.intellij.psi.TokenType;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 
 import org.jetbrains.annotations.NonNls;
 
 public class StoryTokenType extends IElementType {
-
-
 
     public static final IElementType WHITE_SPACE = TokenType.WHITE_SPACE;
     public static final IElementType BAD_CHARACTER = TokenType.BAD_CHARACTER;
@@ -34,12 +33,20 @@ public class StoryTokenType extends IElementType {
     public static final IElementType SCENARIO_TEXT = new StoryTokenType("SCENARIO_TEXT");
 
     public static final IElementType STEP_TYPE = new StoryTokenType("STEP_TYPE");
+    public static final IElementType STEP_TYPE_GIVEN = new StoryTokenType("STEP_TYPE_GIVEN");
+    public static final IElementType STEP_TYPE_WHEN = new StoryTokenType("STEP_TYPE_WHEN");
+    public static final IElementType STEP_TYPE_THEN = new StoryTokenType("STEP_TYPE_THEN");
+    public static final IElementType STEP_TYPE_AND = new StoryTokenType("STEP_TYPE_AND");
+
+    public static final TokenSet STEP_TYPES = TokenSet.create(STEP_TYPE, STEP_TYPE_GIVEN, STEP_TYPE_WHEN, STEP_TYPE_THEN, STEP_TYPE_AND);
+
     public static final IElementType STEP_TEXT = new StoryTokenType("STEP_TEXT");
 
     public static final IElementType TABLE_DELIM = new StoryTokenType("TABLE_DELIM");
     public static final IElementType TABLE_CELL = new StoryTokenType("TABLE_CELL");
 
     public static final IElementType COMMENT = new StoryTokenType("COMMENT");
+    public static final IElementType COMMENT_WITH_LOCALE = new StoryTokenType("COMMENT_WITH_LOCALE");
 
     public static final IElementType META = new StoryTokenType("META");
     public static final IElementType META_KEY = new StoryTokenType("META_KEY");
@@ -50,7 +57,29 @@ public class StoryTokenType extends IElementType {
     public static final IElementType NARRATIVE_TYPE = new StoryTokenType("NARRATIVE_TYPE");
     public static final IElementType NARRATIVE_TEXT = new StoryTokenType("NARRATIVE_TEXT");
 
+    private final String key;
     public StoryTokenType(@NonNls String debugName) {
         super(debugName, STORY_FILE_TYPE.getLanguage());
+        this.key = debugName;
     }
+
+    @Override
+    public boolean equals(Object other) {
+        return (other instanceof StoryTokenType)
+                && ((StoryTokenType)other).key.equals(key);
+    }
+
+    @Override
+    public int hashCode() {
+        return key.hashCode();
+    }
+
+    public static boolean isStepType(IElementType tokenType) {
+        return tokenType == STEP_TYPE_GIVEN
+                || tokenType == STEP_TYPE_WHEN
+                || tokenType == STEP_TYPE_THEN
+                || tokenType == STEP_TYPE_AND
+                || tokenType == STEP_TYPE;
+    }
+
 }
