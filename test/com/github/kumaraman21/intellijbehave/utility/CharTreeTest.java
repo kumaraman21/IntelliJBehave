@@ -1,4 +1,4 @@
-package com.github.kumaraman21.intellijbehave.highlighter;
+package com.github.kumaraman21.intellijbehave.utility;
 
 import static com.github.kumaraman21.intellijbehave.utility.JBKeyword.Narrative;
 import static org.fest.assertions.api.Assertions.assertThat;

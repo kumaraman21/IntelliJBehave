@@ -26,17 +26,20 @@ import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
 
 public class StoryElementType extends IElementType {
+    public static final StoryElementType UNKNOWN_FRAGMENT = new StoryElementType("UNKNOWN_FRAGMENT");
+
+    public static final StoryElementType COMMENT = new StoryElementType("COMMENT");
     public static final IFileElementType STORY_FILE = new IFileElementType(STORY_FILE_TYPE.getLanguage());
     public static final StoryElementType STORY = new StoryElementType("STORY");
     public static final StoryElementType STORY_DESCRIPTION = new StoryElementType("STORY_DESCRIPTION");
     public static final StoryElementType SCENARIO = new StoryElementType("SCENARIO");
     public static final StoryElementType META = new StoryElementType("META");
+    public static final StoryElementType EXAMPLES = new StoryElementType("EXAMPLES");
+    public static final StoryElementType TABLE_ROW = new StoryElementType("TABLE_ROW");
 
     public static final StoryElementType GIVEN_STEP = new StoryElementType("GIVEN_STEP");
     public static final StoryElementType WHEN_STEP = new StoryElementType("WHEN_STEP");
     public static final StoryElementType THEN_STEP = new StoryElementType("THEN_STEP");
-    public static final StoryElementType EXAMPLES = new StoryElementType("EXAMPLES");
-    public static final StoryElementType COMMENT = new StoryElementType("COMMENT");
 
     public static final TokenSet STEPS_TOKEN_SET = TokenSet.create(GIVEN_STEP, WHEN_STEP, THEN_STEP);
 

@@ -15,45 +15,392 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
-import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.isStepType;
-
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
-import com.intellij.openapi.util.Key;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.psi.tree.TokenSet;
 
+import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 public class StoryParser implements PsiParser {
 
-    public static final Key<String> LOCALE_KEY = new Key<String>("locale");
+    private static final boolean DEBUG = false;
 
     @NotNull
     @Override
     public ASTNode parse(IElementType root, PsiBuilder builder) {
-        builder.setDebugMode(true);
         final PsiBuilder.Marker rootMarker = builder.mark();
-
-        String locale = skipWhitespacesOrComments(builder, true);
-        builder.putUserData(LOCALE_KEY, locale);
+        builder.setDebugMode(true);
         parseStory(builder);
-
         rootMarker.done(root);
-        ASTNode treeBuilt = builder.getTreeBuilt();
-        treeBuilt.putUserData(LOCALE_KEY, locale);
-        return treeBuilt;
+        return builder.getTreeBuilt();
     }
 
+    @SuppressWarnings("UnnecessaryLabelOnContinueStatement")
     private void parseStory(PsiBuilder builder) {
         final PsiBuilder.Marker storyMarker = builder.mark();
 
-        skipWhitespacesOrComments(builder);
-        parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
-        parseScenarios(builder);
+        ParserState state = new ParserState(builder);
+
+        whileLoop:
+        while (!builder.eof()) {
+            IElementType tokenType = builder.getTokenType();
+
+            // Comment and whitespace are not returned by default
+
+            if (isComment(tokenType)) {
+                state.enterComment();
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+            else {
+                state.leaveComment();
+            }
+
+            if (isWhitespace(tokenType)) {
+                if(isCrlf(builder.getTokenText())) {
+                    // this is never called unfortunately
+                    state.leaveTableRow();
+                }
+
+                state.enterWhitespace();
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+            else {
+                state.leaveWhitespace();
+            }
+
+
+            if (isStoryDescription(tokenType)) {
+                state.enterStoryDescription();
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+            else {
+                state.leaveStoryDescription();
+            }
+
+            if (isScenario(tokenType)) {
+                state.enterScenario();
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+            else if(!belongsToScenario(tokenType)) {
+                state.leaveScenario();
+            }
+
+            if (isScenarioText(tokenType)) {
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+
+            if(isMeta(tokenType)) {
+                state.enterMeta();
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+
+            if(isStepType(tokenType)) {
+                state.enterStepType(tokenType);
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+
+            if(isStepText(tokenType)) {
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+
+            if(isExampleTable(tokenType)) {
+                state.enterExampleTable();
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+            else if(!belongsToTable(tokenType)) {
+                state.leaveExampleTable();
+            }
+
+            if(isTableRow(tokenType)) {
+                state.enterTableRow();
+                builder.advanceLexer();
+                continue whileLoop;
+            }
+
+            // unknown
+            PsiBuilder.Marker unknwonMark = builder.mark();
+            builder.advanceLexer();
+            unknwonMark.done(StoryElementType.UNKNOWN_FRAGMENT);
+        }
+        state.leaveRemainings();
         storyMarker.done(StoryElementType.STORY);
+    }
+
+    private static boolean isCrlf(String text) {
+        return text.contains("\n") || text.contains("\r");
+    }
+
+    private static class MarkerData {
+        private final PsiBuilder.Marker marker;
+        private final IElementType elementType;
+
+        private MarkerData(PsiBuilder.Marker marker, IElementType elementType) {
+            this.marker = marker;
+            this.elementType = elementType;
+        }
+        public boolean matches(IElementType elementType) {
+            return this.elementType == elementType;
+        }
+        public boolean matches(TokenSet tokenSet) {
+            return tokenSet.contains(this.elementType);
+        }
+        public void applyMark() {
+            marker.done(elementType);
+        }
+    }
+
+    private static class ParserState {
+        private final PsiBuilder builder;
+        private final MarkerData[] markers = new MarkerData[10];
+        private int markerIndex = -1;
+        private StoryElementType previousStepElementType = null;
+
+
+        public ParserState(PsiBuilder builder) {
+            this.builder = builder;
+        }
+
+        private void matchesHeadOrPush(StoryElementType elementType) {
+            if(markerIndex>=0 && markers[markerIndex].matches(elementType)) {
+                return;
+            }
+            markers[++markerIndex] = new MarkerData(builder.mark(), elementType);
+            if(DEBUG) System.out.println("StoryParser$ParserState: PUSH>> " + StringUtils.repeat("..", markerIndex) + elementType);
+        }
+
+        private void popUntilOnlyIfPresent(StoryElementType elementType) {
+            int newMarkerIndex = markerIndex;
+            for(int i=markerIndex; i>=0; i--) {
+                if(markers[i].matches(elementType)) {
+                    newMarkerIndex = i - 1;
+                    break;
+                }
+            }
+
+            for(int i=newMarkerIndex+1;i<=markerIndex;i++) {
+                if(DEBUG) System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", i) + markers[i].elementType);
+                markers[i].applyMark();
+            }
+
+            markerIndex = newMarkerIndex;
+        }
+
+        public void leaveRemainings() {
+            while(markerIndex>=0) {
+                if(DEBUG) System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", markerIndex) + markers[markerIndex].elementType);
+                markers[markerIndex--].applyMark();
+            }
+        }
+
+
+        private void popUntilOnlyIfPresent(TokenSet tokenSet) {
+            int newMarkerIndex = markerIndex;
+            for(int i=markerIndex; i>=0; i--) {
+                if(markers[i].matches(tokenSet)) {
+                    newMarkerIndex = i - 1;
+                    break;
+                }
+            }
+
+            for(int i=newMarkerIndex+1;i<=markerIndex;i++) {
+                System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", i) + markers[i].elementType);
+                markers[i].applyMark();
+            }
+
+            markerIndex = newMarkerIndex;
+        }
+
+
+        public void enterComment() {
+            matchesHeadOrPush(StoryElementType.COMMENT);
+        }
+
+        private void leaveComment() {
+            popUntilOnlyIfPresent(StoryElementType.COMMENT);
+        }
+
+        public void enterWhitespace() {
+        }
+
+        public void leaveWhitespace() {
+        }
+
+        public void enterStoryDescription() {
+            leaveRemainings();
+            matchesHeadOrPush(StoryElementType.STORY_DESCRIPTION);
+        }
+
+        private void leaveStoryDescription() {
+            popUntilOnlyIfPresent(StoryElementType.STORY_DESCRIPTION);
+        }
+
+        public void enterScenario() {
+            leaveRemainings();
+            previousStepElementType = null;
+            matchesHeadOrPush(StoryElementType.SCENARIO);
+        }
+
+        private void leaveScenario() {
+            leaveRemainings();
+            previousStepElementType = null;
+            popUntilOnlyIfPresent(StoryElementType.SCENARIO);
+        }
+
+        public void enterMeta() {
+            leaveStoryDescription();
+            leaveExampleTable();
+            leaveTableRow();
+            leaveStep();
+            matchesHeadOrPush(StoryElementType.META);
+        }
+
+        private void leaveMeta() {
+            popUntilOnlyIfPresent(StoryElementType.META);
+        }
+
+        public void enterStepType(IElementType tokenType) {
+            leaveExampleTable();
+            leaveMeta();
+            leaveStep();
+            leaveStoryDescription();
+            leaveTableRow();
+
+            StoryElementType elementType = previousStepElementType;
+            if (tokenType == StoryTokenType.STEP_TYPE_GIVEN) {
+                elementType = StoryElementType.GIVEN_STEP;
+            }
+            else if (tokenType == StoryTokenType.STEP_TYPE_WHEN) {
+                elementType = StoryElementType.WHEN_STEP;
+            }
+            else if (tokenType == StoryTokenType.STEP_TYPE_THEN) {
+                elementType = StoryElementType.THEN_STEP;
+            }
+            else {
+                // should be the AND
+                if (tokenType != StoryTokenType.STEP_TYPE_AND) {
+                    // throw...
+                }
+            }
+
+            if (elementType == null) { // yuk!
+                elementType = StoryElementType.GIVEN_STEP;
+            }
+            previousStepElementType = elementType;
+            matchesHeadOrPush(elementType);
+        }
+
+        private void leaveStep() {
+            leaveTableRow();
+            popUntilOnlyIfPresent(StoryElementType.STEPS_TOKEN_SET);
+        }
+
+        public void enterExampleTable() {
+            leaveTableRow();
+            leaveStep();
+            leaveMeta();
+            leaveExampleTable();
+            matchesHeadOrPush(StoryElementType.EXAMPLES);
+        }
+
+        public void leaveExampleTable() {
+            leaveTableRow();
+            popUntilOnlyIfPresent(StoryElementType.EXAMPLES);
+        }
+
+        public void enterTableRow() {
+            matchesHeadOrPush(StoryElementType.TABLE_ROW);
+        }
+
+        public void leaveTableRow() {
+            popUntilOnlyIfPresent(StoryElementType.TABLE_ROW);
+        }
+    }
+
+    private static boolean belongsToScenario(IElementType tokenType) {
+        return isWhitespace(tokenType)
+                || isComment(tokenType)
+                || isScenarioText(tokenType)
+                || isStoryDescription(tokenType)
+                || isStepType(tokenType)
+                || isStepText(tokenType)
+                || isExampleTable(tokenType)
+                || isTableRow(tokenType)
+                || isMeta(tokenType);
+    }
+
+    private boolean belongsToTable(IElementType tokenType) {
+        return isWhitespace(tokenType)
+                || isComment(tokenType)
+                || isTableRow(tokenType);
+    }
+    private static boolean isMeta(IElementType tokenType) {
+        return tokenType == StoryTokenType.META
+                || tokenType == StoryTokenType.META_KEY
+                || tokenType == StoryTokenType.META_TEXT
+                ;
+    }
+
+    private static boolean isGivenStories(IElementType tokenType) {
+        return tokenType == StoryTokenType.GIVEN_STORIES;
+    }
+
+    private static boolean isExampleTable(IElementType tokenType) {
+        return tokenType == StoryTokenType.EXAMPLE_TYPE;
+    }
+
+    private static boolean isTableRow(IElementType tokenType) {
+        return tokenType == StoryTokenType.TABLE_CELL
+                || tokenType == StoryTokenType.TABLE_DELIM;
+    }
+
+    private static boolean isStepType(IElementType tokenType) {
+        return tokenType == StoryTokenType.STEP_TYPE
+                || tokenType == StoryTokenType.STEP_TYPE_GIVEN
+                || tokenType == StoryTokenType.STEP_TYPE_WHEN
+                || tokenType == StoryTokenType.STEP_TYPE_THEN
+                || tokenType == StoryTokenType.STEP_TYPE_AND;
+    }
+
+    private static boolean isStepText(IElementType tokenType) {
+        return tokenType == StoryTokenType.STEP_TEXT;
+    }
+
+    private static boolean isScenario(IElementType tokenType) {
+        return tokenType == StoryTokenType.SCENARIO_TYPE;
+    }
+
+    private static boolean isScenarioText(IElementType tokenType) {
+        return tokenType == StoryTokenType.SCENARIO_TEXT;
+    }
+
+    private static boolean isWhitespace(IElementType tokenType) {
+        return tokenType == StoryTokenType.WHITE_SPACE;
+    }
+
+    private static boolean isComment(IElementType tokenType) {
+        return tokenType == StoryTokenType.COMMENT
+                || tokenType == StoryTokenType.COMMENT_WITH_LOCALE;
+    }
+
+    private static boolean isStoryDescription(IElementType tokenType) {
+        return tokenType == StoryTokenType.STORY_DESCRIPTION
+                || tokenType == StoryTokenType.NARRATIVE_TYPE
+                || tokenType == StoryTokenType.NARRATIVE_TEXT
+                ;
     }
 
     private void skipWhitespacesOrComments(PsiBuilder builder) {
@@ -63,15 +410,16 @@ public class StoryParser implements PsiParser {
     private String skipWhitespacesOrComments(PsiBuilder builder, boolean checkForLocale) {
         String storyLocale = "en";
 
-        while(builder.getTokenType() == StoryTokenType.WHITE_SPACE
-                || builder.getTokenType() == StoryTokenType.COMMENT) {
-            if(builder.getTokenType() == StoryTokenType.COMMENT) {
+        while (isWhitespace(builder.getTokenType())
+                || builder.getTokenType() == StoryTokenType.COMMENT)
+        {
+            if (builder.getTokenType() == StoryTokenType.COMMENT) {
                 PsiBuilder.Marker commentMark = builder.mark();
-                while(builder.getTokenType() == StoryTokenType.COMMENT) {
-                    if(checkForLocale) {
+                while (builder.getTokenType() == StoryTokenType.COMMENT) {
+                    if (checkForLocale) {
                         String commentText = builder.getTokenText();
                         String locale = LocalizedStorySupport.checkForLanguageDefinition(commentText);
-                        if(locale!=null) {
+                        if (locale != null) {
                             storyLocale = locale;
                         }
                     }
@@ -88,16 +436,18 @@ public class StoryParser implements PsiParser {
     }
 
     private void parseStoryDescriptionOrNarrativesLinesIfPresent(PsiBuilder builder) {
-        if(builder.getTokenType() != StoryTokenType.STORY_DESCRIPTION
+        if (builder.getTokenType() != StoryTokenType.STORY_DESCRIPTION
                 && builder.getTokenType() != StoryTokenType.NARRATIVE_TYPE
-                && builder.getTokenType() != StoryTokenType.NARRATIVE_TEXT) {
+                && builder.getTokenType() != StoryTokenType.NARRATIVE_TEXT)
+        {
             return;
         }
 
         PsiBuilder.Marker marker = builder.mark();
         while (builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION
                 || builder.getTokenType() == StoryTokenType.NARRATIVE_TYPE
-                || builder.getTokenType() == StoryTokenType.NARRATIVE_TEXT) {
+                || builder.getTokenType() == StoryTokenType.NARRATIVE_TEXT)
+        {
             parseStoryDescriptionLine(builder);
             skipWhitespacesOrComments(builder);
         }
@@ -110,7 +460,7 @@ public class StoryParser implements PsiParser {
 
     private void parseScenarios(PsiBuilder builder) {
         if (builder.getTokenType() == StoryTokenType.SCENARIO_TYPE) {
-            while(builder.getTokenType() == StoryTokenType.SCENARIO_TYPE) {
+            while (builder.getTokenType() == StoryTokenType.SCENARIO_TYPE) {
                 parseScenario(builder);
                 skipWhitespacesOrComments(builder);
             }
@@ -147,7 +497,8 @@ public class StoryParser implements PsiParser {
             final PsiBuilder.Marker stepMarker = builder.mark();
             while (builder.getTokenType() == StoryTokenType.META
                     || builder.getTokenType() == StoryTokenType.META_TEXT
-                    || builder.getTokenType() == StoryTokenType.META_KEY) {
+                    || builder.getTokenType() == StoryTokenType.META_KEY)
+            {
                 builder.advanceLexer();
                 skipWhitespacesOrComments(builder);
             }
@@ -177,24 +528,24 @@ public class StoryParser implements PsiParser {
 
         // TODO find a nicer way to perform the switch
         IElementType tokenType = builder.getTokenType();
-        if(tokenType == StoryTokenType.STEP_TYPE_GIVEN) {
+        if (tokenType == StoryTokenType.STEP_TYPE_GIVEN) {
             currentStepElementType = StoryElementType.GIVEN_STEP;
         }
-        else if(tokenType == StoryTokenType.STEP_TYPE_WHEN) {
+        else if (tokenType == StoryTokenType.STEP_TYPE_WHEN) {
             currentStepElementType = StoryElementType.WHEN_STEP;
         }
-        else if(tokenType == StoryTokenType.STEP_TYPE_THEN) {
+        else if (tokenType == StoryTokenType.STEP_TYPE_THEN) {
             currentStepElementType = StoryElementType.THEN_STEP;
         }
         else {
             // should be the AND
-            if(tokenType != StoryTokenType.STEP_TYPE_AND) {
+            if (tokenType != StoryTokenType.STEP_TYPE_AND) {
                 // throw...
             }
             currentStepElementType = previousStepElementType;
         }
 
-        if(currentStepElementType==null) {
+        if (currentStepElementType == null) {
             // yuk!
             currentStepElementType = StoryElementType.GIVEN_STEP;
         }
@@ -244,7 +595,8 @@ public class StoryParser implements PsiParser {
     private void parseTableIfPresent(PsiBuilder builder) {
         if (builder.getTokenType() == StoryTokenType.TABLE_DELIM) {
             while (builder.getTokenType() == StoryTokenType.TABLE_DELIM
-                    || builder.getTokenType() == StoryTokenType.TABLE_CELL) {
+                    || builder.getTokenType() == StoryTokenType.TABLE_CELL)
+            {
                 parseTableToken(builder);
                 skipWhitespacesOrComments(builder);
             }

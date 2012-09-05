@@ -1,10 +1,10 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
-import static com.github.kumaraman21.intellijbehave.highlighter.Samples.COMPLEX_SAMPLE;
-import static com.github.kumaraman21.intellijbehave.highlighter.Samples.LONG_SAMPLE;
-import static com.github.kumaraman21.intellijbehave.highlighter.Samples.EXAMPLES_SAMPLE;
-import static com.github.kumaraman21.intellijbehave.highlighter.Samples.META_SAMPLE;
-import static com.github.kumaraman21.intellijbehave.highlighter.Samples.SIMPLE_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.COMPLEX_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.LONG_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.EXAMPLES_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.META_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.SIMPLE_SAMPLE;
 import static org.fest.assertions.api.Assertions.assertThat;
 
 import com.intellij.psi.tree.IElementType;

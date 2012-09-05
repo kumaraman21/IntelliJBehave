@@ -1,4 +1,4 @@
-package com.github.kumaraman21.intellijbehave.highlighter;
+package com.github.kumaraman21.intellijbehave;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>

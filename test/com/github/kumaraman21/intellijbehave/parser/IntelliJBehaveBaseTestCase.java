@@ -1,8 +1,7 @@
-package com.github.kumaraman21.intellijbehave.highlighter;
+package com.github.kumaraman21.intellijbehave.parser;
 
-import com.github.kumaraman21.intellijbehave.parser.StoryElementType;
-import com.github.kumaraman21.intellijbehave.parser.StoryParser;
-import com.github.kumaraman21.intellijbehave.parser.StoryParserDefinition;
+import com.github.kumaraman21.intellijbehave.Samples;
+import com.github.kumaraman21.intellijbehave.highlighter.StoryLexerFactory;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.impl.PsiBuilderImpl;
