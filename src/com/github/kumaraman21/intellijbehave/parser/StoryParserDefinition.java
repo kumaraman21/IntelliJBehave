@@ -15,7 +15,7 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
-import com.github.kumaraman21.intellijbehave.highlighter.StoryLexer;
+import com.github.kumaraman21.intellijbehave.highlighter.StoryLexerFactory;
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
@@ -29,15 +29,15 @@ import com.intellij.psi.PsiFile;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
-import org.jetbrains.annotations.NotNull;
 
-import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING;
+import org.jbehave.core.steps.StepType;
+import org.jetbrains.annotations.NotNull;
 
 public class StoryParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public Lexer createLexer(Project project) {
-    return new StoryLexer();
+    return new StoryLexerFactory().createLexer();
   }
 
   @Override
@@ -59,7 +59,7 @@ public class StoryParserDefinition implements ParserDefinition {
   @NotNull
   @Override
   public TokenSet getCommentTokens() {
-    return TokenSet.create(StoryTokenType.COMMENT);
+    return TokenSet.create(StoryTokenType.COMMENT, StoryTokenType.COMMENT_WITH_LOCALE);
   }
 
   @NotNull
@@ -72,8 +72,14 @@ public class StoryParserDefinition implements ParserDefinition {
   @Override
   public PsiElement createElement(ASTNode node) {
     final IElementType type = node.getElementType();
-    if (type == StoryElementType.GIVEN_STEP || type == StoryElementType.WHEN_STEP || type == StoryElementType.THEN_STEP) {
-      return new StepPsiElement(node, STORY_ELEMENT_TYPE_TO_STEP_TYPE_MAPPING.get(type));
+    if (type == StoryElementType.GIVEN_STEP) {
+        return new StepPsiElement(node, StepType.GIVEN);
+    }
+    else if (type == StoryElementType.WHEN_STEP) {
+        return new StepPsiElement(node, StepType.WHEN);
+    }
+    else if (type == StoryElementType.THEN_STEP) {
+        return new StepPsiElement(node, StepType.THEN);
     }
 
     return new ASTWrapperPsiElement(node);

@@ -19,9 +19,9 @@ import com.intellij.psi.PsiAnnotation;
 import org.jbehave.core.steps.StepType;
 
 public class StepDefinitionAnnotation {
-  private StepType stepType;
-  private String annotationText;
-  private PsiAnnotation annotation;
+  private final StepType stepType;
+  private final String annotationText;
+  private final PsiAnnotation annotation;
 
   public StepDefinitionAnnotation(StepType stepType, String annotationText, PsiAnnotation annotation) {
     this.stepType = stepType;

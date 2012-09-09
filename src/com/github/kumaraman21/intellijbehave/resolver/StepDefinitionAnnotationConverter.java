@@ -20,8 +20,10 @@ import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiLiteral;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Aliases;
+import org.jbehave.core.steps.PatternVariantBuilder;
 import org.jbehave.core.steps.StepType;
 
+import java.util.List;
 import java.util.Set;
 
 import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
@@ -37,27 +39,32 @@ public class StepDefinitionAnnotationConverter {
 
     for (PsiAnnotation annotation : annotations) {
       // Given, When, Then
-      if(ANNOTATION_TO_STEP_TYPE_MAPPING.keySet().contains(annotation.getQualifiedName())) {
+      if (ANNOTATION_TO_STEP_TYPE_MAPPING.keySet().contains(annotation.getQualifiedName())) {
         stepType = ANNOTATION_TO_STEP_TYPE_MAPPING.get(annotation.getQualifiedName());
         String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
-        stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
-      }
-      else if(annotation.getQualifiedName().equals(Alias.class.getName())) {
+        stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
+      } else if (annotation.getQualifiedName().equals(Alias.class.getName())) {
         String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
-        stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
-      }
-      else if(annotation.getQualifiedName().equals(Aliases.class.getName())) {
-
+        stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
+      } else if (annotation.getQualifiedName().equals(Aliases.class.getName())) {
         PsiElement[] values = annotation.getParameterList().getAttributes()[0].getValue().getChildren();
         for (PsiElement value : values) {
-          if(value instanceof PsiLiteral) {
+          if (value instanceof PsiLiteral) {
             String annotationText = getTextFromValue(value);
-            stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
+            stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
           }
         }
       }
     }
+    return stepDefinitionAnnotations;
+  }
 
+  private Set<StepDefinitionAnnotation> getPatternVariants(StepType stepType, String annotationText, PsiAnnotation annotation) {
+    Set<StepDefinitionAnnotation> stepDefinitionAnnotations = newHashSet();
+    PatternVariantBuilder b = new PatternVariantBuilder(annotationText);
+    for (String variant : b.allVariants()) {
+      stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, variant, annotation));
+    }
     return stepDefinitionAnnotations;
   }
 
