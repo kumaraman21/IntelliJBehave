@@ -19,6 +19,7 @@ import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
 import org.jbehave.core.steps.StepType;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
@@ -27,9 +28,9 @@ import static com.github.kumaraman21.intellijbehave.utility.ProjectUtils.getCurr
 public abstract class StepDefinitionIterator implements ContentIterator {
 
   private final StepDefinitionAnnotationConverter stepDefinitionAnnotationConverter = new StepDefinitionAnnotationConverter();
-  private StepType stepType;
+  private final StepType stepType;
 
-  public StepDefinitionIterator(StepType stepType) {
+  public StepDefinitionIterator(@Nullable StepType stepType) {
     this.stepType = stepType;
   }
 
@@ -48,10 +49,10 @@ public abstract class StepDefinitionIterator implements ContentIterator {
           Set<StepDefinitionAnnotation> stepDefinitionAnnotations = stepDefinitionAnnotationConverter.convertFrom(annotations);
 
           for (StepDefinitionAnnotation stepDefinitionAnnotation : stepDefinitionAnnotations) {
-            if(stepDefinitionAnnotation.getStepType().equals(stepType)) {
+            if(stepType==null || stepDefinitionAnnotation.getStepType().equals(stepType)) {
 
               boolean shouldContinue = processStepDefinition(stepDefinitionAnnotation);
-              if(shouldContinue == false) {
+              if(!shouldContinue) {
                 return shouldContinue;
               }
             }

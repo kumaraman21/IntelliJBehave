@@ -21,6 +21,7 @@ import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.InputStreamReader;
 
 import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
@@ -33,12 +34,23 @@ public class JBehaveTemplateLoaderComponent implements ApplicationComponent {
     if (template == null) {
       template = FileTemplateManager.getInstance()
         .addTemplate(STORY_FILE_TYPE.getName(), STORY_FILE_TYPE.getDefaultExtension());
+
+      InputStream stream = getClass().getResourceAsStream("/fileTemplates/JBehave Story.story.ft");
       try {
-        template.setText(
-          loadTextAndClose(new InputStreamReader(getClass().getResourceAsStream("/fileTemplates/JBehave Story.story.ft"))));
+        if(stream!=null)
+          template.setText(loadTextAndClose(new InputStreamReader(stream)));
       }
       catch (IOException e) {
         e.printStackTrace();
+      }
+      finally {
+        try {
+          if(stream!=null)
+            stream.close();
+        }
+        catch (IOException e) {
+          e.printStackTrace();
+        }
       }
     }
   }

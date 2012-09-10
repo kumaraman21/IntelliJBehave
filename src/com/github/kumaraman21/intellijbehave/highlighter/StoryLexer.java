@@ -23,4 +23,8 @@ public class StoryLexer extends FlexAdapter {
   public StoryLexer() {
     super(new _StoryLexer((Reader)null));
   }
+
+  public LexicalState lexerState() {
+      return LexicalState.fromLexer(getFlex().yystate());
+  }
 }
