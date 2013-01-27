@@ -33,45 +33,17 @@
       </library>
     </orderEntry>
     <orderEntry type="module-library" scope="TEST">
-      <library name="junit:junit:4.10" type="repository">
-        <properties maven-id="junit:junit:4.10" />
+      <library name="Fest Test Library">
         <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/junit-4.10.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/hamcrest-core-1.1.jar!/" />
+          <root url="jar://$MODULE_DIR$/testLib/fest-assert-core-2.0M5.jar!/" />
+          <root url="jar://$MODULE_DIR$/testLib/fest-util-1.2.0.jar!/" />
+          <root url="jar://$MODULE_DIR$/testLib/junit-4.10.jar!/" />
+          <root url="jar://$MODULE_DIR$/testLib/mockito-all-1.9.0.jar!/" />
         </CLASSES>
         <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library name="org.easytesting:fest-util:1.2.0" type="repository">
-        <properties maven-id="org.easytesting:fest-util:1.2.0" />
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/fest-util-1.2.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library name="org.easytesting:fest-assert-core:2.0M5" type="repository">
-        <properties maven-id="org.easytesting:fest-assert-core:2.0M5" />
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/fest-assert-core-2.0M5.jar!/" />
-          <root url="jar://$MODULE_DIR$/lib/fest-util-1.2.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
-      </library>
-    </orderEntry>
-    <orderEntry type="module-library" scope="TEST">
-      <library name="org.mockito:mockito-all:1.9.0" type="repository">
-        <properties maven-id="org.mockito:mockito-all:1.9.0" />
-        <CLASSES>
-          <root url="jar://$MODULE_DIR$/lib/mockito-all-1.9.0.jar!/" />
-        </CLASSES>
-        <JAVADOC />
-        <SOURCES />
+        <SOURCES>
+          <root url="jar://$MODULE_DIR$/testLib/mockito-all-1.9.0.jar!/" />
+        </SOURCES>
       </library>
     </orderEntry>
   </component>
