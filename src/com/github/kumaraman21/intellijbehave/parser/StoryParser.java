@@ -72,6 +72,7 @@ public class StoryParser implements PsiParser {
     builder.advanceLexer();
     parseSteps(builder);
     parseStoryDescriptionLinesIfPresent(builder);
+    parseTableIfPresent(builder);
     stepMarker.done(StoryElementType.SCENARIO);
   }
 
@@ -105,7 +106,6 @@ public class StoryParser implements PsiParser {
 
     parseStepType(builder);
     parseStepText(builder);
-    parseTableIfPresent(builder);
     stepMarker.done(currentStepElementType);
 
     return currentStepElementType;
