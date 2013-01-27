@@ -43,11 +43,6 @@ public class JBehaveConfigurable implements SearchableConfigurable {
   }
 
   @Override
-  public Icon getIcon() {
-    return null;
-  }
-
-  @Override
   public String getHelpTopic() {
     return "reference.settingsdialog.project.jbehave";
   }

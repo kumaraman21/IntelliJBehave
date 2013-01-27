@@ -22,21 +22,21 @@ import org.jbehave.core.steps.StepType;
 
 import java.util.Set;
 
-import static com.github.kumaraman21.intellijbehave.utility.ProjectUtils.getCurrentProject;
-
 public abstract class StepDefinitionIterator implements ContentIterator {
 
   private final StepDefinitionAnnotationConverter stepDefinitionAnnotationConverter = new StepDefinitionAnnotationConverter();
   private StepType stepType;
+  private PsiElement storyRef;
 
-  public StepDefinitionIterator(StepType stepType) {
+  public StepDefinitionIterator(StepType stepType, PsiElement storyRef) {
     this.stepType = stepType;
+    this.storyRef = storyRef;
   }
 
   @Override
   public boolean processFile(VirtualFile virtualFile) {
 
-    PsiFile psiFile = PsiManager.getInstance(getCurrentProject()).findFile(virtualFile);
+    PsiFile psiFile = PsiManager.getInstance(storyRef.getProject()).findFile(virtualFile);
     if (psiFile instanceof PsiClassOwner) {
       PsiClass[] psiClasses = ((PsiClassOwner)psiFile).getClasses();
 

@@ -56,8 +56,8 @@ public class StepPsiReference implements PsiReference {
     StepType stepType = stepPsiElement.getStepType();
     String stepText = stepPsiElement.getStepText();
 
-    StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(stepType, stepText);
-    getProjectFileIndex().iterateContent(stepAnnotationFinder);
+    StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(stepType, stepText, stepPsiElement);
+    getProjectFileIndex(stepPsiElement.getProject()).iterateContent(stepAnnotationFinder);
 
     return stepAnnotationFinder.getMatchingAnnotation();
   }
@@ -68,8 +68,8 @@ public class StepPsiReference implements PsiReference {
     StepType stepType = stepPsiElement.getStepType();
     String actualStepPrefix = stepPsiElement.getActualStepPrefix();
 
-    StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix);
-    getProjectFileIndex().iterateContent(stepSuggester);
+    StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix, stepPsiElement);
+    getProjectFileIndex(stepPsiElement.getProject()).iterateContent(stepSuggester);
 
     return stepSuggester.getSuggestions().toArray();
   }
@@ -79,8 +79,8 @@ public class StepPsiReference implements PsiReference {
     private List<String> suggestions = newArrayList();
     private String actualStepPrefix;
 
-    public StepSuggester(StepType stepType, String actualStepPrefix) {
-      super(stepType);
+    public StepSuggester(StepType stepType, String actualStepPrefix, PsiElement storyRef) {
+      super(stepType, storyRef);
       this.actualStepPrefix = actualStepPrefix;
     }
 
@@ -102,8 +102,8 @@ private static class StepAnnotationFinder extends StepDefinitionIterator {
   private PsiElement matchingAnnotation;
   private StepPatternParser stepPatternParser = new RegexPrefixCapturingPatternParser();
 
-  private StepAnnotationFinder(StepType stepType, String stepText) {
-    super(stepType);
+  private StepAnnotationFinder(StepType stepType, String stepText, PsiElement storyRef) {
+    super(stepType, storyRef);
     this.stepType = stepType;
     this.stepText = stepText;
   }

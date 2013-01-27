@@ -24,12 +24,7 @@ import org.jetbrains.annotations.NotNull;
 public class ProjectUtils {
 
   @NotNull
-  public static Project getCurrentProject() {
-    return ProjectManager.getInstance().getOpenProjects()[0];
-  }
-
-  @NotNull
-  public static ProjectFileIndex getProjectFileIndex() {
-    return ProjectRootManager.getInstance(getCurrentProject()).getFileIndex();
+  public static ProjectFileIndex getProjectFileIndex(Project project) {
+    return ProjectRootManager.getInstance(project).getFileIndex();
   }
 }
