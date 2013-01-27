@@ -119,8 +119,9 @@ public class StoryCompletionContributor extends CompletionContributor {
                     stepType,
                     actualStepPrefix,
                     textBeforeCaret,
-                    consumer);
-            getProjectFileIndex().iterateContent(stepAnnotationFinder);
+                    consumer,
+                    stepPsiElement);
+            getProjectFileIndex(stepPsiElement.getProject()).iterateContent(stepAnnotationFinder);
         }
     }
 
@@ -159,9 +160,10 @@ public class StoryCompletionContributor extends CompletionContributor {
         private StepSuggester(PrefixMatcher prefixMatcher,
                               StepType stepType,
                               String actualStepPrefix,
-                              String textBeforeCaret, Consumer<LookupElement> consumer)
+                              String textBeforeCaret, Consumer<LookupElement> consumer,
+                              PsiElement storyRef)
         {
-            super(null);
+            super(null, storyRef);
             this.prefixMatcher = prefixMatcher;
             this.stepType = stepType;
             this.actualStepPrefix = actualStepPrefix;
