@@ -1,0 +1,578 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>com.touchatag.qa</groupId>
+    <artifactId>qa-pom</artifactId>
+    <version>2.0-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>qa-pom</name>
+    <url>http://maven.apache.org</url>
+    <modules>
+        <module>framework</module>
+        <module>qa-build-maven-plugin</module>
+        <module>qa-api</module>
+        <module>qa-suite</module>
+		<module>qa-ui2</module>
+		<module>qa-client-v1</module>
+		<module>qa-client-v2</module>
+        <module>qa-vmagent</module>
+        <module>qa-run</module>
+        <module>qa-gateway</module>
+        <module>qa-api-test</module>
+        <module>qa-ui-test</module>
+        <module>qa-merchant-ui</module>
+        <module>qa-stories</module>
+  </modules>
+    <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <groupId>com.touchatag.qa</groupId>
+        <maven.version>3.0.4</maven.version>
+        <aether.version>1.13.1</aether.version>
+        <wagon.version>2.2</wagon.version>
+        <slf4j.version>1.6.6</slf4j.version>
+        
+        <!-- MWS client version -->
+        <mws.version>5.1.1.1-SNAPSHOT</mws.version>
+        
+        <!-- JBOSS versions -->
+        <jboss.version>4.2.3.GA</jboss.version>
+        <jboss.previous.version>4.2.2.GA</jboss.previous.version>
+        <persistence-api.version>1.0</persistence-api.version> <!-- Related to JBoss -->
+        <servlet-api.version>2.4</servlet-api.version> <!-- Related to JBoss -->
+        <jaxb-api.version>2.1</jaxb-api.version> <!-- Related to JBoss -->
+        <resteasy.version>1.1.GA</resteasy.version> <!-- Related to JBoss -->
+       
+    </properties>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>com.touchatag</groupId>
+                <artifactId>com.touchatag.evalue.api.v1.client</artifactId>
+                <version>${mws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.touchatag</groupId>
+                <artifactId>com.touchatag.evalue.api.v1</artifactId>
+                <version>${mws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.touchatag</groupId>
+                <artifactId>com.touchatag.adss.api.client</artifactId>
+                <version>${mws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>com.alcatel_lucent.mcommerce</groupId>
+                <artifactId>api.v2.client</artifactId>
+                <version>${mws.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>junit</groupId>
+                <artifactId>junit</artifactId>
+                <version>4.10</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>4.1.2</version>
+            </dependency>
+            <dependency>
+                <groupId>oauth.signpost</groupId>
+                <artifactId>signpost-core</artifactId>
+                <version>1.2.1.1</version>
+            </dependency>
+            <dependency>
+                <groupId>oauth.signpost</groupId>
+                <artifactId>signpost-commonshttp4</artifactId>
+                <version>1.2.1.1</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.apache.httpcomponents</groupId>
+                        <artifactId>httpcore</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                <groupId>xom</groupId>
+                <artifactId>xom</artifactId>
+                <version>1.2.5</version>
+            </dependency>
+<!--             
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-jmx</artifactId>
+                <version>4.2.3.GA</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.client</groupId>
+                <artifactId>jbossall-client</artifactId>
+                <version>4.2.3.GA</version>
+            </dependency>
+ -->            
+            <dependency>
+                <groupId>org.apache.xmlrpc</groupId>
+                <artifactId>xmlrpc-client</artifactId>
+                <version>3.1.3</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.xmlrpc</groupId>
+                <artifactId>xmlrpc-common</artifactId>
+                <version>3.1.3</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.inject</groupId>
+                <artifactId>javax.inject</artifactId>
+                <version>1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.jboss.weld.se</groupId>
+                <artifactId>weld-se-core</artifactId>
+                <version>1.1.8.Final</version>
+            </dependency>
+            <dependency>
+                <groupId>mysql</groupId>
+                <artifactId>mysql-connector-java</artifactId>
+                <version>5.1.18</version>
+            </dependency>
+            <dependency>
+                <groupId>org.apache.ws.commons.util</groupId>
+                <artifactId>ws-commons-util</artifactId>
+                <version>1.0.2</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.ethz.ganymed</groupId>
+                <artifactId>ganymed-ssh2</artifactId>
+                <version>build250</version>
+            </dependency>
+            <dependency>
+                <groupId>org.freemarker</groupId>
+                <artifactId>freemarker</artifactId>
+                <version>2.3.18</version>
+            </dependency>
+            <dependency>
+                <groupId>com.google.guava</groupId>
+                <artifactId>guava</artifactId>
+                <version>13.0.1</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-api</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>slf4j-ext</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jcl-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>log4j-over-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>org.slf4j</groupId>
+                <artifactId>jul-to-slf4j</artifactId>
+                <version>${slf4j.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>1.0.0</version>
+            </dependency>
+            <dependency>
+                <groupId>log4j</groupId>
+                <artifactId>log4j</artifactId>
+                <version>1.2.16</version>
+            </dependency>
+            <dependency>
+                <groupId>org.scribe</groupId>
+                <artifactId>scribe</artifactId>
+                <version>1.2.3</version>
+            </dependency>
+            <dependency>
+                <groupId>commons-codec</groupId>
+                <artifactId>commons-codec</artifactId>
+                <version>1.4</version>
+            </dependency>
+			<dependency>
+			    <groupId>org.hamcrest</groupId>
+			    <artifactId>hamcrest-core</artifactId>
+			    <version>1.3</version>
+			</dependency>        
+			<dependency>
+			    <groupId>org.hamcrest</groupId>
+			    <artifactId>hamcrest-library</artifactId>
+			    <version>1.3</version>
+			</dependency>
+ 		    <dependency>
+		     	<groupId>org.codehaus.jackson</groupId>
+		     	<artifactId>jackson-mapper-asl</artifactId>
+		     	<version>1.9.9</version>
+		    </dependency>			        
+ 		    <dependency>
+		     	<groupId>org.codehaus.jackson</groupId>
+		     	<artifactId>jackson-core-asl</artifactId>
+		     	<version>1.9.9</version>
+		    </dependency>
+            <dependency>
+                <groupId>joda-time</groupId>
+                <artifactId>joda-time</artifactId>
+                <version>2.0</version>
+            </dependency>
+
+			<dependency>
+				<groupId>org.sonatype.aether</groupId>
+				<artifactId>aether-api</artifactId>
+				<version>${aether.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.aether</groupId>
+				<artifactId>aether-spi</artifactId>
+				<version>${aether.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.aether</groupId>
+				<artifactId>aether-util</artifactId>
+				<version>${aether.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.aether</groupId>
+				<artifactId>aether-impl</artifactId>
+				<version>${aether.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.aether</groupId>
+				<artifactId>aether-connector-file</artifactId>
+				<version>${aether.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.aether</groupId>
+				<artifactId>aether-connector-wagon</artifactId>
+				<version>${aether.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven</groupId>
+				<artifactId>maven-aether-provider</artifactId>
+				<version>${maven.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-provider-api</artifactId>
+				<version>${wagon.version}</version>
+			</dependency>
+			<dependency>
+				<groupId>org.apache.maven.wagon</groupId>
+				<artifactId>wagon-http-lightweight</artifactId>
+				<version>${wagon.version}</version>
+				<exclusions>
+					<exclusion>
+						<groupId>org.apache.maven.wagon</groupId>
+						<artifactId>wagon-http-shared</artifactId>
+					</exclusion>
+				</exclusions>
+			</dependency>
+			<dependency>
+				<groupId>org.codehaus.plexus</groupId>
+				<artifactId>plexus-utils</artifactId>
+				<version>2.0.7</version>
+			</dependency>
+			<dependency>
+				<groupId>org.sonatype.sisu</groupId>
+				<artifactId>sisu-inject-plexus</artifactId>
+				<version>2.3.1</version>
+			</dependency>		
+			<dependency>
+				<groupId>org.springframework</groupId>
+				<artifactId>spring-context</artifactId>
+				<version>3.1.2.RELEASE</version>
+			</dependency> 
+            <dependency>
+                <groupId>org.springframework</groupId>
+                <artifactId>spring-jdbc</artifactId>
+                <version>3.1.2.RELEASE</version>
+            </dependency>
+            <dependency>
+                <groupId>cglib</groupId>
+                <artifactId>cglib</artifactId>
+                <version>2.2.2</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-core</artifactId>
+                <version>2.0.6</version>
+            </dependency>
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>2.0.6</version>
+            </dependency>
+
+
+        <!-- START OF JBOSS DEPENDENCIES -->
+            <!-- These dependencies replace the jbossall-client bundle -->
+            
+            <!-- required -->             
+            <dependency>
+                <groupId>oswego-concurrent</groupId>
+                <artifactId>concurrent</artifactId>
+                <version>1.3.4-jboss-update1</version>
+            </dependency>
+
+            <!-- required -->
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+
+            <!-- not required -->
+            <!--              
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-ejb3</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-ejb3x</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-annotations-ejb3</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-j2ee</artifactId>
+                <version>${jboss.previous.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-system</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+             -->
+             
+            <!-- required -->
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-common</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+            
+            <!-- required -->
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-jmx</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+             
+            <!-- required -->             
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jbosssx</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+             
+            <!-- not required -->
+            <!--              
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jbossws-spi</artifactId>
+                <version>1.0.0.GA</version>
+            </dependency>
+            <dependency>
+                <groupId>jboss.jbossws</groupId>
+                <artifactId>jbossws-core</artifactId>
+                <version>3.0.1-native-2.0.4.GA</version>
+            </dependency>
+             -->
+ 
+            <!-- required -->
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-serialization</artifactId>
+                <version>1.0.3.GA</version>
+            </dependency>
+            
+            <!-- required -->
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-remoting</artifactId>
+                <version>2.2.2.SP8</version>
+            </dependency>
+             
+            <!-- required -->
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jnp-client</artifactId>
+                <version>${jboss.previous.version}</version>
+            </dependency>
+            
+            <!-- required -->
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jmx-adaptor-plugin</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+
+            <!-- required -->             
+            <dependency>
+                <groupId>jboss</groupId>
+                <artifactId>jboss-transaction</artifactId>
+                <version>${jboss.version}</version>
+            </dependency>
+
+            <!-- not required -->
+            <!-- 
+            <dependency>
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxrs</artifactId>
+                <version>${resteasy.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>org.slf4j</groupId>
+                        <artifactId>slf4j-simple</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency> 
+                <groupId>org.jboss.resteasy</groupId>
+                <artifactId>resteasy-jaxb-provider</artifactId>
+                <version>${resteasy.version}</version>
+                <exclusions>
+                    <exclusion>
+                        <groupId>javax.xml.stream</groupId>
+                        <artifactId>stax-api</artifactId>
+                    </exclusion>
+                </exclusions>
+            </dependency>
+            <dependency>
+                    <groupId>org.jboss.resteasy</groupId>
+                    <artifactId>resteasy-jackson-provider</artifactId>
+                    <version>${resteasy.version}</version>
+            </dependency>
+            -->
+ 
+            <!-- JBoss "related" dependencies: These dependencies are based on the implementation support present in JBoss -->
+            <!-- not required -->
+            <!--              
+            <dependency>
+                <groupId>javax.persistence</groupId>
+                <artifactId>persistence-api</artifactId>
+                <version>${persistence-api.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>javax.servlet</groupId>
+                <artifactId>servlet-api</artifactId>
+                <version>${servlet-api.version}</version>
+            </dependency>
+           -->
+        <!-- END OF JBOSS DEPENDENCIES -->
+		</dependencies>
+    </dependencyManagement>
+    <build>
+        <pluginManagement>
+            <plugins>
+                <plugin>
+                    <artifactId>maven-eclipse-plugin</artifactId>
+                    <version>2.8</version>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-compiler-plugin</artifactId>
+                    <version>2.3.2</version>
+                    <configuration>
+                        <encoding>UTF-8</encoding>
+                        <source>1.6</source>
+                        <target>1.6</target>
+						<!-- To avoid the compilation of source files that are already compiled -->
+                        <fork>true</fork>
+                    </configuration>
+                </plugin>
+                <plugin>
+                    <groupId>org.apache.maven.plugins</groupId>
+                    <artifactId>maven-jar-plugin</artifactId>
+                    <version>2.3.2</version>
+                </plugin>
+                
+				<plugin>
+					<groupId>com.touchatag.qa</groupId>
+					<artifactId>qa-build-maven-plugin</artifactId>
+					<version>${project.version}</version>
+					<executions>
+						<execution>
+							<phase>compile</phase>
+							<goals>
+								<goal>ignore-check</goal>
+							</goals>
+						</execution>
+					</executions>
+				</plugin>
+				<!--This plugin's configuration is used to store Eclipse m2e settings only. It has no influence on the Maven build itself.-->
+				<plugin>
+					<groupId>org.eclipse.m2e</groupId>
+					<artifactId>lifecycle-mapping</artifactId>
+					<version>1.0.0</version>
+					<configuration>
+						<lifecycleMappingMetadata>
+							<pluginExecutions>
+								<pluginExecution>
+									<pluginExecutionFilter>
+										<groupId>com.touchatag.qa</groupId>
+										<artifactId>qa-build-maven-plugin</artifactId>
+										<versionRange>[2.0-SNAPSHOT,)</versionRange>
+										<goals>
+											<goal>ignore-check</goal>
+										</goals>
+									</pluginExecutionFilter>
+									<action>
+										<ignore></ignore>
+									</action>
+								</pluginExecution>
+							</pluginExecutions>
+						</lifecycleMappingMetadata>
+					</configuration>
+				</plugin>
+            </plugins>
+        </pluginManagement>
+    </build>
+    
+    <profiles>
+        <profile> <!-- Special profile for CI to include non-QA mCommerce dependencies in build to avoid build plan race conditions -->
+            <id>includeDependencies</id>
+            <modules>
+                <module>qa-dependencies</module>
+            </modules>
+        </profile>
+    </profiles>
+    
+    <distributionManagement>
+        <repository>
+            <id>touchatag.releases</id>
+            <name>Touchatag Release Repository</name>
+            <url>http://nexus.ttag.be:8081/nexus/content/repositories/releases</url>
+        </repository>
+        <snapshotRepository>
+            <id>touchatag.snapshots</id>
+            <name>Touchatag Snapshot Repository</name>
+            <url>http://nexus.ttag.be:8081/nexus/content/repositories/snapshots</url>
+            <uniqueVersion>false</uniqueVersion>
+        </snapshotRepository>
+        <site>
+            <id>tikitag</id>
+            <name>Touchatag Website</name>
+            <url>dav:http://devbox.ttag.be/tikitag-maven-site/</url>
+        </site>
+    </distributionManagement>
+</project>
