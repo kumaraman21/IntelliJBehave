@@ -1,7 +1,5 @@
 package com.github.kumaraman21.intellijbehave.completion;
 
-import static com.github.kumaraman21.intellijbehave.utility.ProjectUtils.getProjectFileIndex;
-
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
 import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionAnnotation;
@@ -9,12 +7,8 @@ import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionIterator;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.github.kumaraman21.intellijbehave.utility.ParametrizedString;
-import com.intellij.codeInsight.completion.CompletionContributor;
-import com.intellij.codeInsight.completion.CompletionParameters;
-import com.intellij.codeInsight.completion.CompletionResultSet;
-import com.intellij.codeInsight.completion.CompletionType;
-import com.intellij.codeInsight.completion.CompletionUtil;
-import com.intellij.codeInsight.completion.PrefixMatcher;
+import com.github.kumaraman21.intellijbehave.utility.ScanUtils;
+import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
@@ -22,7 +16,6 @@ import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Consumer;
-
 import org.jbehave.core.i18n.LocalizedKeywords;
 import org.jbehave.core.steps.StepType;
 
@@ -121,7 +114,7 @@ public class StoryCompletionContributor extends CompletionContributor {
                     textBeforeCaret,
                     consumer,
                     stepPsiElement);
-            getProjectFileIndex(stepPsiElement.getProject()).iterateContent(stepAnnotationFinder);
+            ScanUtils.iterateInContextOf(stepPsiElement, stepAnnotationFinder);
         }
     }
 

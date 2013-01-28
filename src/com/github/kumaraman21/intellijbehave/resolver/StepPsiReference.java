@@ -15,14 +15,13 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
-import static com.github.kumaraman21.intellijbehave.utility.ProjectUtils.getProjectFileIndex;
 import static com.google.common.collect.Lists.newArrayList;
 import static org.apache.commons.lang.StringUtils.trim;
 
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
+import com.github.kumaraman21.intellijbehave.utility.ScanUtils;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.TextRange;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
@@ -57,7 +56,7 @@ public class StepPsiReference implements PsiReference {
         String stepText = stepPsiElement.getStepText();
 
         StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(stepType, stepText, stepPsiElement);
-        getProjectFileIndex(stepPsiElement.getProject()).iterateContent(stepAnnotationFinder);
+        ScanUtils.iterateInContextOf(stepPsiElement, stepAnnotationFinder);
 
         return stepAnnotationFinder.getMatchingAnnotation();
     }
@@ -81,7 +80,7 @@ public class StepPsiReference implements PsiReference {
             String actualStepPrefix = stepPsiElement.getActualStepPrefix();
 
             StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix, stepPsiElement);
-            getProjectFileIndex(stepPsiElement.getProject()).iterateContent(stepSuggester);
+            ScanUtils.iterateInContextOf(stepPsiElement, stepSuggester);
 
             return stepSuggester.getSuggestions().toArray();
         }

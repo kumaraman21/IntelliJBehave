@@ -217,7 +217,7 @@ public class StoryParser implements PsiParser {
             }
 
             for(int i=newMarkerIndex+1;i<=markerIndex;i++) {
-                System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", i) + markers[i].elementType);
+                if (DEBUG) System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", i) + markers[i].elementType);
                 markers[i].applyMark();
             }
 

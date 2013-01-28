@@ -39,6 +39,8 @@ public abstract class StepDefinitionIterator implements ContentIterator {
 
     PsiFile psiFile = PsiManager.getInstance(storyRef.getProject()).findFile(virtualFile);
     if (psiFile instanceof PsiClassOwner) {
+      // System.out.println("Virtual File that is a PsiClassOwner: "+virtualFile);
+
       PsiClass[] psiClasses = ((PsiClassOwner)psiFile).getClasses();
 
       for (PsiClass psiClass : psiClasses) {
