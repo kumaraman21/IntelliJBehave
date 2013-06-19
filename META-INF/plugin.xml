@@ -13,11 +13,25 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<idea-plugin version="2" url="https://github.com/kumaraman21/IntelliJBehave/wiki">
-  <name>IntelliJBehave</name>
-  <id>IntelliJBehave</id>
+<idea-plugin version="2" url="https://github.com/witspirit/IntelliJBehave">
+  <name>JBehave Support</name>
+  <id>jbehave-support-plugin</id>
   <description><![CDATA[
-    IntelliJ IDEA Plugin for JBehave
+    <h1>IntelliJ IDEA Plugin for JBehave</h1>
+    <p>
+    This plugin provides some support for JBehave. <br/>
+    It is a fork of IntelliJBehave, originally created by Aman Kumar. <br/>
+    See <a href="https://github.com/kumaraman21/IntelliJBehave/wiki">https://github.com/kumaraman21/IntelliJBehave/wiki</a>
+    <br/>
+
+    Most of the original code has been retained, but several improvements have been incorporated by various contributors:
+    <ul>
+        <li><a href="https://github.com/jarosite">https://github.com/jarosite</a></li>
+        <li><a href="https://github.com/Arnauld">https://github.com/Arnauld</a></li>
+        <li><a href="https://github.com/harley84">https://github.com/harley84</a></li>
+    </ul>
+    </p>
+
     <p>
     The plugin provides the following features:
     </p>
@@ -30,9 +44,17 @@
     <li> Code inspections to report unused steps definitions and undefined step usages </li>
     <li> Run *.story files</li>
     </ul>
+
+    <p>
+    Known limitations:
+    </p>
+    <ul>
+        <li>Searches complete module classpath, no configuration available to limit scope</li>
+        <li>Does not take into account any custom JBehave configuration</li>
+    </ul>
   ]]></description>
-  <version>1.3.SNAPSHOT</version>
-  <vendor url="https://github.com/kumaraman21" email="kumaraman21@gmail.com">Aman Kumar</vendor>
+  <version>1.0</version>
+  <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken</vendor>
   <idea-version since-build="8000"/>
 
   <application-components>
