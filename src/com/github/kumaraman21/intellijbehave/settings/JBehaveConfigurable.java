@@ -42,7 +42,7 @@ public class JBehaveConfigurable implements SearchableConfigurable {
     return "JBehave";
   }
 
-  @Override
+  //@Override
   public Icon getIcon() {
     return null;
   }
