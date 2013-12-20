@@ -27,28 +27,27 @@ public class StoryCompletionContributor extends CompletionContributor {
     }
 
     @Override
-    public void fillCompletionVariants(CompletionParameters parameters, final CompletionResultSet _result) {
+    public void fillCompletionVariants(final CompletionParameters parameters, final CompletionResultSet _result) {
         if (parameters.getCompletionType() == CompletionType.BASIC) {
-            String prefix = CompletionUtil.findReferenceOrAlphanumericPrefix(parameters);
-            CompletionResultSet result = _result.withPrefixMatcher(prefix);
+            final String prefix = CompletionUtil.findReferenceOrAlphanumericPrefix(parameters);
+            final CompletionResultSet result = _result.withPrefixMatcher(prefix);
 
-            LocalizedKeywords keywords = lookupLocalizedKeywords(parameters);
-            Consumer<LookupElement> consumer = newConsumer(_result);
+            final LocalizedKeywords keywords = lookupLocalizedKeywords(parameters);
+            final Consumer<LookupElement> consumer = newConsumer(_result);
 
             addAllKeywords(result.getPrefixMatcher(), consumer, keywords);
             addAllSteps(parameters,
-                    parameters.getInvocationCount() <= 1,
                     result.getPrefixMatcher(),
                     consumer,
                     keywords);
         }
     }
 
-    private LocalizedKeywords lookupLocalizedKeywords(CompletionParameters parameters) {
+    private LocalizedKeywords lookupLocalizedKeywords(final CompletionParameters parameters) {
         String locale = "en";
-        ASTNode localeNode = parameters.getOriginalFile().getNode().findChildByType(StoryTokenType.COMMENT_WITH_LOCALE);
+        final ASTNode localeNode = parameters.getOriginalFile().getNode().findChildByType(StoryTokenType.COMMENT_WITH_LOCALE);
         if (localeNode != null) {
-            String localeFound = LocalizedStorySupport.checkForLanguageDefinition(localeNode.getText());
+            final String localeFound = LocalizedStorySupport.checkForLanguageDefinition(localeNode.getText());
             if (localeFound != null) {
                 locale = localeFound;
             }
@@ -59,16 +58,15 @@ public class StoryCompletionContributor extends CompletionContributor {
     private static Consumer<LookupElement> newConsumer(final CompletionResultSet result) {
         return new Consumer<LookupElement>() {
             @Override
-            public void consume(LookupElement element) {
+            public void consume(final LookupElement element) {
                 result.addElement(element);
             }
         };
     }
 
-    private static void addAllKeywords(PrefixMatcher prefixMatcher,
-                                       Consumer<LookupElement> consumer,
-                                       LocalizedKeywords keywords)
-    {
+    private static void addAllKeywords(final PrefixMatcher prefixMatcher,
+                                       final Consumer<LookupElement> consumer,
+                                       final LocalizedKeywords keywords) {
         addIfMatches(consumer, prefixMatcher, keywords.narrative());
         addIfMatches(consumer, prefixMatcher, keywords.asA());
         addIfMatches(consumer, prefixMatcher, keywords.inOrderTo());
@@ -85,30 +83,28 @@ public class StoryCompletionContributor extends CompletionContributor {
         addIfMatches(consumer, prefixMatcher, keywords.and());
     }
 
-    private static void addIfMatches(Consumer<LookupElement> consumer, PrefixMatcher prefixMatchers, String input) {
+    private static void addIfMatches(final Consumer<LookupElement> consumer, final PrefixMatcher prefixMatchers, final String input) {
         if (prefixMatchers.prefixMatches(input)) {
             consumer.consume(LookupElementBuilder.create(input));
         }
     }
 
-    private static void addAllSteps(CompletionParameters parameters,
-                                    boolean filterByScope,
-                                    PrefixMatcher prefixMatcher,
-                                    Consumer<LookupElement> consumer, LocalizedKeywords keywords)
-    {
-        StepPsiElement stepPsiElement = getStepPsiElement(parameters);
+    private static void addAllSteps(final CompletionParameters parameters,
+                                    final PrefixMatcher prefixMatcher,
+                                    final Consumer<LookupElement> consumer, final LocalizedKeywords keywords) {
+        final StepPsiElement stepPsiElement = getStepPsiElement(parameters);
         if (stepPsiElement == null) {
             return;
         }
 
-        StepType stepType = stepPsiElement.getStepType();
-        String actualStepPrefix = stepPsiElement.getActualStepPrefix();
+        final StepType stepType = stepPsiElement.getStepType();
+        final String actualStepPrefix = stepPsiElement.getActualStepPrefix();
         //
-        String textBeforeCaret = CompletionUtil.findReferenceOrAlphanumericPrefix(parameters);
+        final String textBeforeCaret = CompletionUtil.findReferenceOrAlphanumericPrefix(parameters);
 
         // suggest only if at least the actualStepPrefix is complete
         if (isStepTypeComplete(keywords, textBeforeCaret)) {
-            StepSuggester stepAnnotationFinder = new StepSuggester(prefixMatcher,
+            final StepSuggester stepAnnotationFinder = new StepSuggester(prefixMatcher,
                     stepType,
                     actualStepPrefix,
                     textBeforeCaret,
@@ -118,26 +114,23 @@ public class StoryCompletionContributor extends CompletionContributor {
         }
     }
 
-    private static boolean isStepTypeComplete(LocalizedKeywords keywords, String input) {
+    private static boolean isStepTypeComplete(final LocalizedKeywords keywords, final String input) {
         return input.startsWith(keywords.given())
-               || input.startsWith(keywords.when())
-               || input.startsWith(keywords.then())
-               || input.startsWith(keywords.and());
+                || input.startsWith(keywords.when())
+                || input.startsWith(keywords.then())
+                || input.startsWith(keywords.and());
     }
 
-    private static StepPsiElement getStepPsiElement(CompletionParameters parameters) {
-        PsiElement position = parameters.getPosition();
-        PsiElement positionParent = position.getParent();
+    private static StepPsiElement getStepPsiElement(final CompletionParameters parameters) {
+        final PsiElement position = parameters.getPosition();
+        final PsiElement positionParent = position.getParent();
         if (positionParent instanceof StepPsiElement) {
             return (StepPsiElement) positionParent;
-        }
-        else if (position instanceof StepPsiReference) {
+        } else if (position instanceof StepPsiReference) {
             return (StepPsiElement) ((StepPsiReference) position).getElement();
-        }
-        else if (position instanceof StepPsiElement) {
+        } else if (position instanceof StepPsiElement) {
             return (StepPsiElement) position;
-        }
-        else {
+        } else {
             return null;
         }
     }
@@ -150,12 +143,11 @@ public class StoryCompletionContributor extends CompletionContributor {
         private final String textBeforeCaret;
         private final Consumer<LookupElement> consumer;
 
-        private StepSuggester(PrefixMatcher prefixMatcher,
-                              StepType stepType,
-                              String actualStepPrefix,
-                              String textBeforeCaret, Consumer<LookupElement> consumer,
-                              PsiElement storyRef)
-        {
+        private StepSuggester(final PrefixMatcher prefixMatcher,
+                              final StepType stepType,
+                              final String actualStepPrefix,
+                              final String textBeforeCaret, final Consumer<LookupElement> consumer,
+                              final StepPsiElement storyRef) {
             super(null, storyRef);
             this.prefixMatcher = prefixMatcher;
             this.stepType = stepType;
@@ -165,22 +157,21 @@ public class StoryCompletionContributor extends CompletionContributor {
         }
 
         @Override
-        public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
-            StepType annotationStepType = stepDefinitionAnnotation.getStepType();
+        public boolean processStepDefinition(final StepDefinitionAnnotation stepDefinitionAnnotation) {
+            final StepType annotationStepType = stepDefinitionAnnotation.getStepType();
             if (annotationStepType != stepType) {
                 return true;
             }
-            String annotationText = stepDefinitionAnnotation.getAnnotationText();
-            String adjustedAnnotationText = actualStepPrefix + " " + annotationText;
+            final String annotationText = stepDefinitionAnnotation.getAnnotationText();
+            final String adjustedAnnotationText = actualStepPrefix + " " + annotationText;
 
-            ParametrizedString pString = new ParametrizedString(adjustedAnnotationText);
-            String complete = pString.complete(textBeforeCaret);
+            final ParametrizedString pString = new ParametrizedString(adjustedAnnotationText);
+            final String complete = pString.complete(textBeforeCaret);
             if (StringUtil.isNotEmpty(complete)) {
-                PsiAnnotation matchingAnnotation = stepDefinitionAnnotation.getAnnotation();
+                final PsiAnnotation matchingAnnotation = stepDefinitionAnnotation.getAnnotation();
                 consumer.consume(LookupElementBuilder.create(matchingAnnotation, textBeforeCaret + complete));
-            }
-            else if (prefixMatcher.prefixMatches(adjustedAnnotationText)) {
-                PsiAnnotation matchingAnnotation = stepDefinitionAnnotation.getAnnotation();
+            } else if (prefixMatcher.prefixMatches(adjustedAnnotationText)) {
+                final PsiAnnotation matchingAnnotation = stepDefinitionAnnotation.getAnnotation();
                 consumer.consume(LookupElementBuilder.create(matchingAnnotation, adjustedAnnotationText));
             }
             return true;

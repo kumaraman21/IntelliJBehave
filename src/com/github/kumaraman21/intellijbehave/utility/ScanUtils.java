@@ -25,25 +25,25 @@ import java.util.HashSet;
 
 public class ScanUtils {
 
-  public static boolean iterateInContextOf(PsiElement storyRef, ContentIterator iterator) {
-      Module module = ModuleUtil.findModuleForPsiElement(storyRef);
+    public static boolean iterateInContextOf(final PsiElement storyRef, final ContentIterator iterator) {
+        final Module module = ModuleUtil.findModuleForPsiElement(storyRef);
 
-      boolean shouldContinue = (module != null) && ModuleRootManager.getInstance(module).getFileIndex().iterateContent(iterator);
+        boolean shouldContinue = (module != null) && ModuleRootManager.getInstance(module).getFileIndex().iterateContent(iterator);
 
-      if (shouldContinue) {
-        HashSet<Module> dependencies = new HashSet<Module>();
-        ModuleUtil.getDependencies(module, dependencies);
+        if (shouldContinue) {
+            final HashSet<Module> dependencies = new HashSet<Module>();
+            ModuleUtil.getDependencies(module, dependencies);
 
-        for (Module dependency : dependencies) {
-            shouldContinue = ModuleRootManager.getInstance(dependency).getFileIndex().iterateContent(iterator);
-            if (!shouldContinue) {
-                break;
+            for (final Module dependency : dependencies) {
+                shouldContinue = ModuleRootManager.getInstance(dependency).getFileIndex().iterateContent(iterator);
+                if (!shouldContinue) {
+                    break;
+                }
             }
         }
-      }
 
-      return shouldContinue;
-  }
+        return shouldContinue;
+    }
 
 
 }

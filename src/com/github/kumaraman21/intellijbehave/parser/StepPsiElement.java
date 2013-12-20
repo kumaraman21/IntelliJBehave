@@ -15,21 +15,20 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
-import static org.apache.commons.lang.StringUtils.trim;
-
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
-
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class StepPsiElement extends ASTWrapperPsiElement {
-    private StepType stepType;
+import static org.apache.commons.lang.StringUtils.trim;
 
-    public StepPsiElement(@NotNull ASTNode node, StepType stepType) {
+public class StepPsiElement extends ASTWrapperPsiElement {
+    private final StepType stepType;
+
+    public StepPsiElement(@NotNull final ASTNode node, final StepType stepType) {
         super(node);
         this.stepType = stepType;
     }
@@ -44,19 +43,14 @@ public class StepPsiElement extends ASTWrapperPsiElement {
         return stepType;
     }
 
-    public boolean isAndStep() {
-        ASTNode keyword = getKeyword();
-        return keyword != null && keyword.getElementType() == StoryTokenType.STEP_TYPE_AND;
-    }
-
     @Nullable
     public ASTNode getKeyword() {
         return getNode().findChildByType(StoryTokenType.STEP_TYPES);
     }
 
     public String getStepText() {
-        int offset = getStepTextOffset();
-        if(offset==0) {
+        final int offset = getStepTextOffset();
+        if (offset == 0) {
             return trim(getText());
         }
         return trim(getText().substring(offset));
@@ -64,7 +58,7 @@ public class StepPsiElement extends ASTWrapperPsiElement {
 
     @Nullable
     public String getActualStepPrefix() {
-        ASTNode keyword = getKeyword();
+        final ASTNode keyword = getKeyword();
         if (keyword == null) { // that's weird!
             return null;
         }
@@ -72,7 +66,7 @@ public class StepPsiElement extends ASTWrapperPsiElement {
     }
 
     public int getStepTextOffset() {
-        String stepPrefix = getActualStepPrefix();
+        final String stepPrefix = getActualStepPrefix();
         return stepPrefix != null ? stepPrefix.length() + 1 : 0;
     }
 }

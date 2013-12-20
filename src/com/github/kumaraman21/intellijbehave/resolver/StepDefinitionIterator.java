@@ -15,9 +15,11 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
+import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
+import org.apache.commons.lang.StringUtils;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,47 +27,57 @@ import java.util.Set;
 
 public abstract class StepDefinitionIterator implements ContentIterator {
 
-  private final StepDefinitionAnnotationConverter stepDefinitionAnnotationConverter = new StepDefinitionAnnotationConverter();
-  private StepType stepType;
-  private PsiElement storyRef;
+    private final StepDefinitionAnnotationConverter stepDefinitionAnnotationConverter = new StepDefinitionAnnotationConverter();
+    private final StepType stepType;
+    private final StepPsiElement storyRef;
 
-  public StepDefinitionIterator(@Nullable StepType stepType, PsiElement storyRef) {
-    this.stepType = stepType;
-    this.storyRef = storyRef;
-  }
-
-  @Override
-  public boolean processFile(VirtualFile virtualFile) {
-
-    PsiFile psiFile = PsiManager.getInstance(storyRef.getProject()).findFile(virtualFile);
-    if (psiFile instanceof PsiClassOwner) {
-      // System.out.println("Virtual File that is a PsiClassOwner: "+virtualFile);
-
-      PsiClass[] psiClasses = ((PsiClassOwner)psiFile).getClasses();
-
-      for (PsiClass psiClass : psiClasses) {
-        PsiMethod[] methods = psiClass.getMethods();
-
-        for (PsiMethod method : methods) {
-          PsiAnnotation[] annotations = method.getModifierList().getApplicableAnnotations();
-          Set<StepDefinitionAnnotation> stepDefinitionAnnotations = stepDefinitionAnnotationConverter.convertFrom(annotations);
-
-          for (StepDefinitionAnnotation stepDefinitionAnnotation : stepDefinitionAnnotations) {
-            if(stepType==null || stepDefinitionAnnotation.getStepType().equals(stepType)) {
-
-              boolean shouldContinue = processStepDefinition(stepDefinitionAnnotation);
-              if(!shouldContinue) {
-                return shouldContinue;
-              }
-            }
-          }
-        }
-      }
+    public StepDefinitionIterator(@Nullable final StepType stepType, final StepPsiElement storyRef) {
+        this.stepType = stepType;
+        this.storyRef = storyRef;
     }
 
-    return true;
-  }
+    @Override
+    public boolean processFile(final VirtualFile virtualFile) {
 
-  public abstract boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation);
+        if (StringUtils.contains(virtualFile.getNameWithoutExtension(), "Steps")) {
+            final PsiFile psiFile = PsiManager.getInstance(storyRef.getProject()).findFile(virtualFile);
+            if (psiFile instanceof PsiClassOwner) {
+                // System.out.println("Virtual File that is a PsiClassOwner: "+virtualFile);
+
+                final PsiClass[] psiClasses = ((PsiClassOwner) psiFile).getClasses();
+
+                for (final PsiClass psiClass : psiClasses) {
+                    final PsiMethod[] methods = psiClass.getMethods();
+
+                    for (final PsiMethod method : methods) {
+                        final PsiAnnotation[] annotations = method.getModifierList().getApplicableAnnotations();
+                        final Set<StepDefinitionAnnotation> stepDefinitionAnnotations = stepDefinitionAnnotationConverter.convertFrom(annotations);
+
+                        for (final StepDefinitionAnnotation stepDefinitionAnnotation : stepDefinitionAnnotations) {
+                            if (stepType == null || stepDefinitionAnnotation.getStepType().equals(stepType)) {
+
+                                final boolean shouldContinue = processStepDefinition(stepDefinitionAnnotation);
+                                if (!shouldContinue) {
+                                    return shouldContinue;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return true;
+    }
+
+    public StepType getStepType() {
+        return stepType;
+    }
+
+    public StepPsiElement getStoryRef() {
+        return storyRef;
+    }
+
+    public abstract boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation);
 
 }
