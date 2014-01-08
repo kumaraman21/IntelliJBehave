@@ -27,15 +27,13 @@ public class StepAnnotationFinder extends StepDefinitionIterator {
 			if (newPriority > oldPriority) {
 				matchingAnnotation = stepDefinitionAnnotation;
 			}
-
-			return false;
 		}
 		return true;
 	}
 
 	private Integer getPriority(final StepDefinitionAnnotation stepDefinitionAnnotation) {
 		if (stepDefinitionAnnotation == null) {
-			return null;
+			return -1;
 		}
 
 		return Integer.valueOf(stepDefinitionAnnotation.getAnnotation().findAttributeValue("priority").getText());
