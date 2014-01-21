@@ -15,6 +15,9 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
+import org.jbehave.core.steps.StepType;
+import org.jetbrains.annotations.NotNull;
+
 import com.github.kumaraman21.intellijbehave.highlighter.StoryLexerFactory;
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
@@ -30,18 +33,15 @@ import com.intellij.psi.tree.IElementType;
 import com.intellij.psi.tree.IFileElementType;
 import com.intellij.psi.tree.TokenSet;
 
-import org.jbehave.core.steps.StepType;
-import org.jetbrains.annotations.NotNull;
-
 public class StoryParserDefinition implements ParserDefinition {
   @NotNull
   @Override
-  public Lexer createLexer(Project project) {
+  public Lexer createLexer(final Project project) {
     return new StoryLexerFactory().createLexer();
   }
 
   @Override
-  public PsiParser createParser(Project project) {
+  public PsiParser createParser(final Project project) {
     return new StoryParser();
   }
 
@@ -70,7 +70,7 @@ public class StoryParserDefinition implements ParserDefinition {
 
   @NotNull
   @Override
-  public PsiElement createElement(ASTNode node) {
+  public PsiElement createElement(final ASTNode node) {
     final IElementType type = node.getElementType();
     if (type == StoryElementType.GIVEN_STEP) {
         return new StepPsiElement(node, StepType.GIVEN);
@@ -86,12 +86,12 @@ public class StoryParserDefinition implements ParserDefinition {
   }
 
   @Override
-  public PsiFile createFile(FileViewProvider fileViewProvider) {
+  public PsiFile createFile(final FileViewProvider fileViewProvider) {
     return new StoryFileImpl(fileViewProvider);
   }
 
   @Override
-  public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
+  public SpaceRequirements spaceExistanceTypeBetweenTokens(final ASTNode left, final ASTNode right) {
     return SpaceRequirements.MAY;
   }
 }

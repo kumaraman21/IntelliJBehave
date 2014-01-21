@@ -15,93 +15,104 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationMemberValue;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
+import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
+import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.lang.StringUtils.isNotEmpty;
+import static org.apache.commons.lang.StringUtils.remove;
+import static org.apache.commons.lang.StringUtils.removeEnd;
+import static org.apache.commons.lang.StringUtils.removeStart;
+
+import java.util.Set;
+
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Aliases;
 import org.jbehave.core.steps.PatternVariantBuilder;
 import org.jbehave.core.steps.StepType;
 
-import java.util.Set;
-
-import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
-import static com.google.common.collect.Sets.newHashSet;
-import static org.apache.commons.lang.StringUtils.*;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiLiteral;
 
 public class StepDefinitionAnnotationConverter {
 
-    public Set<StepDefinitionAnnotation> convertFrom(PsiAnnotation[] annotations) {
+	public Set<StepDefinitionAnnotation> convertFrom(final PsiAnnotation[] annotations) {
 
-        Set<StepDefinitionAnnotation> stepDefinitionAnnotations = newHashSet();
-        StepType stepType = null;
+		final Set<StepDefinitionAnnotation> stepDefinitionAnnotations = newHashSet();
+		StepType stepType = null;
 
-        for (PsiAnnotation annotation : annotations) {
-            String annotationQualifiedName = annotation.getQualifiedName();
-            // Given, When, Then
-            if (ANNOTATION_TO_STEP_TYPE_MAPPING.keySet().contains(annotationQualifiedName)) {
-                stepType = ANNOTATION_TO_STEP_TYPE_MAPPING.get(annotationQualifiedName);
-                String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
-                stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
-            } else if (annotationQualifiedName != null) {
-                if (annotationQualifiedName.equals(Alias.class.getName())) {
-                    String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
-                    stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
-                } else if (annotationQualifiedName.equals(Aliases.class.getName())) {
-                    PsiAnnotationMemberValue attributeValue = annotation.getParameterList().getAttributes()[0].getValue();
-                    if (attributeValue != null) {
-                        PsiElement[] values = attributeValue.getChildren();
-                        for (PsiElement value : values) {
-                            if (value instanceof PsiLiteral) {
-                                String annotationText = getTextFromValue(value);
-                                stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
-                            }
-                        }
-                    }
-                }
-            }
-        }
-        return stepDefinitionAnnotations;
-    }
+		for (final PsiAnnotation annotation : annotations) {
+			final String annotationQualifiedName = annotation.getQualifiedName();
+			// Given, When, Then
+			if (ANNOTATION_TO_STEP_TYPE_MAPPING.keySet().contains(annotationQualifiedName)) {
+				stepType = ANNOTATION_TO_STEP_TYPE_MAPPING.get(annotationQualifiedName);
+				final String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
+				stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
+			} else if (annotationQualifiedName != null) {
+				if (annotationQualifiedName.equals(Alias.class.getName())) {
+					final String annotationText = getTextFromValue(annotation.getParameterList().getAttributes()[0].getValue());
+					stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
+				} else if (annotationQualifiedName.equals(Aliases.class.getName())) {
+					final PsiAnnotationMemberValue attributeValue = annotation.getParameterList().getAttributes()[0].getValue();
+					if (attributeValue != null) {
+						final PsiElement[] values = attributeValue.getChildren();
+						for (final PsiElement value : values) {
+							if (value instanceof PsiLiteral) {
+								final String annotationText = getTextFromValue(value);
+								stepDefinitionAnnotations.addAll(getPatternVariants(stepType, annotationText, annotation));
+							}
+						}
+					}
+				}
+			}
+		}
+		return stepDefinitionAnnotations;
+	}
 
-    /**
-     * @return true if and only if there are no unmatched curly brackets in the string
-     */
-    private boolean hasUnmatchedBrackets(String annotationText) {
-        if (isNotEmpty(annotationText)) {
+	/**
+	 * @return true if and only if there are no unmatched curly brackets in the string
+	 */
+	private boolean hasUnmatchedBrackets(final String annotationText) {
+		if (isNotEmpty(annotationText)) {
 
-            int depth = 0;
+			int depth = 0;
 
-            for (int i = 0; i < annotationText.length(); i++) {
-                char currChar = annotationText.charAt(i);
+			for (int i = 0; i < annotationText.length(); i++) {
+				final char currChar = annotationText.charAt(i);
 
-                if (currChar == '{') depth++;
-                else if (currChar == '}') depth--;
+				if (currChar == '{') {
+					depth++;
+				} else if (currChar == '}') {
+					depth--;
+				}
 
-                if (depth < 0) return true;
-            }
-            if (depth != 0) return true;
-        }
-        return false;
-    }
+				if (depth < 0) {
+					return true;
+				}
+			}
+			if (depth != 0) {
+				return true;
+			}
+		}
+		return false;
+	}
 
-    private Set<StepDefinitionAnnotation> getPatternVariants(StepType stepType, String annotationText, PsiAnnotation annotation) {
-        Set<StepDefinitionAnnotation> stepDefinitionAnnotations = newHashSet();
+	private Set<StepDefinitionAnnotation> getPatternVariants(final StepType stepType, final String annotationText, final PsiAnnotation annotation) {
+		final Set<StepDefinitionAnnotation> stepDefinitionAnnotations = newHashSet();
 
-        // Sanity check for mis
-        if (hasUnmatchedBrackets(annotationText)) {
-            stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
-        } else {
-            PatternVariantBuilder b = new PatternVariantBuilder(annotationText);
-            for (String variant : b.allVariants()) {
-                stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, variant, annotation));
-            }
-        }
-        return stepDefinitionAnnotations;
-    }
+		// Sanity check for mis
+		if (hasUnmatchedBrackets(annotationText)) {
+			stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, annotationText, annotation));
+		} else {
+			final PatternVariantBuilder b = new PatternVariantBuilder(annotationText);
+			for (final String variant : b.allVariants()) {
+				stepDefinitionAnnotations.add(new StepDefinitionAnnotation(stepType, variant, annotation));
+			}
+		}
+		return stepDefinitionAnnotations;
+	}
 
-    private static String getTextFromValue(PsiElement value) {
-        return remove(removeStart(removeEnd(value.getText(), "\""), "\""), "\\");
-    }
+	private static String getTextFromValue(final PsiElement value) {
+		return remove(removeStart(removeEnd(value.getText(), "\""), "\""), "\\");
+	}
 }

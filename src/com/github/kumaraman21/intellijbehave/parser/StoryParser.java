@@ -19,7 +19,6 @@ import org.apache.commons.lang.StringUtils;
 import org.jetbrains.annotations.NotNull;
 
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
-import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.PsiParser;
@@ -177,8 +176,9 @@ public class StoryParser implements PsiParser {
 				return;
 			}
 			markers[++markerIndex] = new MarkerData(builder.mark(), elementType);
-			if (DEBUG)
+			if (DEBUG) {
 				System.out.println("StoryParser$ParserState: PUSH>> " + StringUtils.repeat("..", markerIndex) + elementType);
+			}
 		}
 
 		private void popUntilOnlyIfPresent(final StoryElementType elementType) {
@@ -191,8 +191,9 @@ public class StoryParser implements PsiParser {
 			}
 
 			for (int i = newMarkerIndex + 1; i <= markerIndex; i++) {
-				if (DEBUG)
+				if (DEBUG) {
 					System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", i) + markers[i].elementType);
+				}
 				markers[i].applyMark();
 			}
 
@@ -201,8 +202,9 @@ public class StoryParser implements PsiParser {
 
 		public void leaveRemainings() {
 			while (markerIndex >= 0) {
-				if (DEBUG)
+				if (DEBUG) {
 					System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", markerIndex) + markers[markerIndex].elementType);
+				}
 				markers[markerIndex--].applyMark();
 			}
 		}
@@ -218,8 +220,9 @@ public class StoryParser implements PsiParser {
 			}
 
 			for (int i = newMarkerIndex + 1; i <= markerIndex; i++) {
-				if (DEBUG)
+				if (DEBUG) {
 					System.out.println("StoryParser$ParserState: POP >> " + StringUtils.repeat("..", i) + markers[i].elementType);
+				}
 				markers[i].applyMark();
 			}
 
@@ -288,11 +291,6 @@ public class StoryParser implements PsiParser {
 				elementType = StoryElementType.WHEN_STEP;
 			} else if (tokenType == StoryTokenType.STEP_TYPE_THEN) {
 				elementType = StoryElementType.THEN_STEP;
-			} else {
-				// should be the AND
-				if (tokenType != StoryTokenType.STEP_TYPE_AND) {
-					// throw...
-				}
 			}
 
 			if (elementType == null) { // yuk!
@@ -353,10 +351,6 @@ public class StoryParser implements PsiParser {
 				|| tokenType == StoryTokenType.META_TEXT;
 	}
 
-	private static boolean isGivenStories(final IElementType tokenType) {
-		return tokenType == StoryTokenType.GIVEN_STORIES;
-	}
-
 	private static boolean isExampleTable(final IElementType tokenType) {
 		return tokenType == StoryTokenType.EXAMPLE_TYPE;
 	}
@@ -399,196 +393,5 @@ public class StoryParser implements PsiParser {
 				|| tokenType == StoryTokenType.NARRATIVE_TYPE
 				|| tokenType == StoryTokenType.NARRATIVE_TEXT
 				;
-	}
-
-	private void skipWhitespacesOrComments(final PsiBuilder builder) {
-		skipWhitespacesOrComments(builder, false);
-	}
-
-	private String skipWhitespacesOrComments(final PsiBuilder builder, final boolean checkForLocale) {
-		String storyLocale = "en";
-
-		while (isWhitespace(builder.getTokenType())
-				|| builder.getTokenType() == StoryTokenType.COMMENT) {
-			if (builder.getTokenType() == StoryTokenType.COMMENT) {
-				final PsiBuilder.Marker commentMark = builder.mark();
-				while (builder.getTokenType() == StoryTokenType.COMMENT) {
-					if (checkForLocale) {
-						final String commentText = builder.getTokenText();
-						final String locale = LocalizedStorySupport.checkForLanguageDefinition(commentText);
-						if (locale != null) {
-							storyLocale = locale;
-						}
-					}
-					builder.advanceLexer();
-				}
-				commentMark.done(StoryElementType.COMMENT);
-			} else {
-				builder.advanceLexer();
-			}
-		}
-
-		return storyLocale;
-	}
-
-	private void parseStoryDescriptionOrNarrativesLinesIfPresent(final PsiBuilder builder) {
-		if (builder.getTokenType() != StoryTokenType.STORY_DESCRIPTION
-				&& builder.getTokenType() != StoryTokenType.NARRATIVE_TYPE
-				&& builder.getTokenType() != StoryTokenType.NARRATIVE_TEXT) {
-			return;
-		}
-
-		final PsiBuilder.Marker marker = builder.mark();
-		while (builder.getTokenType() == StoryTokenType.STORY_DESCRIPTION
-				|| builder.getTokenType() == StoryTokenType.NARRATIVE_TYPE
-				|| builder.getTokenType() == StoryTokenType.NARRATIVE_TEXT) {
-			parseStoryDescriptionLine(builder);
-			skipWhitespacesOrComments(builder);
-		}
-		marker.done(StoryElementType.STORY_DESCRIPTION);
-	}
-
-	private void parseStoryDescriptionLine(final PsiBuilder builder) {
-		builder.advanceLexer();
-	}
-
-	private void parseScenarios(final PsiBuilder builder) {
-		if (builder.getTokenType() == StoryTokenType.SCENARIO_TYPE) {
-			while (builder.getTokenType() == StoryTokenType.SCENARIO_TYPE) {
-				parseScenario(builder);
-				skipWhitespacesOrComments(builder);
-			}
-		} else {
-			builder.advanceLexer();
-			builder.error("Scenario expected");
-		}
-	}
-
-	private void parseScenario(final PsiBuilder builder) {
-		final PsiBuilder.Marker stepMarker = builder.mark();
-		builder.advanceLexer();
-		skipWhitespacesOrComments(builder);
-		while (builder.getTokenType() == StoryTokenType.SCENARIO_TEXT) {
-			parseScenarioText(builder);
-			skipWhitespacesOrComments(builder);
-		}
-		parseMeta(builder);
-		parseSteps(builder);
-		skipWhitespacesOrComments(builder);
-		parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
-		skipWhitespacesOrComments(builder);
-		parseExamples(builder);
-		stepMarker.done(StoryElementType.SCENARIO);
-	}
-
-	private void parseScenarioText(final PsiBuilder builder) {
-		builder.advanceLexer();
-	}
-
-	private void parseMeta(final PsiBuilder builder) {
-		if (builder.getTokenType() == StoryTokenType.META) {
-			final PsiBuilder.Marker stepMarker = builder.mark();
-			while (builder.getTokenType() == StoryTokenType.META
-					|| builder.getTokenType() == StoryTokenType.META_TEXT
-					|| builder.getTokenType() == StoryTokenType.META_KEY) {
-				builder.advanceLexer();
-				skipWhitespacesOrComments(builder);
-			}
-			stepMarker.done(StoryElementType.META);
-		}
-	}
-
-	private void parseSteps(final PsiBuilder builder) {
-		parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
-		if (isStepType(builder.getTokenType())) {
-			StoryElementType previousStepElementType = null;
-			while (isStepType(builder.getTokenType())) {
-				previousStepElementType = parseStep(builder, previousStepElementType);
-				skipWhitespacesOrComments(builder);
-				parseStoryDescriptionOrNarrativesLinesIfPresent(builder);
-			}
-		} else {
-			builder.error("At least one step expected");
-		}
-	}
-
-
-	private StoryElementType parseStep(final PsiBuilder builder, final StoryElementType previousStepElementType) {
-		final PsiBuilder.Marker stepMarker = builder.mark();
-		StoryElementType currentStepElementType;
-
-		// TODO find a nicer way to perform the switch
-		final IElementType tokenType = builder.getTokenType();
-		if (tokenType == StoryTokenType.STEP_TYPE_GIVEN) {
-			currentStepElementType = StoryElementType.GIVEN_STEP;
-		} else if (tokenType == StoryTokenType.STEP_TYPE_WHEN) {
-			currentStepElementType = StoryElementType.WHEN_STEP;
-		} else if (tokenType == StoryTokenType.STEP_TYPE_THEN) {
-			currentStepElementType = StoryElementType.THEN_STEP;
-		} else {
-			// should be the AND
-			if (tokenType != StoryTokenType.STEP_TYPE_AND) {
-				// throw...
-			}
-			currentStepElementType = previousStepElementType;
-		}
-
-		if (currentStepElementType == null) {
-			// yuk!
-			currentStepElementType = StoryElementType.GIVEN_STEP;
-		}
-
-		parseStepType(builder);
-		parseStepText(builder);
-		skipWhitespacesOrComments(builder);
-		parseTableIfPresent(builder);
-		skipWhitespacesOrComments(builder);
-		stepMarker.done(currentStepElementType);
-
-		return currentStepElementType;
-	}
-
-	private void parseStepType(final PsiBuilder builder) {
-		builder.advanceLexer();
-	}
-
-	private void parseStepText(final PsiBuilder builder) {
-		if (builder.getTokenType() == StoryTokenType.STEP_TEXT) {
-			while (builder.getTokenType() == StoryTokenType.STEP_TEXT) {
-				builder.advanceLexer();
-				skipWhitespacesOrComments(builder);
-			}
-		} else {
-			builder.error("Step text expected");
-		}
-	}
-
-	private void parseExamples(final PsiBuilder builder) {
-		if (builder.getTokenType() == StoryTokenType.EXAMPLE_TYPE) {
-			final PsiBuilder.Marker stepMarker = builder.mark();
-			builder.advanceLexer();
-			skipWhitespacesOrComments(builder);
-			if (builder.getTokenType() == StoryTokenType.TABLE_DELIM) {
-				parseTableIfPresent(builder);
-			} else {
-				builder.error("Table row expected");
-			}
-
-			stepMarker.done(StoryElementType.EXAMPLES);
-		}
-	}
-
-	private void parseTableIfPresent(final PsiBuilder builder) {
-		if (builder.getTokenType() == StoryTokenType.TABLE_DELIM) {
-			while (builder.getTokenType() == StoryTokenType.TABLE_DELIM
-					|| builder.getTokenType() == StoryTokenType.TABLE_CELL) {
-				parseTableToken(builder);
-				skipWhitespacesOrComments(builder);
-			}
-		}
-	}
-
-	private void parseTableToken(final PsiBuilder builder) {
-		builder.advanceLexer();
 	}
 }

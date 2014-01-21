@@ -2,9 +2,7 @@ package com.github.kumaraman21.intellijbehave.utility;
 
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -13,404 +11,336 @@ import java.util.regex.Pattern;
  */
 public class ParametrizedString {
 
-    private static Pattern compileParameterPattern(String parameterPrefix) {
-        return Pattern.compile("(\\" + parameterPrefix + "\\w*)(\\W|\\Z)", Pattern.DOTALL);
-    }
+	private static Pattern compileParameterPattern(final String parameterPrefix) {
+		return Pattern.compile("(\\" + parameterPrefix + "\\w*)(\\W|\\Z)", Pattern.DOTALL);
+	}
 
-    private List<Token> tokens = new ArrayList<Token>();
-    private final String content;
-    private final String parameterPrefix;
-    private int parameterCount = -1; // lazily calculated
+	private final List<Token> tokens = new ArrayList<Token>();
+	private final String content;
+	private final String parameterPrefix;
 
 
-    public ParametrizedString(String content) {
-        this(content, "$");
-    }
+	public ParametrizedString(final String content) {
+		this(content, "$");
+	}
 
-    public ParametrizedString(String content, String parameterPrefix) {
-        if (content == null) {
-            throw new IllegalArgumentException("Content cannot be null");
-        }
-        this.content = content;
-        this.parameterPrefix = parameterPrefix;
-        parse(compileParameterPattern(parameterPrefix));
-    }
+	public ParametrizedString(final String content, final String parameterPrefix) {
+		if (content == null) {
+			throw new IllegalArgumentException("Content cannot be null");
+		}
+		this.content = content;
+		this.parameterPrefix = parameterPrefix;
+		parse(compileParameterPattern(parameterPrefix));
+	}
 
-    @Override
-    public int hashCode() {
-        return content.hashCode();
-    }
+	@Override
+	public int hashCode() {
+		return content.hashCode();
+	}
 
-    @Override
-    public boolean equals(Object obj) {
-        return (obj instanceof ParametrizedString) && isSameAs((ParametrizedString) obj);
-    }
+	@Override
+	public boolean equals(final Object obj) {
+		return (obj instanceof ParametrizedString) && isSameAs((ParametrizedString) obj);
+	}
 
-    public boolean isSameAs(ParametrizedString other) {
-        return other.content.equals(content);
-    }
+	public boolean isSameAs(final ParametrizedString other) {
+		return other.content.equals(content);
+	}
 
-    public String getContent() {
-        return content;
-    }
+	private void parse(final Pattern parameterPattern) {
+		final Matcher matcher = parameterPattern.matcher(content);
 
-    private void parse(Pattern parameterPattern) {
-        Matcher matcher = parameterPattern.matcher(content);
+		int prev = 0;
+		while (matcher.find()) {
+			int start = matcher.start();
+			int end = matcher.end();
+			if (start > prev) {
+				add(new Token(prev, start - prev, false));
+			}
+			end -= matcher.group(2).length();
+			start += parameterPrefix.length(); // remove prefix from the identifier
+			add(new Token(start, end - start, true));
+			prev = end;
+		}
+		if (prev < content.length()) {
+			add(new Token(prev, content.length() - prev, false));
+		}
+	}
 
-        int prev = 0;
-        while (matcher.find()) {
-            int start = matcher.start();
-            int end = matcher.end();
-            if (start > prev) {
-                add(new Token(prev, start - prev, false));
-            }
-            end -= matcher.group(2).length();
-            start += parameterPrefix.length(); // remove prefix from the identifier
-            add(new Token(start, end - start, true));
-            prev = end;
-        }
-        if (prev < content.length()) {
-            add(new Token(prev, content.length() - prev, false));
-        }
-    }
+	private void add(final Token token) {
+		tokens.add(token);
+	}
 
-    private void add(Token token) {
-        tokens.add(token);
-    }
+	public class Token {
+		private final int offset;
+		private final int length;
+		private final boolean isIdentifier;
 
-    public class Token {
-        private final int offset;
-        private final int length;
-        private final boolean isIdentifier;
+		public Token(final int offset, final int length, final boolean isIdentifier) {
+			this.offset = offset;
+			this.length = length;
+			this.isIdentifier = isIdentifier;
+		}
 
-        public Token(int offset, int length, boolean isIdentifier) {
-            this.offset = offset;
-            this.length = length;
-            this.isIdentifier = isIdentifier;
-        }
+		public String value() {
+			return content.substring(getOffset(), getOffset() + getLength());
+		}
 
-        public String value() {
-            return content.substring(getOffset(), getOffset() + getLength());
-        }
+		@Override
+		public String toString() {
+			return "<<" + (isIdentifier() ? "$" : "") + value() + ">>";
+		}
 
-        @Override
-        public String toString() {
-            return "<<" + (isIdentifier() ? "$" : "") + value() + ">>";
-        }
+		public boolean regionMatches(final int toffset, final String other, final int ooffset, final int len) {
+			try {
+				return normalize(content, getOffset() + toffset, len)
+						.equalsIgnoreCase(normalize(other, ooffset, len));
+			} catch (final java.lang.StringIndexOutOfBoundsException e) {
+				return false;
+			}
+		}
 
-        public boolean regionMatches(int toffset, String other, int ooffset, int len) {
-            return content.regionMatches(getOffset() + toffset, other, ooffset, len);
-        }
+		private String normalize(final String input, final int offset, final int len) {
+			return input.substring(offset, offset + len)
+					.replaceAll("\\s+", "");
+		}
 
-        public int getOffset() {
-            return offset;
-        }
+		public int getOffset() {
+			return offset;
+		}
 
-        public int getLength() {
-            return length;
-        }
+		public int getLength() {
+			return length;
+		}
 
-        public boolean isIdentifier() {
-            return isIdentifier;
-        }
-    }
+		public boolean isIdentifier() {
+			return isIdentifier;
+		}
+	}
 
-    public Token getToken(int index) {
-        return tokens.get(index);
-    }
+	public Token getToken(final int index) {
+		return tokens.get(index);
+	}
 
-    public List<Token> getTokens() {
-        return new ArrayList<Token>(tokens);
-    }
+	public int getTokenCount() {
+		return tokens.size();
+	}
 
-    public List<String> getParameters() {
-        List<String> parameters = new ArrayList<String>();
-        for (Token token : tokens) {
-            if (token.isIdentifier()) {
-                parameters.add(token.value());
-            }
-        }
-        return parameters;
-    }
+	public WeightChain calculateWeightChain(final String input) {
+		final WeightChain chain = acceptsBeginning(0, input, 0);
+		chain.input = input;
+		chain.collectWeights();
+		return chain;
+	}
 
-    public int getTokenCount() {
-        return tokens.size();
-    }
+	public static class StringToken {
+		private final String value;
+		private final boolean identifier;
 
-    public int getParameterCount() {
-        if (parameterCount == -1) {
-            parameterCount = parameterCount();
-        }
-        return parameterCount;
-    }
+		public StringToken(final String value, final boolean identifier) {
+			this.value = value;
+			this.identifier = identifier;
+		}
 
-    private int parameterCount() {
-        int count = 0;
-        for(Token token : tokens) {
-            if(token.isIdentifier())
-                count++;
-        }
-        return count;
-    }
+		public String getValue() {
+			return value;
+		}
 
-    public float weightOf(String input) {
-        return ((float) acceptsBeginning(input)) / ((float) getTokenCount());
-    }
+		public boolean isIdentifier() {
+			return identifier;
+		}
+	}
 
-    public int acceptsBeginning(String input) {
-        WeightChain chain = calculateWeightChain(input);
-        return chain.getWeight();
-    }
+	public List<StringToken> tokenize(final String stepInput) {
 
-    public WeightChain calculateWeightChain(String input) {
-        WeightChain chain = acceptsBeginning(0, input, 0);
-        chain.input = input;
-        chain.collectWeights();
-        return chain;
-    }
+		final List<StringToken> stringTokens = new ArrayList<StringToken>();
 
-    public static class StringToken {
-        private final String value;
-        private final boolean identifier;
+		WeightChain chain = calculateWeightChain(stepInput);
+		final List<String> inputTokens = chain.tokenize();
+		while (chain != null) {
+			if (!chain.isZero()) {
+				final Token token = tokens.get(chain.getTokenIndex());
+				final String value = inputTokens.get(chain.getTokenIndex());
+				stringTokens.add(new StringToken(value, token.isIdentifier()));
+			}
+			chain = chain.getNext();
+		}
+		return stringTokens;
+	}
 
-        public StringToken(String value, boolean identifier) {
-            this.value = value;
-            this.identifier = identifier;
-        }
+	private WeightChain acceptsBeginning(int inputIndex, final String input, final int tokenIndexStart) {
+		final WeightChain pair = new WeightChain();
+		pair.inputIndex = inputIndex;
 
-        public String getValue() {
-            return value;
-        }
+		WeightChain current = pair;
 
-        public boolean isIdentifier() {
-            return identifier;
-        }
-    }
+		final List<Token> tokenList = this.tokens;
+		for (int tokenIndex = tokenIndexStart, n = tokenList.size(); tokenIndex < n; tokenIndex++) {
+			final boolean isLastToken = (tokenIndex == n - 1);
+			final Token token = tokenList.get(tokenIndex);
+			if (!token.isIdentifier()) {
+				final int remaining = input.length() - inputIndex;
+				if (remaining > token.getLength() && isLastToken) {
+					// more data than the token itself
+					return WeightChain.zero();
+				}
 
-    public List<StringToken> tokenize(String stepInput) {
+				final int overlaping = Math.min(token.getLength(), remaining);
+				if (overlaping > 0) {
+					if (token.regionMatches(0, input, inputIndex, overlaping)) {
+						current.tokenIndex = tokenIndex;
+						current.weight++;
+						if (overlaping == token.getLength()) // full token match
+						{
+							current.weight++;
+							if ((inputIndex + overlaping) == input.length())
+							// no more data, break the loop now
+							{
+								return pair;
+							}
+						} // break looop
+						else {
+							return pair;
+						}
 
-        List<StringToken> stringTokens = new ArrayList<StringToken>();
+						inputIndex += overlaping;
+						final WeightChain next = new WeightChain();
+						next.inputIndex = inputIndex;
+						current.next = next;
+						current = next;
+					} else {
+						// no match
+						return WeightChain.zero();
+					}
+				} else {
+					// not enough data, returns what has been collected
+					return pair;
+				}
+			} else {
+				current.tokenIndex = tokenIndex;
+				current.weight++;
 
-        WeightChain chain = calculateWeightChain(stepInput);
-        List<String> inputTokens = chain.tokenize();
-        while (chain != null) {
-            if (!chain.isZero()) {
-                Token token = tokens.get(chain.getTokenIndex());
-                String value = inputTokens.get(chain.getTokenIndex());
-                stringTokens.add(new StringToken(value, token.isIdentifier()));
-            }
-            chain = chain.getNext();
-        }
-        return stringTokens;
-    }
+				// not the most efficient part, but no other solution right now
+				WeightChain next = WeightChain.zero();
+				for (int j = inputIndex + 1; j < input.length(); j++) {
+					final WeightChain sub = acceptsBeginning(j, input, tokenIndex + 1);
+					if (sub.hasMoreWeightThan(next)) {
+						next = sub;
+					}
+				}
+				current.next = next;
+				return pair;
+			}
+		}
+		return pair;
+	}
 
-    public Map<String, String> extractParameterValues(String input) {
-        Map<String, String> namedParameters = new HashMap<String,String>();
+	public static class WeightChain {
+		public static WeightChain zero() {
+			return new WeightChain();
+		}
 
-        WeightChain chain = calculateWeightChain(input);
-        List<String> inputTokens = chain.tokenize();
-        while (chain != null) {
-            if (!chain.isZero()) {
-                Token token = tokens.get(chain.getTokenIndex());
-                if (token.isIdentifier()) {
-                    String value = inputTokens.get(chain.getTokenIndex());
-                    namedParameters.put(token.value(), value);
-                }
-            }
+		private String input;
+		private int inputIndex;
+		private int weight;
+		private int tokenIndex = -1;
+		private WeightChain next;
 
-            chain = chain.getNext();
-        }
-        return namedParameters;
-    }
+		public WeightChain last() {
+			WeightChain last = this;
+			WeightChain iter = this;
+			while (iter != null) {
+				if (!iter.isZero()) {
+					last = iter;
+				}
+				iter = iter.next;
+			}
+			return last;
+		}
 
-    private WeightChain acceptsBeginning(int inputIndex, String input, int tokenIndexStart) {
-        WeightChain pair = new WeightChain();
-        pair.inputIndex = inputIndex;
+		public boolean isZero() {
+			return weight == 0 && tokenIndex == -1;
+		}
 
-        WeightChain current = pair;
+		public WeightChain getNext() {
+			return next;
+		}
 
-        List<Token> tokenList = this.tokens;
-        for (int tokenIndex = tokenIndexStart, n = tokenList.size(); tokenIndex < n; tokenIndex++) {
-            boolean isLastToken = (tokenIndex == n - 1);
-            Token token = tokenList.get(tokenIndex);
-            if (!token.isIdentifier()) {
-                int remaining = input.length() - inputIndex;
-                if (remaining > token.getLength() && isLastToken) {
-                    // more data than the token itself
-                    return WeightChain.zero();
-                }
+		public int getTokenIndex() {
+			return tokenIndex;
+		}
 
-                int overlaping = Math.min(token.getLength(), remaining);
-                if (overlaping > 0) {
-                    if (token.regionMatches(0, input, inputIndex, overlaping)) {
-                        current.tokenIndex = tokenIndex;
-                        current.weight++;
-                        if (overlaping == token.getLength()) // full token match
-                        {
-                            current.weight++;
-                            if ((inputIndex + overlaping) == input.length())
-                            // no more data, break the loop now
-                            {
-                                return pair;
-                            }
-                        } // break looop
-                        else {
-                            return pair;
-                        }
+		public boolean hasMoreWeightThan(final WeightChain pair) {
+			if (weight > pair.weight) {
+				return true;
+			}
+			return false;
+		}
 
-                        inputIndex += overlaping;
-                        WeightChain next = new WeightChain();
-                        next.inputIndex = inputIndex;
-                        current.next = next;
-                        current = next;
-                    }
-                    else {
-                        // no match
-                        return WeightChain.zero();
-                    }
-                }
-                else {
-                    // not enough data, returns what has been collected
-                    return pair;
-                }
-            }
-            else {
-                current.tokenIndex = tokenIndex;
-                current.weight++;
+		@Override
+		public String toString() {
+			return "WeightChain [inputIndex=" + inputIndex + ", weight=" + weight + ", tokenIndex=" + tokenIndex + "]";
+		}
 
-                // not the most efficient part, but no other solution right now
-                WeightChain next = WeightChain.zero();
-                for (int j = inputIndex + 1; j < input.length(); j++) {
-                    WeightChain sub = acceptsBeginning(j, input, tokenIndex + 1);
-                    if (sub.hasMoreWeightThan(next)) {
-                        next = sub;
-                    }
-                }
-                current.next = next;
-                return pair;
-            }
-        }
-        return pair;
-    }
+		public void collectWeights() {
+			int w = weight;
+			WeightChain n = next;
+			while (n != null) {
+				if (!n.isZero()) {
+					w += n.weight;
+				}
+				n = n.next;
+			}
 
-    public static class WeightChain {
-        public static WeightChain zero() {
-            return new WeightChain();
-        }
+			this.weight = w;
+		}
 
-        private String input;
-        private int inputIndex;
-        private int weight;
-        private int tokenIndex = -1;
-        private WeightChain next;
+		public List<String> tokenize() {
+			final List<String> parts = new ArrayList<String>();
+			if (isZero()) {
+				return parts;
+			}
 
-        public WeightChain last() {
-            WeightChain last = this;
-            WeightChain iter = this;
-            while (iter != null) {
-                if (!iter.isZero()) {
-                    last = iter;
-                }
-                iter = iter.next;
-            }
-            return last;
-        }
+			int indexBeg = inputIndex;
+			WeightChain n = next;
+			while (n != null) {
+				if (!n.isZero()) {
+					parts.add(input.substring(indexBeg, n.inputIndex));
+					indexBeg = n.inputIndex;
+				}
+				n = n.next;
+			}
+			parts.add(input.substring(indexBeg));
 
-        public boolean isZero() {
-            return weight == 0 && tokenIndex == -1;
-        }
+			return parts;
+		}
+	}
 
-        public int getInputIndex() {
-            return inputIndex;
-        }
+	public String complete(final String input) {
+		final WeightChain chain = calculateWeightChain(input);
+		final WeightChain last = chain.last();
+		if (last.isZero()) {
+			return "";
+		}
+		final int inputIndex = last.inputIndex;
+		int tokenIndex = last.tokenIndex;
 
-        public WeightChain getNext() {
-            return next;
-        }
+		final StringBuilder builder = new StringBuilder();
 
-        public int getWeight() {
-            return weight;
-        }
-
-        public int getTokenIndex() {
-            return tokenIndex;
-        }
-
-        public boolean hasMoreWeightThan(WeightChain pair) {
-            if (weight > pair.weight) {
-                return true;
-            }
-            return false;
-        }
-
-        @Override
-        public String toString() {
-            return "WeightChain [inputIndex=" + inputIndex + ", weight=" + weight + ", tokenIndex=" + tokenIndex + "]";
-        }
-
-        public void collectWeights() {
-            int w = weight;
-            WeightChain n = next;
-            while (n != null) {
-                if (!n.isZero()) {
-                    w += n.weight;
-                }
-                n = n.next;
-            }
-
-            this.weight = w;
-        }
-
-        public List<String> tokenize() {
-            List<String> parts = new ArrayList<String>();
-            if (isZero()) {
-                return parts;
-            }
-
-            int indexBeg = inputIndex;
-            WeightChain n = next;
-            while (n != null) {
-                if (!n.isZero()) {
-                    parts.add(input.substring(indexBeg, n.inputIndex));
-                    indexBeg = n.inputIndex;
-                }
-                n = n.next;
-            }
-            parts.add(input.substring(indexBeg));
-
-            return parts;
-        }
-    }
-
-    public boolean matches(String input) {
-        return acceptsBeginning(input) == (2 * getTokenCount() - getParameterCount());
-    }
-
-    public String complete(String input) {
-        WeightChain chain = calculateWeightChain(input);
-        WeightChain last = chain.last();
-        if (last.isZero()) {
-            return "";
-        }
-        int inputIndex = last.inputIndex;
-        int tokenIndex = last.tokenIndex;
-
-        StringBuilder builder = new StringBuilder();
-
-        Token token = getToken(tokenIndex);
-        if (!token.isIdentifier()) {
-            int consumed = input.length() - inputIndex;
-            builder.append(getToken(tokenIndex).value().substring(consumed));
-        }
-        tokenIndex++;
-        for (int i = tokenIndex; i < getTokenCount(); i++) {
-            token = getToken(i);
-            if (token.isIdentifier()) {
-                builder.append(parameterPrefix);
-            }
-            builder.append(token.value());
-        }
-        return builder.toString();
-    }
+		Token token = getToken(tokenIndex);
+		if (!token.isIdentifier()) {
+			final int consumed = input.length() - inputIndex;
+			builder.append(getToken(tokenIndex).value().substring(consumed));
+		}
+		tokenIndex++;
+		for (int i = tokenIndex; i < getTokenCount(); i++) {
+			token = getToken(i);
+			if (token.isIdentifier()) {
+				builder.append(parameterPrefix);
+			}
+			builder.append(token.value());
+		}
+		return builder.toString();
+	}
 
 }

@@ -76,15 +76,4 @@ public class StoryTokenType extends IElementType {
 	public int hashCode() {
 		return key.hashCode();
 	}
-
-	public static boolean isStepType(final IElementType tokenType) {
-		return tokenType == STEP_TYPE_GIVEN
-				|| tokenType == STEP_TYPE_WHEN
-				|| tokenType == STEP_TYPE_THEN
-				|| tokenType == STEP_TYPE_AND
-				|| tokenType == WHEN_TYPE
-				|| tokenType == THEN_TYPE
-				|| tokenType == GIVEN_TYPE;
-	}
-
 }
