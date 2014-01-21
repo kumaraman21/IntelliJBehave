@@ -92,8 +92,10 @@ public class Samples {
 					"Given the following\n existing users:\n" + //
 					"| nickname | password |\n" + //
 					"|   Travis |   PacMan |\n" + //
-					"Given i am the user with nickname: \"Travis\"\n" + //
+					"Given i am the user\n with nickname: \"Travis\"\n" + //
+					"And he is the user\n with nickname: \"Bomo\"\n" + //
 					"When i try to login\n using the password \"McCallum\"\n" + //
+					"And he tries to login\n using the password \"Bimo\"\n" + //
 					"Then i get an error\n message of type \"Wrong Credentials\"\n" + //
 					"\n" + //
 					"\n" + //

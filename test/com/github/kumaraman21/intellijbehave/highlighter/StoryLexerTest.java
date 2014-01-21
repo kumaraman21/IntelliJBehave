@@ -137,8 +137,14 @@ public class StoryLexerTest {
 		advanceAndAssert(StoryTokenType.GIVEN_TYPE, "Given ");
 		advanceAndAssert(StoryTokenType.STEP_TEXT, "i am the user with nickname: \"Travis\"");
 		advanceAndAssert(StoryTokenType.WHITE_SPACE);
+		advanceAndAssert(StoryTokenType.GIVEN_TYPE, "And ");
+		advanceAndAssert(StoryTokenType.STEP_TEXT, "he is the user with nickname: \"Bomo\"");
+		advanceAndAssert(StoryTokenType.WHITE_SPACE);
 		advanceAndAssert(StoryTokenType.WHEN_TYPE, "When ");
 		advanceAndAssert(StoryTokenType.STEP_TEXT, "i try to login using the password \"McCallum\"");
+		advanceAndAssert(StoryTokenType.WHITE_SPACE);
+		advanceAndAssert(StoryTokenType.WHEN_TYPE, "And ");
+		advanceAndAssert(StoryTokenType.STEP_TEXT, "he tries to login using the password \"Bimo\"");
 		advanceAndAssert(StoryTokenType.WHITE_SPACE);
 		advanceAndAssert(StoryTokenType.THEN_TYPE, "Then ");
 		advanceAndAssert(StoryTokenType.STEP_TEXT, "i get an error message of type \"Wrong Credentials\"");

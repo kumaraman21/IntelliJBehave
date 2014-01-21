@@ -190,12 +190,16 @@ KeyWords       = "Scenario: " | "Meta:" | "Examples:" | "Given " | "When " | "Th
         ( "Scenario: "
         | "Meta:"
         | "Examples:"
-        | "Given " | "When " | "Then " | "And"
+        | "Given " | "When " | "Then "
         | "!--"
         | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
-    ({InputChar}+{CRLF}"When "
-    | {InputChar}+{CRLF}
-    | {InputChar}+{CRLF}"|")                         { retrieveMultilineText(); return StoryTokenType.STEP_TEXT; }
+    "And "{InputChar}+{CRLF}
+        ("And " | "Given " | "When " | "Then "
+        | {InputChar})                               { yypushback(yytext().length() - 4); currentStepStart = 0; return StoryTokenType.GIVEN_TYPE;    }
+    {InputChar}+{CRLF}
+        ("And " | "Given " | "When " | "Then "
+        | "| "
+        | "")                                        { retrieveMultilineText(); return StoryTokenType.STEP_TEXT; }
     {InputChar}+{CRLF}{InputChar}                    { setStepStart(); }
     {CRLF}                                           { return StoryTokenType.WHITE_SPACE;   }
 }
@@ -205,10 +209,16 @@ KeyWords       = "Scenario: " | "Meta:" | "Examples:" | "Given " | "When " | "Th
         ( "Scenario: "
         | "Meta:"
         | "Examples:"
-        | "Given " | "When " | "Then " | "And"
+        | "Given " | "When " | "Then "
         | "!--"
         | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
-    ({InputChar}+{CRLF}"Then " | {InputChar}+{CRLF}) { retrieveMultilineText(); return StoryTokenType.STEP_TEXT; }
+    "And "{InputChar}+{CRLF}
+        ("And " | "Given " | "When " | "Then "
+        | {InputChar})                               { yypushback(yytext().length() - 4); currentStepStart = 0; return StoryTokenType.WHEN_TYPE;    }
+    {InputChar}+{CRLF}
+        ("And " | "Given " | "When " | "Then "
+        | "| "
+        | "")                                        { retrieveMultilineText(); return StoryTokenType.STEP_TEXT; }
     {InputChar}+{CRLF}{InputChar}                    { setStepStart(); }
     {CRLF}                                           { return StoryTokenType.WHITE_SPACE;   }
 }
@@ -222,12 +232,13 @@ KeyWords       = "Scenario: " | "Meta:" | "Examples:" | "Given " | "When " | "Th
         | "!--"
         | "|" )                                      { yystatePush(IN_DIRECTIVE); yypushback(yytext().length()); }
     "And "{InputChar}+{CRLF}
-        ("And "
-        | "When "
-        | {InputChar})                               { yypushback(yytext().length() - 4); return StoryTokenType.THEN_TYPE;    }
-    {InputChar}+{CRLF}("And " | "When " | "")        { retrieveMultilineText(); return StoryTokenType.STEP_TEXT; }
+        ("And " | "Given " | "When " | "Then "
+        | {InputChar})                               { yypushback(yytext().length() - 4); currentStepStart = 0; return StoryTokenType.THEN_TYPE;    }
+    {InputChar}+{CRLF}
+        ("And " | "Given " | "When " | "Then "
+        | "| "
+        | "")                                        { retrieveMultilineText(); return StoryTokenType.STEP_TEXT; }
     {InputChar}+{CRLF}{InputChar}                    { setStepStart(); }
-//    {CRLF}"And "                                     { yypushback(4);return StoryTokenType.WHITE_SPACE;    }
     {CRLF}                                           { return StoryTokenType.WHITE_SPACE;   }
 }
 
