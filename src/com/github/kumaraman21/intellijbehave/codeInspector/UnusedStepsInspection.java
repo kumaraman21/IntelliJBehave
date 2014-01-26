@@ -36,97 +36,96 @@ import static com.google.common.collect.Sets.newHashSet;
 
 public class UnusedStepsInspection extends BaseJavaLocalInspectionTool {
 
-  private static final List<String> JBEHAVE_ANNOTATIONS = newArrayList(
-    Given.class.getName(),
-    When.class.getName(),
-    Then.class.getName(),
-    Alias.class.getName(),
-    Aliases.class.getName());
+    private static final List<String> JBEHAVE_ANNOTATIONS = newArrayList(
+            Given.class.getName(),
+            When.class.getName(),
+            Then.class.getName(),
+            Alias.class.getName(),
+            Aliases.class.getName());
 
-  @Nls
-  @NotNull
-  @Override
-  public String getGroupDisplayName() {
-    return "JBehave";
-  }
+    @Nls
+    @NotNull
+    @Override
+    public String getGroupDisplayName() {
+        return "JBehave";
+    }
 
-  @Nls
-  @NotNull
-  @Override
-  public String getDisplayName() {
-    return "Unused step declaration";
-  }
+    @Nls
+    @NotNull
+    @Override
+    public String getDisplayName() {
+        return "Unused step declaration";
+    }
 
-  @NotNull
-  @Override
-  public String getShortName() {
-    return "UnusedStepDeclaration";
-  }
-
-  @Override
-  public String getStaticDescription() {
-    return super.getStaticDescription();
-  }
-
-  @Override
-  public boolean isEnabledByDefault() {
-    return true;
-  }
-
-  @NotNull
-  @Override
-  public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
-    return new JavaElementVisitor() {
-
-      @Override
-      public void visitElement(PsiElement element) {
-        super.visitElement(element);
-
-        if(! (element instanceof PsiAnnotation)) {
-          return;
-        }
-
-        PsiAnnotation annotation = (PsiAnnotation)element;
-        if(! JBEHAVE_ANNOTATIONS.contains(annotation.getQualifiedName())) {
-          return;
-        }
-
-        Project project = element.getProject();
-        StepUsageFinder stepUsageFinder = new StepUsageFinder(project);
-        ProjectRootManager.getInstance(project).getFileIndex().iterateContent(stepUsageFinder);
-        Set<StepPsiElement> stepUsages = stepUsageFinder.getStepUsages();
-
-        for (StepPsiElement stepUsage : stepUsages) {
-          if(stepUsage.getReference().resolve() == annotation) {
-            return;
-          }
-        }
-
-        holder.registerProblem(annotation, "Step <code>#ref</code> is never used");
-      }
-    };
-  }
-
-  private static class StepUsageFinder implements ContentIterator {
-    private Project project;
-    private Set<StepPsiElement> stepUsages = newHashSet();
-
-    private StepUsageFinder(Project project) {
-      this.project = project;
+    @NotNull
+    @Override
+    public String getShortName() {
+        return "UnusedStepDeclaration";
     }
 
     @Override
-    public boolean processFile(VirtualFile virtualFile) {
-      PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
-      if (psiFile instanceof StoryFileImpl) {
-        List<StepPsiElement> stepPsiElements = ((StoryFileImpl)psiFile).getSteps();
-        stepUsages.addAll(stepPsiElements);
-      }
-      return true;
+    public String getStaticDescription() {
+        return super.getStaticDescription();
     }
 
-    public Set<StepPsiElement> getStepUsages() {
-      return stepUsages;
+    @Override
+    public boolean isEnabledByDefault() {
+        return true;
     }
-  }
+
+    @NotNull
+    @Override
+    public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
+        return new JavaElementVisitor() {
+
+            @Override
+            public void visitAnnotation(PsiAnnotation annotation) {
+
+                if (!JBEHAVE_ANNOTATIONS.contains(annotation.getQualifiedName())) {
+                    return;
+                }
+
+                Project project = annotation.getProject();
+                StepUsageFinder stepUsageFinder = new StepUsageFinder(project);
+                ProjectRootManager.getInstance(project).getFileIndex().iterateContent(stepUsageFinder);
+                Set<StepPsiElement> stepUsages = stepUsageFinder.getStepUsages();
+
+                for (StepPsiElement stepUsage : stepUsages) {
+                    if (stepUsage.getReference().resolve() == annotation) {
+                        return;
+                    }
+                }
+
+                holder.registerProblem(annotation, "Step <code>#ref</code> is never used");
+            }
+        };
+    }
+
+    private static class StepUsageFinder implements ContentIterator {
+        private Project project;
+        private Set<StepPsiElement> stepUsages = newHashSet();
+
+        private StepUsageFinder(Project project) {
+            this.project = project;
+        }
+
+        @Override
+        public boolean processFile(VirtualFile virtualFile) {
+
+            if (virtualFile.isDirectory() || !virtualFile.getFileType().getDefaultExtension().equals("story")) {
+                return true;
+            }
+
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+            if (psiFile instanceof StoryFileImpl) {
+                List<StepPsiElement> stepPsiElements = ((StoryFileImpl) psiFile).getSteps();
+                stepUsages.addAll(stepPsiElements);
+            }
+            return true;
+        }
+
+        public Set<StepPsiElement> getStepUsages() {
+            return stepUsages;
+        }
+    }
 }
