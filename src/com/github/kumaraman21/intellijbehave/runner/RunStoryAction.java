@@ -43,88 +43,85 @@ import static org.apache.commons.lang.StringUtils.isBlank;
 
 public class RunStoryAction extends AnAction {
 
-  public void actionPerformed(AnActionEvent e) {
-    Application application = ApplicationManager.getApplication();
-    JBehaveSettings component = application.getComponent(JBehaveSettings.class);
+    public void actionPerformed(AnActionEvent e) {
+        Application application = ApplicationManager.getApplication();
+        JBehaveSettings component = application.getComponent(JBehaveSettings.class);
 
-    String storyRunnerName = component.getStoryRunner();
-    if (isBlank(storyRunnerName)) {
-      showMessageDialog("In order to run a story file you need to first set a main class in the JBehave settings.",
-                        "No main class found to run the story",
-                        getErrorIcon());
-      return;
+        String storyRunnerName = component.getStoryRunner();
+        if (isBlank(storyRunnerName)) {
+            showMessageDialog("In order to run a story file you need to first set a main class in the JBehave settings.",
+                    "No Main Class Found to Run the Story",
+                    getErrorIcon());
+            return;
+        }
+
+        VirtualFile file = e.getData(PlatformDataKeys.VIRTUAL_FILE);
+        if (file == null) {
+            showMessageDialog("Select a file or focus on the story file in the editor to run it.",
+                    "Story File not Selected",
+                    getErrorIcon());
+            return;
+        }
+
+        Project project = e.getData(PlatformDataKeys.PROJECT);
+        final PsiClass storyRunnerClass = JavaPsiFacade.getInstance(project).findClass(storyRunnerName,
+                GlobalSearchScope.allScope(project));
+        if (storyRunnerClass == null) {
+            showMessageDialog("Could not find the specified main class ''" + storyRunnerName + "'.",
+                    "Main Class not Found",
+                    getErrorIcon());
+            return;
+        }
+
+        Module module = ProjectRootManager.getInstance(project).getFileIndex()
+                .getModuleForFile(storyRunnerClass.getContainingFile().getVirtualFile());
+        if (module == null) {
+            showMessageDialog("Could not find the module in which main class to run stories was defined.'" +
+                    "/n Resetting the main class in the JBehave settings might fix this issue.",
+                    "Module not Found For Main Class",
+                    getErrorIcon());
+            return;
+        }
+
+        RunManagerImpl runManager = (RunManagerImpl) RunManager.getInstance(project);
+        RunnerAndConfigurationSettingsImpl runnerAndConfigurationSettings = findConfigurationByName(JBEHAVE_STORY_RUNNER, runManager);
+        ApplicationConfiguration conf = null;
+
+        if (runnerAndConfigurationSettings != null) {
+            conf = (ApplicationConfiguration) runnerAndConfigurationSettings.getConfiguration();
+            updateConfiguration(storyRunnerName, file, module, conf);
+        } else {
+            StoryRunnerConfigurationType type = application.getComponent(StoryRunnerConfigurationType.class);
+            runnerAndConfigurationSettings =
+                    (RunnerAndConfigurationSettingsImpl) runManager.createRunConfiguration(JBEHAVE_STORY_RUNNER, type.getConfigurationFactories()[0]);
+            conf = (ApplicationConfiguration) runnerAndConfigurationSettings.getConfiguration();
+            updateConfiguration(storyRunnerName, file, module, conf);
+            runManager.addConfiguration(runnerAndConfigurationSettings, true);
+        }
+
+        runManager.setActiveConfiguration(runnerAndConfigurationSettings);
+
+        Executor executor = DefaultRunExecutor.getRunExecutorInstance();
+        ProgramRunner runner = RunnerRegistry.getInstance().getRunner(executor.getId(), conf);
+        ExecutionEnvironment environment = new ExecutionEnvironment(executor, runner, runnerAndConfigurationSettings, project);
+
+        try {
+            runner.execute(environment);
+        } catch (ExecutionException e1) {
+            JavaExecutionUtil.showExecutionErrorMessage(e1, "Error", project);
+        }
     }
 
-    VirtualFile file = e.getData(PlatformDataKeys.VIRTUAL_FILE);
-    if (file == null) {
-      showMessageDialog("Select a file or focus on the story file in the editor to run it.",
-                        "Story file not selected",
-                        getErrorIcon());
-      return;
+    private RunnerAndConfigurationSettingsImpl findConfigurationByName(String name, RunManagerImpl runManager) {
+        for (RunnerAndConfigurationSettings settings : runManager.getSortedConfigurations()) {
+            if (settings.getName().equals(name)) return (RunnerAndConfigurationSettingsImpl) settings;
+        }
+        return null;
     }
 
-    Project project = e.getData(PlatformDataKeys.PROJECT);
-    final PsiClass storyRunnerClass = JavaPsiFacade.getInstance(project).findClass(storyRunnerName,
-                                                                               GlobalSearchScope.allScope(project));
-    if(storyRunnerClass == null) {
-      showMessageDialog("Could not find the specified main class ''" + storyRunnerName + "'.",
-                        "Main class not found",
-                        getErrorIcon());
-      return;
+    private void updateConfiguration(String mainClassName, VirtualFile file, Module module, ApplicationConfiguration conf) {
+        conf.setMainClassName(mainClassName);
+        conf.setProgramParameters(file.getPath());
+        conf.setModule(module);
     }
-
-    Module module = ProjectRootManager.getInstance(project).getFileIndex()
-      .getModuleForFile(storyRunnerClass.getContainingFile().getVirtualFile());
-    if (module == null) {
-      showMessageDialog("Could not find the module in which main class to run stories was defined.'" +
-                        "/n Resetting the main class in the JBehave settings might fix this issue.",
-                        "Module not found for main class",
-                        getErrorIcon());
-      return;
-    }
-
-    RunManagerImpl runManager = (RunManagerImpl)RunManager.getInstance(project);
-    RunnerAndConfigurationSettingsImpl runnerAndConfigurationSettings = findConfigurationByName(JBEHAVE_STORY_RUNNER, runManager);
-    ApplicationConfiguration conf = null;
-
-    if (runnerAndConfigurationSettings != null) {
-      conf = (ApplicationConfiguration)runnerAndConfigurationSettings.getConfiguration();
-      updateConfiguration(storyRunnerName, file, module, conf);
-
-    }
-    else {
-      StoryRunnerConfigurationType type = application.getComponent(StoryRunnerConfigurationType.class);
-      runnerAndConfigurationSettings =
-        (RunnerAndConfigurationSettingsImpl)runManager.createRunConfiguration(JBEHAVE_STORY_RUNNER, type.getConfigurationFactories()[0]);
-      conf = (ApplicationConfiguration)runnerAndConfigurationSettings.getConfiguration();
-      updateConfiguration(storyRunnerName, file, module, conf);
-      runManager.addConfiguration(runnerAndConfigurationSettings, true);
-    }
-
-    runManager.setActiveConfiguration(runnerAndConfigurationSettings);
-
-    Executor executor = DefaultRunExecutor.getRunExecutorInstance();
-    ProgramRunner runner = RunnerRegistry.getInstance().getRunner(executor.getId(), conf);
-    ExecutionEnvironment environment = new ExecutionEnvironment(executor, runner, runnerAndConfigurationSettings, project);
-
-    try {
-      runner.execute(environment);
-    }
-    catch (ExecutionException e1) {
-      JavaExecutionUtil.showExecutionErrorMessage(e1, "Error", project);
-    }
-  }
-
-  private RunnerAndConfigurationSettingsImpl findConfigurationByName(String name, RunManagerImpl runManager) {
-    for (RunnerAndConfigurationSettings settings : runManager.getSortedConfigurations()) {
-      if (settings.getName().equals(name)) return (RunnerAndConfigurationSettingsImpl)settings;
-    }
-    return null;
-  }
-
-  private void updateConfiguration(String mainClassName, VirtualFile file, Module module, ApplicationConfiguration conf) {
-    conf.setMainClassName(mainClassName);
-    conf.setProgramParameters(file.getPath());
-    conf.setModule(module);
-  }
 }
