@@ -43,7 +43,7 @@ public class StoryElementType extends IElementType {
 	public static final TokenSet STEPS_TOKEN_SET = TokenSet.create(GIVEN_STEP, WHEN_STEP, THEN_STEP);
 
 
-	public StoryElementType(@NotNull @NonNls final String debugName) {
+	public StoryElementType(@NotNull @NonNls String debugName) {
 		super(debugName, STORY_FILE_TYPE.getLanguage());
 	}
 }

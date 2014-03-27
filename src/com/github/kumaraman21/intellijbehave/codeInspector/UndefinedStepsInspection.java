@@ -15,18 +15,23 @@
  */
 package com.github.kumaraman21.intellijbehave.codeInspector;
 
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
+
 import com.github.kumaraman21.intellijbehave.highlighter.StorySyntaxHighlighter;
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
 import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionAnnotation;
 import com.github.kumaraman21.intellijbehave.utility.ParametrizedString;
-import com.intellij.codeInspection.*;
+import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
+import com.intellij.codeInspection.LocalQuickFix;
+import com.intellij.codeInspection.ProblemDescriptor;
+import com.intellij.codeInspection.ProblemHighlightType;
+import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
 
 public class UndefinedStepsInspection extends BaseJavaLocalInspectionTool {
 
@@ -62,19 +67,19 @@ public class UndefinedStepsInspection extends BaseJavaLocalInspectionTool {
 
     @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, final boolean isOnTheFly) {
+    public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
         return new PsiElementVisitor() {
 
             @Override
-            public void visitElement(final PsiElement psiElement) {
+            public void visitElement(PsiElement psiElement) {
                 super.visitElement(psiElement);
 
                 if (!(psiElement instanceof StepPsiElement)) {
                     return;
                 }
 
-                final StepPsiElement stepPsiElement = (StepPsiElement) psiElement;
-                final StepDefinitionAnnotation annotationDef = stepPsiElement.getReference().stepDefinitionAnnotation();
+                StepPsiElement stepPsiElement = (StepPsiElement) psiElement;
+                StepDefinitionAnnotation annotationDef = stepPsiElement.getReference().stepDefinitionAnnotation();
                 if (annotationDef == null) {
                     holder.registerProblem(stepPsiElement, "Step <code>#ref</code> is not defined");
                 } else {
@@ -85,16 +90,16 @@ public class UndefinedStepsInspection extends BaseJavaLocalInspectionTool {
     }
 
 
-    private void highlightParameters(final StepPsiElement stepPsiElement,
-                                     final StepDefinitionAnnotation annotation,
-                                     final ProblemsHolder holder) {
-        final String stepText = stepPsiElement.getStepText();
-        final String annotationText = annotation.getAnnotationText();
-        final ParametrizedString pString = new ParametrizedString(annotationText);
+    private void highlightParameters(StepPsiElement stepPsiElement,
+                                     StepDefinitionAnnotation annotation,
+                                     ProblemsHolder holder) {
+        String stepText = stepPsiElement.getStepText();
+        String annotationText = annotation.getAnnotationText();
+        ParametrizedString pString = new ParametrizedString(annotationText);
 
         int offset = stepPsiElement.getStepTextOffset();
-        for (final ParametrizedString.StringToken token : pString.tokenize(stepText)) {
-            final int length = token.getValue().length();
+        for (ParametrizedString.StringToken token : pString.tokenize(stepText)) {
+            int length = token.getValue().length();
             if (token.isIdentifier()) {
                 registerHiglighting(StorySyntaxHighlighter.TABLE_CELL,
                         stepPsiElement,
@@ -105,10 +110,10 @@ public class UndefinedStepsInspection extends BaseJavaLocalInspectionTool {
         }
     }
 
-    private static void registerHiglighting(final TextAttributesKey attributesKey,
-                                            final StepPsiElement step,
-                                            final TextRange range,
-                                            final ProblemsHolder holder) {
+    private static void registerHiglighting(TextAttributesKey attributesKey,
+                                            StepPsiElement step,
+                                            TextRange range,
+                                            ProblemsHolder holder) {
         final ProblemDescriptor descriptor = new ProblemDescriptorImpl(
                 step, step, "", LocalQuickFix.EMPTY_ARRAY,
                 ProblemHighlightType.INFORMATION, false, range, false, null,

@@ -79,7 +79,7 @@ public class StepPsiReference implements PsiReference {
 
 	@Override
 	public PsiElement resolve() {
-		final StepDefinitionAnnotation stepDefinitionAnnotation = stepDefinitionAnnotation();
+		StepDefinitionAnnotation stepDefinitionAnnotation = stepDefinitionAnnotation();
 		if (stepDefinitionAnnotation == null) {
 			return null;
 		}
@@ -93,10 +93,10 @@ public class StepPsiReference implements PsiReference {
 	public Object[] getVariants() {
 
 		if (useVariants) {
-			final StepType stepType = stepPsiElement.getStepType();
-			final String actualStepPrefix = stepPsiElement.getActualStepPrefix();
+			StepType stepType = stepPsiElement.getStepType();
+			String actualStepPrefix = stepPsiElement.getActualStepPrefix();
 
-			final StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix, stepPsiElement);
+			StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix, stepPsiElement);
 			ScanUtils.iterateInContextOf(stepPsiElement, stepSuggester);
 
 			return stepSuggester.getSuggestions().toArray();
@@ -110,13 +110,13 @@ public class StepPsiReference implements PsiReference {
 		private final List<String> suggestions = newArrayList();
 		private final String actualStepPrefix;
 
-		public StepSuggester(final StepType stepType, final String actualStepPrefix, final StepPsiElement storyRef) {
+		public StepSuggester(StepType stepType, String actualStepPrefix, StepPsiElement storyRef) {
 			super(stepType, storyRef);
 			this.actualStepPrefix = actualStepPrefix;
 		}
 
 		@Override
-		public boolean processStepDefinition(final StepDefinitionAnnotation stepDefinitionAnnotation) {
+		public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
 			suggestions.add(actualStepPrefix + " " + stepDefinitionAnnotation.getAnnotationText());
 			return true;
 		}

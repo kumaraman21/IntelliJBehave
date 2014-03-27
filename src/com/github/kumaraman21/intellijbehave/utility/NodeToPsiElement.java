@@ -21,7 +21,7 @@ import com.intellij.psi.PsiElement;
 
 public class NodeToPsiElement implements Function<ASTNode, PsiElement> {
 	@Override
-	public PsiElement apply(final ASTNode astNode) {
+	public PsiElement apply(ASTNode astNode) {
 		return astNode.getPsi();
 	}
 }

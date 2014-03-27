@@ -28,13 +28,13 @@ import com.intellij.psi.PsiElement;
 
 public class StoryAnnotator implements Annotator {
 	@Override
-	public void annotate(@NotNull final PsiElement psiElement, @NotNull final AnnotationHolder annotationHolder) {
+	public void annotate(@NotNull PsiElement psiElement, @NotNull AnnotationHolder annotationHolder) {
 		if (!(psiElement instanceof StepPsiElement)) {
 			return;
 		}
 
-		final StepPsiElement stepPsiElement = (StepPsiElement) psiElement;
-		final StepDefinitionAnnotation annotationDef = stepPsiElement.getReference().stepDefinitionAnnotation();
+		StepPsiElement stepPsiElement = (StepPsiElement) psiElement;
+		StepDefinitionAnnotation annotationDef = stepPsiElement.getReference().stepDefinitionAnnotation();
 		if (annotationDef == null) {
 			annotationHolder.createErrorAnnotation(psiElement, "No definition found for the step");
 		} else {
@@ -42,16 +42,16 @@ public class StoryAnnotator implements Annotator {
 		}
 	}
 
-	private void annotateParameters(final StepPsiElement stepPsiElement,
-									final StepDefinitionAnnotation annotation,
-									final AnnotationHolder annotationHolder) {
-		final String stepText = stepPsiElement.getStepText();
-		final String annotationText = annotation.getAnnotationText();
-		final ParametrizedString pString = new ParametrizedString(annotationText);
+	private void annotateParameters(StepPsiElement stepPsiElement,
+									StepDefinitionAnnotation annotation,
+									AnnotationHolder annotationHolder) {
+		String stepText = stepPsiElement.getStepText();
+		String annotationText = annotation.getAnnotationText();
+		ParametrizedString pString = new ParametrizedString(annotationText);
 
 		int offset = stepPsiElement.getTextOffset();
-		for (final StringToken token : pString.tokenize(stepText)) {
-			final int length = token.getValue().length();
+		for (StringToken token : pString.tokenize(stepText)) {
+			int length = token.getValue().length();
 			if (token.isIdentifier()) {
 				annotationHolder.createInfoAnnotation(
 						TextRange.from(offset, length), "Parameter");

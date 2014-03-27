@@ -36,7 +36,7 @@ import com.intellij.psi.tree.TokenSet;
 
 public class StoryFileImpl extends PsiFileBase {
 
-	public StoryFileImpl(final FileViewProvider fileViewProvider) {
+	public StoryFileImpl(FileViewProvider fileViewProvider) {
 		super(fileViewProvider, STORY_FILE_TYPE.getLanguage());
 	}
 
@@ -49,10 +49,10 @@ public class StoryFileImpl extends PsiFileBase {
 	@NotNull
 	public List<StepPsiElement> getSteps() {
 
-		final List<ASTNode> stepNodes = newArrayList();
+		List<ASTNode> stepNodes = newArrayList();
 
-		for (final PsiElement scenario : getScenarios()) {
-			final ASTNode[] stepNodesOfScenario = scenario.getNode().getChildren(STEPS_TOKEN_SET);
+		for (PsiElement scenario : getScenarios()) {
+			ASTNode[] stepNodesOfScenario = scenario.getNode().getChildren(STEPS_TOKEN_SET);
 			stepNodes.addAll(asList(stepNodesOfScenario));
 		}
 
@@ -61,17 +61,17 @@ public class StoryFileImpl extends PsiFileBase {
 
 	@NotNull
 	private List<PsiElement> getScenarios() {
-		final PsiElement story = getStory();
+		PsiElement story = getStory();
 		if (story == null) {
 			return newArrayList();
 		}
 
-		final ASTNode[] scenarioNodes = story.getNode().getChildren(TokenSet.create(SCENARIO));
+		ASTNode[] scenarioNodes = story.getNode().getChildren(TokenSet.create(SCENARIO));
 		return transform(asList(scenarioNodes), new NodeToPsiElement());
 	}
 
 	private PsiElement getStory() {
-		final ASTNode[] storyNodes = this.getNode().getChildren(TokenSet.create(STORY));
+		ASTNode[] storyNodes = this.getNode().getChildren(TokenSet.create(STORY));
 
 		if (storyNodes.length > 0) {
 			return storyNodes[0].getPsi();

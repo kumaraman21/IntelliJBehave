@@ -15,26 +15,26 @@
  */
 package com.github.kumaraman21.intellijbehave.utility;
 
+import java.util.HashSet;
+
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.psi.PsiElement;
 
-import java.util.HashSet;
-
 public class ScanUtils {
 
-    public static boolean iterateInContextOf(final PsiElement storyRef, final ContentIterator iterator) {
-        final Module module = ModuleUtil.findModuleForPsiElement(storyRef);
+    public static boolean iterateInContextOf(PsiElement storyRef, ContentIterator iterator) {
+        Module module = ModuleUtil.findModuleForPsiElement(storyRef);
 
         boolean shouldContinue = (module != null) && ModuleRootManager.getInstance(module).getFileIndex().iterateContent(iterator);
 
         if (shouldContinue) {
-            final HashSet<Module> dependencies = new HashSet<Module>();
+            HashSet<Module> dependencies = new HashSet<Module>();
             ModuleUtil.getDependencies(module, dependencies);
 
-            for (final Module dependency : dependencies) {
+            for (Module dependency : dependencies) {
                 shouldContinue = ModuleRootManager.getInstance(dependency).getFileIndex().iterateContent(iterator);
                 if (!shouldContinue) {
                     break;

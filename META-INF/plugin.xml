@@ -53,9 +53,10 @@
         <li>Does not take into account any custom JBehave configuration</li>
     </ul>
   ]]></description>
-    <version>3</version>
+  <version>1.2</version>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken</vendor>
-    <idea-version since-build="8000"/>
+
+    <idea-version since-build="133.0"/>
 
     <application-components>
         <component>

@@ -15,8 +15,6 @@
  */
 package com.github.kumaraman21.intellijbehave.highlighter;
 
-import gnu.trove.THashMap;
-
 import java.util.Map;
 
 import org.jetbrains.annotations.NonNls;
@@ -30,6 +28,8 @@ import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 
+import gnu.trove.THashMap;
+
 public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
 
 	private static final Map<IElementType, TextAttributesKey> ATTRIBUTES = new THashMap<IElementType, TextAttributesKey>();
@@ -42,7 +42,7 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
 
 	@NotNull
 	@Override
-	public TextAttributesKey[] getTokenHighlights(final IElementType tokenType) {
+	public TextAttributesKey[] getTokenHighlights(IElementType tokenType) {
 		return pack(ATTRIBUTES.get(tokenType));
 	}
 
@@ -124,7 +124,7 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
 		ATTRIBUTES.put(StoryTokenType.BAD_CHARACTER, BAD_CHARACTER);
 	}
 
-	private static TextAttributesKey createKey(final String externalName, final TextAttributesKey textAttributesKey) {
+	private static TextAttributesKey createKey(String externalName, TextAttributesKey textAttributesKey) {
 		return TextAttributesKey.createTextAttributesKey(externalName, textAttributesKey);
 	}
 }

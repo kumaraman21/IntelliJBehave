@@ -45,22 +45,22 @@ public class StoryLocalizedLexer extends LexerBase {
 		this(new LocalizedStorySupport());
 	}
 
-	public StoryLocalizedLexer(final LocalizedStorySupport kwSupport) {
+	public StoryLocalizedLexer(LocalizedStorySupport kwSupport) {
 		this.kwSupport = kwSupport;
 		changeLocale("en");
 	}
 
-	public void changeLocale(final String locale) {
+	public void changeLocale(String locale) {
 		keywords = kwSupport.getKeywords(locale);
 		charTree = new CharTree<JBKeyword>('/', null);
-		for (final JBKeyword kw : JBKeyword.values()) {
-			final String asString = kw.asString(keywords);
+		for (JBKeyword kw : JBKeyword.values()) {
+			String asString = kw.asString(keywords);
 			charTree.push(asString, kw);
 		}
 	}
 
 	@Override
-	public void start(final CharSequence buffer, final int startOffset, final int endOffset, final int initialState) {
+	public void start(CharSequence buffer, int startOffset, int endOffset, int initialState) {
 		this.buffer = buffer;
 		//this.startOffset = startOffset;
 		this.position = startOffset;
@@ -129,7 +129,7 @@ public class StoryLocalizedLexer extends LexerBase {
 		if (consume(keywords.ignorable())) {
 			consume(INPUT_CHAR);
 			if (state == State.YYINITIAL) {
-				final String locale = LocalizedStorySupport.checkForLanguageDefinition(tokenText());
+				String locale = LocalizedStorySupport.checkForLanguageDefinition(tokenText());
 				if (locale != null) {
 					changeLocale(locale);
 					tokenType = StoryTokenType.COMMENT_WITH_LOCALE;
@@ -143,7 +143,7 @@ public class StoryLocalizedLexer extends LexerBase {
 		switch (state) {
 			case YYINITIAL:
 			case IN_STORY: {
-				final CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
+				CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
 				if (entry.hasValue()) {
 					tokenType = tokenType(entry.value);
 					position += entry.length;
@@ -162,7 +162,7 @@ public class StoryLocalizedLexer extends LexerBase {
 					tokenType = StoryTokenType.WHITE_SPACE;
 					return;
 				}
-				final CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
+				CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
 				tokenType = tokenType(entry.value);
 				position += entry.length;
 				return;
@@ -171,7 +171,7 @@ public class StoryLocalizedLexer extends LexerBase {
 				if (consume(CRLF)) {
 					tokenType = StoryTokenType.WHITE_SPACE;
 					//
-					final CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
+					CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
 					if (entry.hasValue()) {
 						switch (entry.value) {
 							case Given:
@@ -256,7 +256,7 @@ public class StoryLocalizedLexer extends LexerBase {
 					tokenType = StoryTokenType.WHITE_SPACE;
 
 					//
-					final CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
+					CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
 					if (entry.hasValue()) {
 						switch (entry.value) {
 							case Given:
@@ -291,7 +291,7 @@ public class StoryLocalizedLexer extends LexerBase {
 				if (consume(CRLF)) {
 					tokenType = StoryTokenType.WHITE_SPACE;
 					//
-					final CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
+					CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
 					if (entry.hasValue()) {
 						switch (entry.value) {
 							case Given:
@@ -331,7 +331,7 @@ public class StoryLocalizedLexer extends LexerBase {
 		return buffer.subSequence(this.currentTokenStart, this.position);
 	}
 
-	private boolean matchesAhead(final String text) {
+	private boolean matchesAhead(String text) {
 		if (position + text.length() > endOffset) {
 			return false;
 		}
@@ -343,7 +343,7 @@ public class StoryLocalizedLexer extends LexerBase {
 		return true;
 	}
 
-	private boolean consume(final String data) {
+	private boolean consume(String data) {
 		if (matchesAhead(data)) {
 			position += data.length();
 			return true;
@@ -351,16 +351,16 @@ public class StoryLocalizedLexer extends LexerBase {
 		return false;
 	}
 
-	private boolean consumeUntil(final CharFilter filter, final String stopWord) {
-		final int previousPosition = position;
+	private boolean consumeUntil(CharFilter filter, String stopWord) {
+		int previousPosition = position;
 		while (position < endOffset && !matchesAhead(stopWord) && filter.accept(buffer.charAt(position))) {
 			position++;
 		}
 		return position != previousPosition;
 	}
 
-	private boolean consumeUntil(final CharFilter filter, final String stopWord1, final String stopWord2) {
-		final int previousPosition = position;
+	private boolean consumeUntil(CharFilter filter, String stopWord1, String stopWord2) {
+		int previousPosition = position;
 		while (position < endOffset && !(matchesAhead(stopWord1) || matchesAhead(stopWord2))
 				&& filter.accept(buffer.charAt(position))) {
 			position++;
@@ -368,8 +368,8 @@ public class StoryLocalizedLexer extends LexerBase {
 		return position != previousPosition;
 	}
 
-	private boolean consume(final CharFilter filter) {
-		final int previousPosition = position;
+	private boolean consume(CharFilter filter) {
+		int previousPosition = position;
 		while (position < endOffset && filter.accept(buffer.charAt(position))) {
 			position++;
 		}
@@ -384,35 +384,38 @@ public class StoryLocalizedLexer extends LexerBase {
 		boolean accept(char c);
 	}
 
-	private static final CharFilter SPACES = new CharFilter() {
+	private static CharFilter SPACES = new CharFilter() {
 		@Override
-		public boolean accept(final char c) {
+		public boolean accept(char c) {
 			return c == ' ' || c == '\t';
 		}
 	};
 
-	private static final CharFilter CRLF = new CharFilter() {
+	private static CharFilter CRLF = new CharFilter() {
 		@Override
-		public boolean accept(final char c) {
+		public boolean accept(char c) {
 			return c == '\r' || c == '\n';
 		}
 	};
 
-	private static final CharFilter INPUT_CHAR = new CharFilter() {
+	private static CharFilter INPUT_CHAR = new CharFilter() {
 		@Override
-		public boolean accept(final char c) {
+		public boolean accept(char c) {
 			return c != '\r' && c != '\n';
 		}
 	};
 
-	private static final CharFilter META_PROPERTY_CHARS = new CharFilter() {
+	private static CharFilter META_PROPERTY_CHARS = new CharFilter() {
 		@Override
-		public boolean accept(final char c) {
+		public boolean accept(char c) {
 			return !SPACES.accept(c) && !CRLF.accept(c);
 		}
 	};
 
-	private IElementType tokenType(final JBKeyword value) {
+	private IElementType tokenType(JBKeyword value) {
+        if (value == null) {
+			return StoryTokenType.BAD_CHARACTER;
+		}
 		switch (value) {
 			case Given:
 				state = State.IN_STEP;

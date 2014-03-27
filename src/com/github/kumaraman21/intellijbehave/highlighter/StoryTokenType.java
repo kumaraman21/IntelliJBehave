@@ -61,13 +61,13 @@ public class StoryTokenType extends IElementType {
 
 	private final String key;
 
-	public StoryTokenType(@NonNls final String debugName) {
+	public StoryTokenType(@NonNls String debugName) {
 		super(debugName, STORY_FILE_TYPE.getLanguage());
 		this.key = debugName;
 	}
 
 	@Override
-	public boolean equals(final Object other) {
+	public boolean equals(Object other) {
 		return other instanceof StoryTokenType
 				&& ((StoryTokenType) other).key.equals(key);
 	}

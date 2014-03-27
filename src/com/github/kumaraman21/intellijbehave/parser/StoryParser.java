@@ -31,7 +31,7 @@ public class StoryParser implements PsiParser {
 
 	@NotNull
 	@Override
-	public ASTNode parse(final IElementType root, final PsiBuilder builder) {
+	public ASTNode parse(IElementType root, PsiBuilder builder) {
 		final PsiBuilder.Marker rootMarker = builder.mark();
 		builder.setDebugMode(true);
 		parseStory(builder);
@@ -40,14 +40,14 @@ public class StoryParser implements PsiParser {
 	}
 
 	@SuppressWarnings("UnnecessaryLabelOnContinueStatement")
-	private void parseStory(final PsiBuilder builder) {
+	private void parseStory(PsiBuilder builder) {
 		final PsiBuilder.Marker storyMarker = builder.mark();
 
-		final ParserState state = new ParserState(builder);
+		ParserState state = new ParserState(builder);
 
 		whileLoop:
 		while (!builder.eof()) {
-			final IElementType tokenType = builder.getTokenType();
+			IElementType tokenType = builder.getTokenType();
 
 			// Comment and whitespace are not returned by default
 
@@ -126,7 +126,7 @@ public class StoryParser implements PsiParser {
 			}
 
 			// unknown
-			final PsiBuilder.Marker unknwonMark = builder.mark();
+			PsiBuilder.Marker unknwonMark = builder.mark();
 			builder.advanceLexer();
 			unknwonMark.done(StoryElementType.UNKNOWN_FRAGMENT);
 		}
@@ -134,7 +134,7 @@ public class StoryParser implements PsiParser {
 		storyMarker.done(StoryElementType.STORY);
 	}
 
-	private static boolean isCrlf(final String text) {
+	private static boolean isCrlf(String text) {
 		return text.contains("\n") || text.contains("\r");
 	}
 
@@ -142,16 +142,16 @@ public class StoryParser implements PsiParser {
 		private final PsiBuilder.Marker marker;
 		private final IElementType elementType;
 
-		private MarkerData(final PsiBuilder.Marker marker, final IElementType elementType) {
+		private MarkerData(PsiBuilder.Marker marker, IElementType elementType) {
 			this.marker = marker;
 			this.elementType = elementType;
 		}
 
-		public boolean matches(final IElementType elementType) {
+		public boolean matches(IElementType elementType) {
 			return this.elementType == elementType;
 		}
 
-		public boolean matches(final TokenSet tokenSet) {
+		public boolean matches(TokenSet tokenSet) {
 			return tokenSet.contains(this.elementType);
 		}
 
@@ -167,11 +167,11 @@ public class StoryParser implements PsiParser {
 		private StoryElementType previousStepElementType = null;
 
 
-		public ParserState(final PsiBuilder builder) {
+		public ParserState(PsiBuilder builder) {
 			this.builder = builder;
 		}
 
-		private void matchesHeadOrPush(final StoryElementType elementType) {
+		private void matchesHeadOrPush(StoryElementType elementType) {
 			if (markerIndex >= 0 && markers[markerIndex].matches(elementType)) {
 				return;
 			}
@@ -181,7 +181,7 @@ public class StoryParser implements PsiParser {
 			}
 		}
 
-		private void popUntilOnlyIfPresent(final StoryElementType elementType) {
+		private void popUntilOnlyIfPresent(StoryElementType elementType) {
 			int newMarkerIndex = markerIndex;
 			for (int i = markerIndex; i >= 0; i--) {
 				if (markers[i].matches(elementType)) {
@@ -210,7 +210,7 @@ public class StoryParser implements PsiParser {
 		}
 
 
-		private void popUntilOnlyIfPresent(final TokenSet tokenSet) {
+		private void popUntilOnlyIfPresent(TokenSet tokenSet) {
 			int newMarkerIndex = markerIndex;
 			for (int i = markerIndex; i >= 0; i--) {
 				if (markers[i].matches(tokenSet)) {
@@ -277,7 +277,7 @@ public class StoryParser implements PsiParser {
 			popUntilOnlyIfPresent(StoryElementType.META);
 		}
 
-		public void enterStepType(final IElementType tokenType) {
+		public void enterStepType(IElementType tokenType) {
 			leaveExampleTable();
 			leaveMeta();
 			leaveStep();
@@ -327,7 +327,7 @@ public class StoryParser implements PsiParser {
 		}
 	}
 
-	private static boolean belongsToScenario(final IElementType tokenType) {
+	private static boolean belongsToScenario(IElementType tokenType) {
 		return isWhitespace(tokenType)
 				|| isComment(tokenType)
 				|| isScenarioText(tokenType)
@@ -339,59 +339,58 @@ public class StoryParser implements PsiParser {
 				|| isMeta(tokenType);
 	}
 
-	private boolean belongsToTable(final IElementType tokenType) {
+	private boolean belongsToTable(IElementType tokenType) {
 		return isWhitespace(tokenType)
 				|| isComment(tokenType)
 				|| isTableRow(tokenType);
 	}
 
-	private static boolean isMeta(final IElementType tokenType) {
+	private static boolean isMeta(IElementType tokenType) {
 		return tokenType == StoryTokenType.META
 				|| tokenType == StoryTokenType.META_KEY
 				|| tokenType == StoryTokenType.META_TEXT;
 	}
 
-	private static boolean isExampleTable(final IElementType tokenType) {
+	private static boolean isExampleTable(IElementType tokenType) {
 		return tokenType == StoryTokenType.EXAMPLE_TYPE;
 	}
 
-	private static boolean isTableRow(final IElementType tokenType) {
+	private static boolean isTableRow(IElementType tokenType) {
 		return tokenType == StoryTokenType.TABLE_CELL
 				|| tokenType == StoryTokenType.TABLE_DELIM;
 	}
 
-	private static boolean isStepType(final IElementType tokenType) {
+	private static boolean isStepType(IElementType tokenType) {
 		return tokenType == StoryTokenType.STEP_TYPE_GIVEN
 				|| tokenType == StoryTokenType.STEP_TYPE_WHEN
 				|| tokenType == StoryTokenType.STEP_TYPE_THEN
 				|| tokenType == StoryTokenType.STEP_TYPE_AND;
 	}
 
-	private static boolean isStepText(final IElementType tokenType) {
+	private static boolean isStepText(IElementType tokenType) {
 		return tokenType == StoryTokenType.STEP_TEXT;
 	}
 
-	private static boolean isScenario(final IElementType tokenType) {
+	private static boolean isScenario(IElementType tokenType) {
 		return tokenType == StoryTokenType.SCENARIO_TYPE;
 	}
 
-	private static boolean isScenarioText(final IElementType tokenType) {
+	private static boolean isScenarioText(IElementType tokenType) {
 		return tokenType == StoryTokenType.SCENARIO_TEXT;
 	}
 
-	private static boolean isWhitespace(final IElementType tokenType) {
+	private static boolean isWhitespace(IElementType tokenType) {
 		return tokenType == StoryTokenType.WHITE_SPACE;
 	}
 
-	private static boolean isComment(final IElementType tokenType) {
+	private static boolean isComment(IElementType tokenType) {
 		return tokenType == StoryTokenType.COMMENT
 				|| tokenType == StoryTokenType.COMMENT_WITH_LOCALE;
 	}
 
-	private static boolean isStoryDescription(final IElementType tokenType) {
+	private static boolean isStoryDescription(IElementType tokenType) {
 		return tokenType == StoryTokenType.STORY_DESCRIPTION
 				|| tokenType == StoryTokenType.NARRATIVE_TYPE
-				|| tokenType == StoryTokenType.NARRATIVE_TEXT
-				;
-	}
+				|| tokenType == StoryTokenType.NARRATIVE_TEXT;
+    }
 }

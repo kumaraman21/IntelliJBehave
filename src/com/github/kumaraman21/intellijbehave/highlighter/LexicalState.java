@@ -17,12 +17,12 @@ public enum LexicalState {
 
 	private final int lexerId;
 
-	LexicalState(final int lexerId) {
+	LexicalState(int lexerId) {
 		this.lexerId = lexerId;
 	}
 
-	public static LexicalState fromLexer(final int lexerId) {
-		for (final LexicalState state : values()) {
+	public static LexicalState fromLexer(int lexerId) {
+		for (LexicalState state : values()) {
 			if (state.lexerId == lexerId) {
 				return state;
 			}

@@ -79,11 +79,11 @@ public class UnusedStepsInspection extends BaseJavaLocalInspectionTool {
 
     @NotNull
     @Override
-    public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, final boolean isOnTheFly) {
+    public PsiElementVisitor buildVisitor(@NotNull final ProblemsHolder holder, boolean isOnTheFly) {
         return new JavaElementVisitor() {
 
             @Override
-            public void visitElement(final PsiElement element) {
+            public void visitElement(PsiElement element) {
                 super.visitElement(element);
 
                 if (!(element instanceof PsiAnnotation)) {

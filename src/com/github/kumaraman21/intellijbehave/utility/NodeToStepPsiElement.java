@@ -21,7 +21,7 @@ import com.intellij.lang.ASTNode;
 
 public class NodeToStepPsiElement implements Function<ASTNode, StepPsiElement> {
 	@Override
-	public StepPsiElement apply(final ASTNode astNode) {
+	public StepPsiElement apply(ASTNode astNode) {
 		return (StepPsiElement) astNode.getPsi();
 	}
 }

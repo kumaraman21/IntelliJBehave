@@ -15,20 +15,21 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
-import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
-import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
-import com.intellij.extapi.psi.ASTWrapperPsiElement;
-import com.intellij.lang.ASTNode;
+import static org.apache.commons.lang.StringUtils.trim;
+
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static org.apache.commons.lang.StringUtils.trim;
+import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
+import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
+import com.intellij.extapi.psi.ASTWrapperPsiElement;
+import com.intellij.lang.ASTNode;
 
 public class StepPsiElement extends ASTWrapperPsiElement {
-    private final StepType stepType;
+    private StepType stepType;
 
-    public StepPsiElement(@NotNull final ASTNode node, final StepType stepType) {
+    public StepPsiElement(@NotNull ASTNode node, StepType stepType) {
         super(node);
         this.stepType = stepType;
     }
@@ -49,7 +50,7 @@ public class StepPsiElement extends ASTWrapperPsiElement {
     }
 
     public String getStepText() {
-        final int offset = getStepTextOffset();
+        int offset = getStepTextOffset();
         if (offset == 0) {
             return trim(getText());
         }
@@ -58,7 +59,7 @@ public class StepPsiElement extends ASTWrapperPsiElement {
 
     @Nullable
     public String getActualStepPrefix() {
-        final ASTNode keyword = getKeyword();
+        ASTNode keyword = getKeyword();
         if (keyword == null) { // that's weird!
             return null;
         }
@@ -66,7 +67,7 @@ public class StepPsiElement extends ASTWrapperPsiElement {
     }
 
     public int getStepTextOffset() {
-        final String stepPrefix = getActualStepPrefix();
+        String stepPrefix = getActualStepPrefix();
         return stepPrefix != null ? stepPrefix.length() + 1 : 0;
     }
 }

@@ -36,12 +36,12 @@ import com.intellij.psi.tree.TokenSet;
 public class StoryParserDefinition implements ParserDefinition {
   @NotNull
   @Override
-  public Lexer createLexer(final Project project) {
+  public Lexer createLexer(Project project) {
     return new StoryLexerFactory().createLexer();
   }
 
   @Override
-  public PsiParser createParser(final Project project) {
+  public PsiParser createParser(Project project) {
     return new StoryParser();
   }
 
@@ -70,7 +70,7 @@ public class StoryParserDefinition implements ParserDefinition {
 
   @NotNull
   @Override
-  public PsiElement createElement(final ASTNode node) {
+  public PsiElement createElement(ASTNode node) {
     final IElementType type = node.getElementType();
     if (type == StoryElementType.GIVEN_STEP) {
         return new StepPsiElement(node, StepType.GIVEN);
@@ -86,12 +86,12 @@ public class StoryParserDefinition implements ParserDefinition {
   }
 
   @Override
-  public PsiFile createFile(final FileViewProvider fileViewProvider) {
+  public PsiFile createFile(FileViewProvider fileViewProvider) {
     return new StoryFileImpl(fileViewProvider);
   }
 
   @Override
-  public SpaceRequirements spaceExistanceTypeBetweenTokens(final ASTNode left, final ASTNode right) {
+  public SpaceRequirements spaceExistanceTypeBetweenTokens(ASTNode left, ASTNode right) {
     return SpaceRequirements.MAY;
   }
 }
