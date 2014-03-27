@@ -16,19 +16,16 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
 import com.intellij.lexer.Lexer;
+import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
-import com.intellij.openapi.editor.SyntaxHighlighterColors;
 import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
 import gnu.trove.THashMap;
-
 import org.jetbrains.annotations.NonNls;
 import org.jetbrains.annotations.NotNull;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
+
 import java.util.Map;
 
 public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
@@ -74,18 +71,18 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
 
     // Registering TextAttributes
     static {
-        createKey(STORY_DESCRIPTION_ID, SyntaxHighlighterColors.NUMBER);
+        createKey(STORY_DESCRIPTION_ID, DefaultLanguageHighlighterColors.NUMBER);
         createKey(SCENARIO_TYPE_ID, CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
         createKey(SCENARIO_TEXT_ID, CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
-        createKey(STEP_TYPE_ID, SyntaxHighlighterColors.KEYWORD);
+        createKey(STEP_TYPE_ID, DefaultLanguageHighlighterColors.KEYWORD);
         createKey(STEP_TEXT_ID, HighlighterColors.TEXT);
-        createKey(TABLE_DELIM_ID, SyntaxHighlighterColors.BRACES);
-        createKey(TABLE_CELL_ID, SyntaxHighlighterColors.STRING);
-        createKey(META_TYPE_ID, SyntaxHighlighterColors.KEYWORD);
-        createKey(META_KEY_ID,  SyntaxHighlighterColors.STRING);
-        createKey(META_TEXT_ID, SyntaxHighlighterColors.STRING);
-        createKey(LINE_COMMENT_ID, SyntaxHighlighterColors.LINE_COMMENT);
-        createKey(BAD_CHARACTER_ID, SyntaxHighlighterColors.INVALID_STRING_ESCAPE);
+        createKey(TABLE_DELIM_ID, DefaultLanguageHighlighterColors.BRACES);
+        createKey(TABLE_CELL_ID, DefaultLanguageHighlighterColors.STRING);
+        createKey(META_TYPE_ID, DefaultLanguageHighlighterColors.KEYWORD);
+        createKey(META_KEY_ID,  DefaultLanguageHighlighterColors.STRING);
+        createKey(META_TEXT_ID, DefaultLanguageHighlighterColors.STRING);
+        createKey(LINE_COMMENT_ID, DefaultLanguageHighlighterColors.LINE_COMMENT);
+        createKey(BAD_CHARACTER_ID, DefaultLanguageHighlighterColors.INVALID_STRING_ESCAPE);
     }
 
     public static TextAttributesKey STORY_DESCRIPTION = TextAttributesKey.createTextAttributesKey(STORY_DESCRIPTION_ID);

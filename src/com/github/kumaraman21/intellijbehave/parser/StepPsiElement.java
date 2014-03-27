@@ -56,10 +56,13 @@ public class StepPsiElement extends ASTWrapperPsiElement {
 
     public String getStepText() {
         int offset = getStepTextOffset();
-        if(offset==0) {
-            return trim(getText());
+        String text = getText();
+
+        if (offset <= 0 || offset >= text.length()) {
+            return trim(text);
+        } else {
+            return trim(text.substring(offset));
         }
-        return trim(getText().substring(offset));
     }
 
     @Nullable
