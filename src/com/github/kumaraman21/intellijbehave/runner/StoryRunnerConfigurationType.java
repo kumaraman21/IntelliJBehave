@@ -15,10 +15,9 @@
  */
 package com.github.kumaraman21.intellijbehave.runner;
 
-import org.jetbrains.annotations.NotNull;
-
 import com.intellij.execution.application.ApplicationConfigurationType;
 import com.intellij.openapi.components.ApplicationComponent;
+import org.jetbrains.annotations.NotNull;
 
 public class StoryRunnerConfigurationType extends ApplicationConfigurationType implements ApplicationComponent {
 

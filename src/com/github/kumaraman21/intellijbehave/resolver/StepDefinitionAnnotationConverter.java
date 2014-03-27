@@ -15,25 +15,17 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
-import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
-import static com.google.common.collect.Sets.newHashSet;
-import static org.apache.commons.lang.StringUtils.isNotEmpty;
-import static org.apache.commons.lang.StringUtils.remove;
-import static org.apache.commons.lang.StringUtils.removeEnd;
-import static org.apache.commons.lang.StringUtils.removeStart;
-
-import java.util.Set;
-
+import com.intellij.psi.*;
 import org.jbehave.core.annotations.Alias;
 import org.jbehave.core.annotations.Aliases;
 import org.jbehave.core.steps.PatternVariantBuilder;
 import org.jbehave.core.steps.StepType;
 
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiAnnotationMemberValue;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiLiteral;
-import com.intellij.psi.PsiNameValuePair;
+import java.util.Set;
+
+import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
+import static com.google.common.collect.Sets.newHashSet;
+import static org.apache.commons.lang.StringUtils.*;
 
 public class StepDefinitionAnnotationConverter {
 

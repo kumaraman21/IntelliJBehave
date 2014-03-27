@@ -15,28 +15,24 @@
  */
 package com.github.kumaraman21.intellijbehave.codeInspector;
 
-import static com.google.common.collect.Lists.newArrayList;
+import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
+import com.github.kumaraman21.intellijbehave.parser.StoryFileImpl;
+import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
+import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.openapi.project.Project;
+import com.intellij.openapi.roots.ContentIterator;
+import com.intellij.openapi.roots.ProjectRootManager;
+import com.intellij.openapi.vfs.VirtualFile;
+import com.intellij.psi.*;
+import org.jbehave.core.annotations.*;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Set;
 
-import org.jbehave.core.annotations.Alias;
-import org.jbehave.core.annotations.Aliases;
-import org.jbehave.core.annotations.Given;
-import org.jbehave.core.annotations.Then;
-import org.jbehave.core.annotations.When;
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-
-import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
-import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
-import com.intellij.codeInspection.ProblemsHolder;
-import com.intellij.openapi.project.Project;
-import com.intellij.openapi.roots.ProjectRootManager;
-import com.intellij.psi.JavaElementVisitor;
-import com.intellij.psi.PsiAnnotation;
-import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiElementVisitor;
+import static com.google.common.collect.Lists.newArrayList;
+import static com.google.common.collect.Sets.newHashSet;
 
 public class UnusedStepsInspection extends BaseJavaLocalInspectionTool {
 
@@ -83,24 +79,18 @@ public class UnusedStepsInspection extends BaseJavaLocalInspectionTool {
         return new JavaElementVisitor() {
 
             @Override
-            public void visitElement(PsiElement element) {
-                super.visitElement(element);
+            public void visitAnnotation(PsiAnnotation annotation) {
 
-                if (!(element instanceof PsiAnnotation)) {
-                    return;
-                }
-
-                final PsiAnnotation annotation = (PsiAnnotation) element;
                 if (!JBEHAVE_ANNOTATIONS.contains(annotation.getQualifiedName())) {
                     return;
                 }
 
-                final Project project = element.getProject();
-                final StepUsageFinder stepUsageFinder = new StepUsageFinder(project);
+                Project project = annotation.getProject();
+                StepUsageFinder stepUsageFinder = new StepUsageFinder(project);
                 ProjectRootManager.getInstance(project).getFileIndex().iterateContent(stepUsageFinder);
-                final Set<StepPsiElement> stepUsages = stepUsageFinder.getStepUsages();
+                Set<StepPsiElement> stepUsages = stepUsageFinder.getStepUsages();
 
-                for (final StepPsiElement stepUsage : stepUsages) {
+                for (StepPsiElement stepUsage : stepUsages) {
                     if (stepUsage.getReference().resolve() == annotation) {
                         return;
                     }
@@ -111,4 +101,31 @@ public class UnusedStepsInspection extends BaseJavaLocalInspectionTool {
         };
     }
 
+    private static class StepUsageFinder implements ContentIterator {
+        private Project project;
+        private Set<StepPsiElement> stepUsages = newHashSet();
+
+        private StepUsageFinder(Project project) {
+            this.project = project;
+        }
+
+        @Override
+        public boolean processFile(VirtualFile virtualFile) {
+
+            if (virtualFile.isDirectory() || !virtualFile.getFileType().getDefaultExtension().equals("story")) {
+                return true;
+            }
+
+            PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
+            if (psiFile instanceof StoryFileImpl) {
+                List<StepPsiElement> stepPsiElements = ((StoryFileImpl) psiFile).getSteps();
+                stepUsages.addAll(stepPsiElements);
+            }
+            return true;
+        }
+
+        public Set<StepPsiElement> getStepUsages() {
+            return stepUsages;
+        }
+    }
 }

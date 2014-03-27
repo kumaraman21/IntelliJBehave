@@ -15,9 +15,8 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
-import org.jbehave.core.steps.StepType;
-
 import com.intellij.psi.PsiAnnotation;
+import org.jbehave.core.steps.StepType;
 
 public class StepDefinitionAnnotation {
     private final StepType stepType;

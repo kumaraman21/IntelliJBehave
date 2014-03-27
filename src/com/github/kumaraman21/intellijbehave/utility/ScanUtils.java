@@ -15,13 +15,13 @@
  */
 package com.github.kumaraman21.intellijbehave.utility;
 
-import java.util.HashSet;
-
 import com.intellij.openapi.module.Module;
 import com.intellij.openapi.module.ModuleUtil;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.roots.ModuleRootManager;
 import com.intellij.psi.PsiElement;
+
+import java.util.HashSet;
 
 public class ScanUtils {
 

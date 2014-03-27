@@ -15,16 +15,15 @@
  */
 package com.github.kumaraman21.intellijbehave.parser;
 
-import static org.apache.commons.lang.StringUtils.trim;
-
-import org.jbehave.core.steps.StepType;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import org.jbehave.core.steps.StepType;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
+import static org.apache.commons.lang.StringUtils.trim;
 
 public class StepPsiElement extends ASTWrapperPsiElement {
     private StepType stepType;

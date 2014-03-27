@@ -15,184 +15,153 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
-import static com.google.common.cache.CacheBuilder.newBuilder;
-import static com.google.common.collect.Lists.newArrayList;
-import static java.util.concurrent.TimeUnit.SECONDS;
-import static org.apache.commons.lang.StringUtils.trim;
-
-import java.util.List;
-
-import org.jbehave.core.steps.StepType;
-import org.jetbrains.annotations.NotNull;
-
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
 import com.github.kumaraman21.intellijbehave.utility.ScanUtils;
-import com.google.common.cache.CacheLoader;
-import com.google.common.cache.LoadingCache;
 import com.intellij.openapi.util.Comparing;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiReference;
 import com.intellij.util.IncorrectOperationException;
+import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
+import org.jbehave.core.parsers.StepMatcher;
+import org.jbehave.core.parsers.StepPatternParser;
+import org.jbehave.core.steps.StepType;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
+
+import static com.google.common.collect.Lists.newArrayList;
+import static org.apache.commons.lang.StringUtils.trim;
 
 public class StepPsiReference implements PsiReference {
 
-	private final StepPsiElement stepPsiElement;
-	private static final CacheLoader<CacheKey, StepDefinitionAnnotation> loader = new CacheLoader<CacheKey, StepDefinitionAnnotation>() {
-		@Override
-		public StepDefinitionAnnotation load(final CacheKey cacheKey) throws Exception {
-			final StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(cacheKey.getStepPsiElement());
-			ScanUtils.iterateInContextOf(cacheKey.getStepPsiElement(), stepAnnotationFinder);
-			return stepAnnotationFinder.getMatchingAnnotation();
-		}
-	};
-	private static final LoadingCache<CacheKey, StepDefinitionAnnotation> cache
-			= newBuilder()
-			.expireAfterWrite(5, SECONDS)
-			.build(loader);
+    private StepPsiElement stepPsiElement;
 
-	public StepPsiReference(final StepPsiElement stepPsiElement) {
-		this.stepPsiElement = stepPsiElement;
-	}
+    public StepPsiReference(StepPsiElement stepPsiElement) {
+        this.stepPsiElement = stepPsiElement;
+    }
 
-	@Override
-	public PsiElement getElement() {
-		return stepPsiElement;
-	}
+    @Override
+    public PsiElement getElement() {
+        return stepPsiElement;
+    }
 
-	@Override
-	public TextRange getRangeInElement() {
-		return TextRange.from(0, stepPsiElement.getTextLength());
-	}
+    @Override
+    public TextRange getRangeInElement() {
+        return TextRange.from(0, stepPsiElement.getTextLength());
+    }
 
-	public StepDefinitionAnnotation stepDefinitionAnnotation() {
-		try {
-			return cache.getUnchecked(key(stepPsiElement));
-		} catch (final Exception e) {
-			return null;
-		}
-	}
+    public StepDefinitionAnnotation stepDefinitionAnnotation() {
+        StepType stepType = stepPsiElement.getStepType();
+        String stepText = stepPsiElement.getStepText();
 
-	private CacheKey key(final StepPsiElement stepPsiElement) {
-		return new CacheKey(stepPsiElement);
-	}
+        StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(stepType, stepText, stepPsiElement);
+        ScanUtils.iterateInContextOf(stepPsiElement, stepAnnotationFinder);
 
-	@Override
-	public PsiElement resolve() {
-		StepDefinitionAnnotation stepDefinitionAnnotation = stepDefinitionAnnotation();
-		if (stepDefinitionAnnotation == null) {
-			return null;
-		}
-		return stepDefinitionAnnotation.getAnnotation();
-	}
+        return stepAnnotationFinder.getMatchingAnnotation();
+    }
 
-	private static final boolean useVariants = false;
+    @Override
+    public PsiElement resolve() {
+        StepDefinitionAnnotation stepDefinitionAnnotation = stepDefinitionAnnotation();
+        if (stepDefinitionAnnotation == null)
+            return null;
+        return stepDefinitionAnnotation.getAnnotation();
+    }
 
-	@NotNull
-	@Override
-	public Object[] getVariants() {
+    private static final boolean useVariants = false;
 
-		if (useVariants) {
-			StepType stepType = stepPsiElement.getStepType();
-			String actualStepPrefix = stepPsiElement.getActualStepPrefix();
+    @NotNull
+    @Override
+    public Object[] getVariants() {
 
-			StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix, stepPsiElement);
-			ScanUtils.iterateInContextOf(stepPsiElement, stepSuggester);
+        if (useVariants) {
+            StepType stepType = stepPsiElement.getStepType();
+            String actualStepPrefix = stepPsiElement.getActualStepPrefix();
 
-			return stepSuggester.getSuggestions().toArray();
-		} else {
-			return new Object[0];
-		}
-	}
+            StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix, stepPsiElement);
+            ScanUtils.iterateInContextOf(stepPsiElement, stepSuggester);
 
-	private static class StepSuggester extends StepDefinitionIterator {
+            return stepSuggester.getSuggestions().toArray();
+        } else {
+            return new Object[0];
+        }
+    }
 
-		private final List<String> suggestions = newArrayList();
-		private final String actualStepPrefix;
+    private static class StepSuggester extends StepDefinitionIterator {
 
-		public StepSuggester(StepType stepType, String actualStepPrefix, StepPsiElement storyRef) {
-			super(stepType, storyRef);
-			this.actualStepPrefix = actualStepPrefix;
-		}
+        private final List<String> suggestions = newArrayList();
+        private final String actualStepPrefix;
 
-		@Override
-		public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
-			suggestions.add(actualStepPrefix + " " + stepDefinitionAnnotation.getAnnotationText());
-			return true;
-		}
+        public StepSuggester(StepType stepType, String actualStepPrefix, PsiElement storyRef) {
+            super(stepType, storyRef);
+            this.actualStepPrefix = actualStepPrefix;
+        }
 
-		public List<String> getSuggestions() {
-			return suggestions;
-		}
-	}
+        @Override
+        public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
+            suggestions.add(actualStepPrefix + " " + stepDefinitionAnnotation.getAnnotationText());
+            return true;
+        }
 
-	@NotNull
-	@Override
-	public String getCanonicalText() {
-		return trim(stepPsiElement.getText());
-	}
+        public List<String> getSuggestions() {
+            return suggestions;
+        }
+    }
 
-	@Override
-	public PsiElement handleElementRename(final String s) throws IncorrectOperationException {
-		throw new IncorrectOperationException();
-	}
+    private static class StepAnnotationFinder extends StepDefinitionIterator {
 
-	@Override
-	public PsiElement bindToElement(@NotNull final PsiElement psiElement) throws IncorrectOperationException {
-		throw new IncorrectOperationException();
-	}
+        private StepType stepType;
+        private String stepText;
+        private StepDefinitionAnnotation matchingAnnotation;
+        private StepPatternParser stepPatternParser = new RegexPrefixCapturingPatternParser();
 
-	@Override
-	public boolean isReferenceTo(final PsiElement psiElement) {
-		return psiElement instanceof StepPsiElement && Comparing.equal(resolve(), psiElement);
-	}
+        private StepAnnotationFinder(StepType stepType, String stepText, PsiElement storyRef) {
+            super(stepType, storyRef);
+            this.stepType = stepType;
+            this.stepText = stepText;
+        }
 
-	@Override
-	public boolean isSoft() {
-		return false;
-	}
+        @Override
+        public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
+            StepMatcher stepMatcher = stepPatternParser.parseStep(stepType, stepDefinitionAnnotation.getAnnotationText());
 
-	private class CacheKey {
-		private final StepType stepType;
-		private final String stepText;
-		private final StepPsiElement stepPsiElement;
+            if (stepMatcher.matches(stepText)) {
+                matchingAnnotation = stepDefinitionAnnotation;
 
-		public CacheKey(final StepPsiElement stepPsiElement) {
-			this.stepType = stepPsiElement.getStepType();
-			this.stepText = stepPsiElement.getStepText();
-			this.stepPsiElement = stepPsiElement;
-		}
+                return false;
+            }
+            return true;
+        }
 
-		public StepPsiElement getStepPsiElement() {
-			return stepPsiElement;
-		}
+        public StepDefinitionAnnotation getMatchingAnnotation() {
+            return matchingAnnotation;
+        }
+    }
 
-		@Override
-		public boolean equals(final Object o) {
-			if (this == o) {
-				return true;
-			}
-			if (o == null || getClass() != o.getClass()) {
-				return false;
-			}
+    @NotNull
+    @Override
+    public String getCanonicalText() {
+        return trim(stepPsiElement.getText());
+    }
 
-			final CacheKey cacheKey = (CacheKey) o;
+    @Override
+    public PsiElement handleElementRename(String s) throws IncorrectOperationException {
+        throw new IncorrectOperationException();
+    }
 
-			if (stepText != null ? !stepText.equals(cacheKey.stepText) : cacheKey.stepText != null) {
-				return false;
-			}
-			if (stepType != cacheKey.stepType) {
-				return false;
-			}
+    @Override
+    public PsiElement bindToElement(@NotNull PsiElement psiElement) throws IncorrectOperationException {
+        throw new IncorrectOperationException();
+    }
 
-			return true;
-		}
+    @Override
+    public boolean isReferenceTo(PsiElement psiElement) {
+        return psiElement instanceof StepPsiElement && Comparing.equal(resolve(), psiElement);
+    }
 
-		@Override
-		public int hashCode() {
-			int result = stepType != null ? stepType.hashCode() : 0;
-			result = 31 * result + (stepText != null ? stepText.hashCode() : 0);
-			return result;
-		}
-	}
+    @Override
+    public boolean isSoft() {
+        return false;
+    }
 }

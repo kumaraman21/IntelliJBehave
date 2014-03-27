@@ -15,23 +15,18 @@
  */
 package com.github.kumaraman21.intellijbehave.codeInspector;
 
-import org.jetbrains.annotations.Nls;
-import org.jetbrains.annotations.NotNull;
-
 import com.github.kumaraman21.intellijbehave.highlighter.StorySyntaxHighlighter;
 import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
 import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionAnnotation;
 import com.github.kumaraman21.intellijbehave.utility.ParametrizedString;
-import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
-import com.intellij.codeInspection.LocalQuickFix;
-import com.intellij.codeInspection.ProblemDescriptor;
-import com.intellij.codeInspection.ProblemHighlightType;
-import com.intellij.codeInspection.ProblemsHolder;
+import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiElementVisitor;
+import org.jetbrains.annotations.Nls;
+import org.jetbrains.annotations.NotNull;
 
 public class UndefinedStepsInspection extends BaseJavaLocalInspectionTool {
 
