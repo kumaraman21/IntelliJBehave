@@ -7,6 +7,7 @@ import com.intellij.lexer.LexerBase;
 import com.intellij.psi.tree.IElementType;
 import com.intellij.util.ArrayUtil;
 import org.jbehave.core.i18n.LocalizedKeywords;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
@@ -59,7 +60,7 @@ public class StoryLocalizedLexer extends LexerBase {
     }
 
     @Override
-    public void start(CharSequence buffer, int startOffset, int endOffset, int initialState) {
+    public void start(@NotNull CharSequence buffer, int startOffset, int endOffset, int initialState) {
         this.buffer = buffer;
         //this.startOffset = startOffset;
         this.position = startOffset;
@@ -92,6 +93,7 @@ public class StoryLocalizedLexer extends LexerBase {
         return position;
     }
 
+    @NotNull
     @Override
     public CharSequence getBufferSequence() {
         return buffer;
