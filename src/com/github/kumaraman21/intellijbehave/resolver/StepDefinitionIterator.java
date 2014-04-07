@@ -15,6 +15,7 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
+import com.google.common.base.Objects;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -51,7 +52,7 @@ public abstract class StepDefinitionIterator implements ContentIterator {
                     Set<StepDefinitionAnnotation> stepDefinitionAnnotations = stepDefinitionAnnotationConverter.convertFrom(annotations);
 
                     for (StepDefinitionAnnotation stepDefinitionAnnotation : stepDefinitionAnnotations) {
-                        if (stepType == null || stepDefinitionAnnotation.getStepType().equals(stepType)) {
+                        if (stepType == null || Objects.equal(stepType, stepDefinitionAnnotation.getStepType())) {
 
                             boolean shouldContinue = processStepDefinition(stepDefinitionAnnotation);
                             if (!shouldContinue) {
