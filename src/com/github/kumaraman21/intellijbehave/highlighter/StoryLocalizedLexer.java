@@ -165,7 +165,12 @@ public class StoryLocalizedLexer extends LexerBase {
                 }
                 CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
                 tokenType = tokenType(entry.value);
-                position += entry.length;
+                // Prevent getting stuck in one place
+                if (tokenType == StoryTokenType.BAD_CHARACTER) {
+                    position++;
+                } else {
+                    position += entry.length;
+                }
                 return;
             }
             case IN_SCENARIO: {
@@ -301,6 +306,8 @@ public class StoryLocalizedLexer extends LexerBase {
                             case And:
                             case Meta:
                             case ExamplesTable:
+                                state = State.IN_EXAMPLES;
+                                break;
                             case Narrative:
                             case AsA:
                             case IWantTo:
@@ -323,6 +330,19 @@ public class StoryLocalizedLexer extends LexerBase {
                 }
             }
             case IN_EXAMPLES:
+                if (consume(CRLF)) {
+                    tokenType = StoryTokenType.WHITE_SPACE;
+                } else {
+                    CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
+                    if (!entry.hasValue()) {
+                        consume(INPUT_CHAR);
+                        tokenType = StoryTokenType.EXAMPLE_TYPE;
+                    } else {
+                        tokenType = tokenType(entry.value);
+                        position += entry.length;
+                    }
+                }
+                break;
             default:
                 throw new UnsupportedOperationException("State: " + state.name());
         }
@@ -369,6 +389,10 @@ public class StoryLocalizedLexer extends LexerBase {
         return position != previousPosition;
     }
 
+    /**
+     * Increment the position as long as the filter matches the current character
+     * @return whether the position has changed as a result of a call to this function
+     */
     private boolean consume(CharFilter filter) {
         int previousPosition = position;
         while (position < endOffset && filter.accept(buffer.charAt(position))) {
@@ -440,6 +464,7 @@ public class StoryLocalizedLexer extends LexerBase {
                 state = State.IN_STORY;
                 return StoryTokenType.NARRATIVE_TYPE;
             case ExamplesTable:
+                state = State.IN_EXAMPLES;
                 return StoryTokenType.EXAMPLE_TYPE;
             case ExamplesTableHeaderSeparator:
             case ExamplesTableValueSeparator:
