@@ -102,6 +102,10 @@ public class CreateStoryAction extends CreateElementActionBase {
   }
 
   private String getFileName(String name) {
-      return name + "." + STORY_FILE_TYPE.getDefaultExtension();
+      if (name.endsWith("." + STORY_FILE_TYPE.getDefaultExtension())) {
+          return name;
+      } else {
+          return name + "." + STORY_FILE_TYPE.getDefaultExtension();
+      }
     }
 }
