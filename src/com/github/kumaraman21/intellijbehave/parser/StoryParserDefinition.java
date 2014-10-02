@@ -72,11 +72,11 @@ public class StoryParserDefinition implements ParserDefinition {
     public PsiElement createElement(ASTNode node) {
         final IElementType type = node.getElementType();
         if (type == StoryElementType.GIVEN_STEP) {
-            return new StepPsiElement(node, StepType.GIVEN);
+            return new JBehaveStep(node, StepType.GIVEN);
         } else if (type == StoryElementType.WHEN_STEP) {
-            return new StepPsiElement(node, StepType.WHEN);
+            return new JBehaveStep(node, StepType.WHEN);
         } else if (type == StoryElementType.THEN_STEP) {
-            return new StepPsiElement(node, StepType.THEN);
+            return new JBehaveStep(node, StepType.THEN);
         }
 
         return new ASTWrapperPsiElement(node);
@@ -84,7 +84,7 @@ public class StoryParserDefinition implements ParserDefinition {
 
     @Override
     public PsiFile createFile(FileViewProvider fileViewProvider) {
-        return new StoryFileImpl(fileViewProvider);
+        return new StoryFile(fileViewProvider);
     }
 
     @Override

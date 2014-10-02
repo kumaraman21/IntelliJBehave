@@ -33,9 +33,9 @@ import static com.google.common.collect.Lists.newArrayList;
 import static com.google.common.collect.Lists.transform;
 import static java.util.Arrays.asList;
 
-public class StoryFileImpl extends PsiFileBase {
+public class StoryFile extends PsiFileBase {
 
-    public StoryFileImpl(FileViewProvider fileViewProvider) {
+    public StoryFile(FileViewProvider fileViewProvider) {
         super(fileViewProvider, STORY_FILE_TYPE.getLanguage());
     }
 
@@ -46,7 +46,7 @@ public class StoryFileImpl extends PsiFileBase {
     }
 
     @NotNull
-    public List<StepPsiElement> getSteps() {
+    public List<JBehaveStep> getSteps() {
 
         List<ASTNode> stepNodes = newArrayList();
 
