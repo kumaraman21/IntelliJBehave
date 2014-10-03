@@ -148,7 +148,8 @@ public class StoryCompletionContributor extends CompletionContributor {
                               StepType stepType,
                               String actualStepPrefix,
                               String textBeforeCaret,
-                              Consumer<LookupElement> consumer, Project project) {
+                              Consumer<LookupElement> consumer,
+                              Project project) {
             super(stepType, project);
             this.prefixMatcher = prefixMatcher;
             this.actualStepPrefix = actualStepPrefix;

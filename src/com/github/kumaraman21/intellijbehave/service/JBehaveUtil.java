@@ -3,8 +3,6 @@ package com.github.kumaraman21.intellijbehave.service;
 import com.github.kumaraman21.intellijbehave.language.StoryFileType;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
-import com.intellij.openapi.util.Ref;
-import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.*;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiSearchHelper;
@@ -14,16 +12,18 @@ import com.intellij.util.Processor;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces;
+
 public class JBehaveUtil {
     public static boolean isJBehaveStepAnnotation(@NotNull PsiAnnotation annotation) {
         String annotationName = getAnnotationName(annotation);
         if (annotationName == null) {
             return false;
-        } else {
-            String annotationSuffix = getJBehaveAnnotationSuffix(annotationName);
-
-            return !annotationSuffix.isEmpty();
         }
+
+        String annotationSuffix = getJBehaveAnnotationSuffix(annotationName);
+
+        return !annotationSuffix.isEmpty();
     }
 
     private static String getJBehaveAnnotationSuffix(@NotNull String name) {
@@ -36,14 +36,12 @@ public class JBehaveUtil {
 
     @Nullable
     private static String getAnnotationName(@NotNull final PsiAnnotation annotation) {
-        final Ref<String> qualifiedAnnotationName = new Ref<String>();
-        ApplicationManager.getApplication().runReadAction(new Runnable() {
-            public void run() {
-                String qualifiedName = annotation.getQualifiedName();
-                qualifiedAnnotationName.set(qualifiedName);
+        return ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+            @Override
+            public String compute() {
+                return annotation.getQualifiedName();
             }
         });
-        return qualifiedAnnotationName.get();
     }
 
     @Nullable
@@ -65,30 +63,30 @@ public class JBehaveUtil {
     }
 
     @Nullable
-    public static String getAnnotationText(PsiElement element) {
-        if (!(element instanceof PsiMethod)) {
-            return null;
-        } else {
-            PsiAnnotation stepAnnotation = getJBehaveStepAnnotation((PsiMethod) element);
-
-            assert stepAnnotation != null;
-
-            return getAnnotationText(stepAnnotation);
-        }
-    }
-
-    @Nullable
     public static String getAnnotationText(PsiAnnotation stepAnnotation) {
-        String result = null;
         PsiAnnotationMemberValue annotationValue = stepAnnotation.findAttributeValue("value");
         if (annotationValue != null) {
             PsiConstantEvaluationHelper evaluationHelper = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper();
             Object constantValue = evaluationHelper.computeConstantExpression(annotationValue, false);
             if (constantValue != null) {
-                result = constantValue.toString();
+                return constantValue.toString();
             }
         }
-        return result;
+
+        return null;
+    }
+
+    public static Integer getAnnotationPriority(PsiAnnotation stepAnnotation) {
+        PsiAnnotationMemberValue annotationValue = stepAnnotation.findAttributeValue("priority");
+        if (annotationValue != null) {
+            PsiConstantEvaluationHelper evaluationHelper = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper();
+            Object constantValue = evaluationHelper.computeConstantExpression(annotationValue, false);
+            if (constantValue != null) {
+                return Integer.valueOf(constantValue.toString());
+            }
+        }
+
+        return -1;
     }
 
     public static boolean findJBehaveReferencesToElement(@NotNull PsiElement stepDefinitionElement, @NotNull String stepText, @NotNull Processor<PsiReference> consumer, @NotNull SearchScope effectiveSearchScope) {
@@ -97,17 +95,19 @@ public class JBehaveUtil {
 
     public static boolean findPossibleJBehaveElementUsages(@NotNull PsiElement stepDefinitionElement, @NotNull String stepText, @NotNull TextOccurenceProcessor processor, @NotNull final SearchScope effectiveSearchScope) {
         String word = getTheBiggestWordToSearchByIndex(stepText);
-        if (StringUtil.isEmptyOrSpaces(word)) {
+
+        if (isEmptyOrSpaces(word)) {
             return true;
-        } else {
-            SearchScope searchScope = restrictScopeToJBehaveFiles(new Computable<SearchScope>() {
-                public SearchScope compute() {
-                    return effectiveSearchScope;
-                }
-            });
-            PsiSearchHelper instance = PsiSearchHelper.SERVICE.getInstance(stepDefinitionElement.getProject());
-            return instance.processElementsWithWord(processor, searchScope, word, (short) 5, true);
         }
+
+        SearchScope searchScope = restrictScopeToJBehaveFiles(new Computable<SearchScope>() {
+            public SearchScope compute() {
+                return effectiveSearchScope;
+            }
+        });
+
+        PsiSearchHelper instance = PsiSearchHelper.SERVICE.getInstance(stepDefinitionElement.getProject());
+        return instance.processElementsWithWord(processor, searchScope, word, (short) 5, true);
     }
 
     public static SearchScope restrictScopeToJBehaveFiles(final Computable<SearchScope> originalScopeComputation) {

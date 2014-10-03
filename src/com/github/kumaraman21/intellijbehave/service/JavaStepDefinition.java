@@ -2,7 +2,12 @@ package com.github.kumaraman21.intellijbehave.service;
 
 import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
 import com.google.common.base.Objects;
-import com.intellij.psi.*;
+import com.intellij.openapi.application.ApplicationManager;
+import com.intellij.openapi.util.Computable;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.SmartPointerManager;
+import com.intellij.psi.SmartPsiElementPointer;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
 import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;
@@ -21,49 +26,13 @@ public class JavaStepDefinition {
         myElementPointer = SmartPointerManager.getInstance(method.getProject()).createSmartPsiElementPointer(method);
     }
 
-    @Nullable
-    protected StepType getAnnotationType(PsiElement element) {
-        if (!(element instanceof PsiMethod)) {
-            return null;
-        } else {
-            PsiAnnotation stepAnnotation = getJBehaveStepAnnotation((PsiMethod) element);
-
-            assert stepAnnotation != null;
-
-            return ANNOTATION_TO_STEP_TYPE_MAPPING.get(stepAnnotation.getQualifiedName());
-        }
-    }
-
-    @NotNull
-    protected Integer getAnnotationPriority(PsiElement element) {
-        if (!(element instanceof PsiMethod)) {
-            return -1;
-        } else {
-            int result = -1;
-            PsiAnnotation stepAnnotation = getJBehaveStepAnnotation((PsiMethod) element);
-
-            assert stepAnnotation != null;
-
-            PsiAnnotationMemberValue annotationValue = stepAnnotation.findAttributeValue("priority");
-            if (annotationValue != null) {
-                PsiConstantEvaluationHelper evaluationHelper = JavaPsiFacade.getInstance(element.getProject()).getConstantEvaluationHelper();
-                Object constantValue = evaluationHelper.computeConstantExpression(annotationValue, false);
-                if (constantValue != null) {
-                    result = Integer.valueOf(constantValue.toString());
-                }
-            }
-
-            return result;
-        }
-    }
-
     public boolean matches(String stepName) {
         StepMatcher stepMatcher = getStepMatcher();
         return stepMatcher != null && stepMatcher.matches(stepName);
     }
 
     @Nullable
-    public PsiElement getElement() {
+    public PsiMethod getElement() {
         return myElementPointer.getElement();
     }
 
@@ -72,24 +41,57 @@ public class JavaStepDefinition {
         String annotationText = getAnnotationText();
         if (annotationText == null) {
             return null;
-        } else {
-            return stepPatternParser.parseStep(getAnnotationType(), annotationText);
         }
+
+        return stepPatternParser.parseStep(getAnnotationType(), annotationText);
     }
 
     @Nullable
     public String getAnnotationText() {
-        return JBehaveUtil.getAnnotationText(getElement());
+        PsiMethod element = getElement();
+        if (element == null) {
+            return null;
+        }
+
+        PsiAnnotation stepAnnotation = getJBehaveStepAnnotation(element);
+
+        assert stepAnnotation != null;
+
+        return JBehaveUtil.getAnnotationText(stepAnnotation);
     }
 
     @Nullable
     public StepType getAnnotationType() {
-        return getAnnotationType(getElement());
+        PsiMethod element = getElement();
+        if (element == null) {
+            return null;
+        }
+
+        final PsiAnnotation stepAnnotation = getJBehaveStepAnnotation(element);
+
+        assert stepAnnotation != null;
+
+        String qualifiedName = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
+            public String compute() {
+                return stepAnnotation.getQualifiedName();
+            }
+        });
+
+        return ANNOTATION_TO_STEP_TYPE_MAPPING.get(qualifiedName);
     }
 
     @NotNull
     public Integer getAnnotationPriority() {
-        return getAnnotationPriority(getElement());
+        PsiMethod element = getElement();
+        if (element == null) {
+            return -1;
+        }
+
+        PsiAnnotation stepAnnotation = getJBehaveStepAnnotation(element);
+
+        assert stepAnnotation != null;
+
+        return JBehaveUtil.getAnnotationPriority(stepAnnotation);
     }
 
     public boolean equals(Object o) {

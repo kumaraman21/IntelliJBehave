@@ -27,35 +27,36 @@ public class JBehaveStepsIndex {
     @NotNull
     public Collection<JavaStepDefinition> findStepDefinitions(@NotNull JBehaveStep step) {
         Module module = ModuleUtilCore.findModuleForPsiElement(step);
+
         if (module == null) {
             return emptyList();
-        } else {
-            Map<Class, JavaStepDefinition> definitionsByClass = new HashMap<Class, JavaStepDefinition>();
-            List<JavaStepDefinition> stepDefinitions = loadStepsFor(module);
-            String stepText = step.getStepText();
+        }
 
-            for (JavaStepDefinition stepDefinition : stepDefinitions) {
-                if (stepDefinition.matches(stepText) && stepDefinition.supportsStep(step)) {
-                    Integer currentHighestPriority = getPriorityByDefinition(definitionsByClass.get(stepDefinition.getClass()));
-                    Integer newPriority = getPriorityByDefinition(stepDefinition);
+        Map<Class, JavaStepDefinition> definitionsByClass = new HashMap<Class, JavaStepDefinition>();
+        List<JavaStepDefinition> stepDefinitions = loadStepsFor(module);
+        String stepText = step.getStepText();
 
-                    if (newPriority > currentHighestPriority) {
-                        definitionsByClass.put(stepDefinition.getClass(), stepDefinition);
-                    }
+        for (JavaStepDefinition stepDefinition : stepDefinitions) {
+            if (stepDefinition.matches(stepText) && stepDefinition.supportsStep(step)) {
+                Integer currentHighestPriority = getPriorityByDefinition(definitionsByClass.get(stepDefinition.getClass()));
+                Integer newPriority = getPriorityByDefinition(stepDefinition);
+
+                if (newPriority > currentHighestPriority) {
+                    definitionsByClass.put(stepDefinition.getClass(), stepDefinition);
                 }
             }
-
-            return definitionsByClass.values();
         }
+
+        return definitionsByClass.values();
     }
 
     @NotNull
     private static Integer getPriorityByDefinition(@Nullable JavaStepDefinition definition) {
         if (definition == null) {
             return -1;
-        } else {
-            return definition.getAnnotationPriority();
         }
+
+        return definition.getAnnotationPriority();
     }
 
     public List<JavaStepDefinition> loadStepsFor(@NotNull Module module) {
@@ -67,20 +68,20 @@ public class JBehaveStepsIndex {
 
         if (givenAnnotationClass == null || whenAnnotationClass == null || thenAnnotationClass == null) {
             return emptyList();
-        } else {
-            List<JavaStepDefinition> result = new ArrayList<JavaStepDefinition>();
-
-            List<PsiClass> stepAnnotations = asList(givenAnnotationClass, whenAnnotationClass, thenAnnotationClass);
-            for (PsiClass stepAnnotation : stepAnnotations) {
-                Query<PsiMethod> javaStepDefinitions = AnnotatedElementsSearch.searchPsiMethods(stepAnnotation, dependenciesScope);
-
-                for (PsiMethod stepDefMethod : javaStepDefinitions) {
-                    result.add(new JavaStepDefinition(stepDefMethod));
-                }
-            }
-
-            return result;
         }
+
+        List<JavaStepDefinition> result = new ArrayList<JavaStepDefinition>();
+
+        List<PsiClass> stepAnnotations = asList(givenAnnotationClass, whenAnnotationClass, thenAnnotationClass);
+        for (PsiClass stepAnnotation : stepAnnotations) {
+            Query<PsiMethod> javaStepDefinitions = AnnotatedElementsSearch.searchPsiMethods(stepAnnotation, dependenciesScope);
+
+            for (PsiMethod stepDefMethod : javaStepDefinitions) {
+                result.add(new JavaStepDefinition(stepDefMethod));
+            }
+        }
+
+        return result;
     }
 
     @Nullable
@@ -88,14 +89,12 @@ public class JBehaveStepsIndex {
         Collection<PsiClass> stepDefAnnotationCandidates =
                 JavaFullClassNameIndex.getInstance().get(stepClass.hashCode(), module.getProject(), dependenciesScope);
 
-        PsiClass stepDefAnnotationClass = null;
-
         for (PsiClass stepDefAnnotations : stepDefAnnotationCandidates) {
             if (stepClass.equals(stepDefAnnotations.getQualifiedName())) {
-                stepDefAnnotationClass = stepDefAnnotations;
-                break;
+                return stepDefAnnotations;
             }
         }
-        return stepDefAnnotationClass;
+
+        return null;
     }
 }
