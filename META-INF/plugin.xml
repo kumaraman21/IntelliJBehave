@@ -34,6 +34,13 @@
     </p>
 
     <p>
+        JBehave icon comes from
+        <a href="https://github.com/jbehave/jbehave-eclipse/blob/master/org.jbehave.eclipse/icons/bdd-jb-orange-red-green.png">
+            https://github.com/jbehave/jbehave-eclipse/blob/master/org.jbehave.eclipse/icons/bdd-jb-orange-red-green.png
+        </a>.
+    </p>
+
+    <p>
     The plugin provides the following features:
     </p>
     <ul>
@@ -53,8 +60,17 @@
         <li>Searches complete module classpath, no configuration available to limit scope</li>
         <li>Does not take into account any custom JBehave configuration</li>
     </ul>
+
+    <h2>Release notes:</h2>
+    <p>
+        New in version 1.5:
+    </p>
+    <ul>
+        <li>Inspections speed has been increased</li>
+        <li>JBehave icon has been updated</li>
+    </ul>
   ]]></description>
-    <version>1.4</version>
+    <version>1.5</version>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
     <idea-version since-build="133.0"/>
@@ -104,10 +120,21 @@
         <completion.contributor language="Story"
                                 implementationClass="com.github.kumaraman21.intellijbehave.completion.StoryCompletionContributor"/>
 
+        <referencesSearch
+                implementation="com.github.kumaraman21.intellijbehave.service.JBehaveJavaStepDefinitionSearch"/>
+        <methodReferencesSearch
+                implementation="com.github.kumaraman21.intellijbehave.service.JBehaveJavaMethodUsageSearcher"/>
         <!--code inspections-->
-        <inspectionToolProvider id="unusedStepsInspection" order="FIRST"
-                                implementation="com.github.kumaraman21.intellijbehave.codeInspector.UnusedStepsInspectionProvider"/>
-        <inspectionToolProvider id="undefinedStepsInspection" order="LAST"
-                                implementation="com.github.kumaraman21.intellijbehave.codeInspector.UndefinedStepsInspectionProvider"/>
+        <localInspection id="unusedStepDeclaration" language="JAVA" displayName="Unused step declaration"
+                         groupName="JBehave" enabledByDefault="false" level="WARNING"
+                         implementationClass="com.github.kumaraman21.intellijbehave.codeInspector.UnusedStepDeclarationInspection"/>
+        <localInspection id="undefinedStep" language="Story" displayName="Undefined step"
+                         groupName="JBehave" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.github.kumaraman21.intellijbehave.codeInspector.UndefinedStepInspection"/>
+        <psi.referenceContributor
+                implementation="com.github.kumaraman21.intellijbehave.resolver.StepPsiReferenceContributor"/>
+
+        <projectService serviceInterface="com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex"
+                        serviceImplementation="com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex"/>
     </extensions>
 </idea-plugin>

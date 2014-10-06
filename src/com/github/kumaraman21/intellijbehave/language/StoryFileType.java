@@ -21,7 +21,6 @@ import org.jetbrains.annotations.NotNull;
 import javax.swing.*;
 
 import static com.github.kumaraman21.intellijbehave.language.StoryLanguage.STORY_LANGUAGE;
-import static com.intellij.icons.AllIcons.FileTypes.Text;
 
 public class StoryFileType extends LanguageFileType {
     public static final StoryFileType STORY_FILE_TYPE = new StoryFileType();
@@ -50,6 +49,6 @@ public class StoryFileType extends LanguageFileType {
 
     @Override
     public Icon getIcon() {
-        return Text;
+        return JBehaveIcons.JB;
     }
 }

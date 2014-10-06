@@ -15,153 +15,123 @@
  */
 package com.github.kumaraman21.intellijbehave.resolver;
 
-import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
-import com.github.kumaraman21.intellijbehave.utility.ScanUtils;
-import com.intellij.openapi.util.Comparing;
+import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
+import com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex;
+import com.github.kumaraman21.intellijbehave.service.JavaStepDefinition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
-import com.intellij.psi.PsiReference;
+import com.intellij.psi.PsiPolyVariantReference;
+import com.intellij.psi.ResolveResult;
+import com.intellij.util.ArrayUtil;
 import com.intellij.util.IncorrectOperationException;
-import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
-import org.jbehave.core.parsers.StepMatcher;
-import org.jbehave.core.parsers.StepPatternParser;
-import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
+import java.util.ArrayList;
+import java.util.Collection;
 
-import static com.google.common.collect.Lists.newArrayList;
-import static org.apache.commons.lang.StringUtils.trim;
+public class StepPsiReference implements PsiPolyVariantReference {
+    private final JBehaveStep myStep;
+    private final TextRange myRange;
 
-public class StepPsiReference implements PsiReference {
-
-    private StepPsiElement stepPsiElement;
-
-    public StepPsiReference(StepPsiElement stepPsiElement) {
-        this.stepPsiElement = stepPsiElement;
+    public StepPsiReference(JBehaveStep element, TextRange range) {
+        myStep = element;
+        myRange = range;
     }
 
     @Override
-    public PsiElement getElement() {
-        return stepPsiElement;
+    public JBehaveStep getElement() {
+        return myStep;
     }
 
     @Override
     public TextRange getRangeInElement() {
-        return TextRange.from(0, stepPsiElement.getTextLength());
-    }
-
-    public StepDefinitionAnnotation stepDefinitionAnnotation() {
-        StepType stepType = stepPsiElement.getStepType();
-        String stepText = stepPsiElement.getStepText();
-
-        StepAnnotationFinder stepAnnotationFinder = new StepAnnotationFinder(stepType, stepText, stepPsiElement);
-        ScanUtils.iterateInContextOf(stepPsiElement, stepAnnotationFinder);
-
-        return stepAnnotationFinder.getMatchingAnnotation();
+        return myRange;
     }
 
     @Override
     public PsiElement resolve() {
-        StepDefinitionAnnotation stepDefinitionAnnotation = stepDefinitionAnnotation();
-        if (stepDefinitionAnnotation == null)
-            return null;
-        return stepDefinitionAnnotation.getAnnotation();
-    }
-
-    private static final boolean useVariants = false;
-
-    @NotNull
-    @Override
-    public Object[] getVariants() {
-
-        if (useVariants) {
-            StepType stepType = stepPsiElement.getStepType();
-            String actualStepPrefix = stepPsiElement.getActualStepPrefix();
-
-            StepSuggester stepSuggester = new StepSuggester(stepType, actualStepPrefix, stepPsiElement);
-            ScanUtils.iterateInContextOf(stepPsiElement, stepSuggester);
-
-            return stepSuggester.getSuggestions().toArray();
-        } else {
-            return new Object[0];
-        }
-    }
-
-    private static class StepSuggester extends StepDefinitionIterator {
-
-        private final List<String> suggestions = newArrayList();
-        private final String actualStepPrefix;
-
-        public StepSuggester(StepType stepType, String actualStepPrefix, PsiElement storyRef) {
-            super(stepType, storyRef);
-            this.actualStepPrefix = actualStepPrefix;
-        }
-
-        @Override
-        public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
-            suggestions.add(actualStepPrefix + " " + stepDefinitionAnnotation.getAnnotationText());
-            return true;
-        }
-
-        public List<String> getSuggestions() {
-            return suggestions;
-        }
-    }
-
-    private static class StepAnnotationFinder extends StepDefinitionIterator {
-
-        private StepType stepType;
-        private String stepText;
-        private StepDefinitionAnnotation matchingAnnotation;
-        private StepPatternParser stepPatternParser = new RegexPrefixCapturingPatternParser();
-
-        private StepAnnotationFinder(StepType stepType, String stepText, PsiElement storyRef) {
-            super(stepType, storyRef);
-            this.stepType = stepType;
-            this.stepText = stepText;
-        }
-
-        @Override
-        public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
-            StepMatcher stepMatcher = stepPatternParser.parseStep(stepType, stepDefinitionAnnotation.getAnnotationText());
-
-            if (stepMatcher.matches(stepText)) {
-                matchingAnnotation = stepDefinitionAnnotation;
-
-                return false;
-            }
-            return true;
-        }
-
-        public StepDefinitionAnnotation getMatchingAnnotation() {
-            return matchingAnnotation;
-        }
+        ResolveResult[] result = multiResolve(true);
+        return result.length == 1 ? result[0].getElement() : null;
     }
 
     @NotNull
     @Override
     public String getCanonicalText() {
-        return trim(stepPsiElement.getText());
+        return myStep.getText();
     }
 
     @Override
-    public PsiElement handleElementRename(String s) throws IncorrectOperationException {
-        throw new IncorrectOperationException();
+    public PsiElement handleElementRename(String newElementName) throws IncorrectOperationException {
+        return myStep;
     }
 
     @Override
-    public PsiElement bindToElement(@NotNull PsiElement psiElement) throws IncorrectOperationException {
-        throw new IncorrectOperationException();
+    public PsiElement bindToElement(@NotNull PsiElement element) throws IncorrectOperationException {
+        return myStep;
     }
 
     @Override
-    public boolean isReferenceTo(PsiElement psiElement) {
-        return psiElement instanceof StepPsiElement && Comparing.equal(resolve(), psiElement);
+    public boolean isReferenceTo(PsiElement element) {
+        ResolveResult[] resolvedResults = multiResolve(false);
+
+        for (ResolveResult resolveResult : resolvedResults) {
+            if (getElement().getManager().areElementsEquivalent(resolveResult.getElement(), element)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    @NotNull
+    @Override
+    public Object[] getVariants() {
+        return ArrayUtil.EMPTY_OBJECT_ARRAY;
     }
 
     @Override
     public boolean isSoft() {
         return false;
+    }
+
+    @Nullable
+    public JavaStepDefinition resolveToDefinition() {
+        Collection definitions = resolveToDefinitions();
+        return definitions.isEmpty() ? null : (JavaStepDefinition) definitions.iterator().next();
+    }
+
+    @NotNull
+    public Collection<JavaStepDefinition> resolveToDefinitions() {
+        JBehaveStepsIndex index = JBehaveStepsIndex.getInstance(myStep.getProject());
+        return index.findStepDefinitions(myStep);
+    }
+
+    @NotNull
+    @Override
+    public ResolveResult[] multiResolve(boolean incompleteCode) {
+        ArrayList<ResolveResult> result = new ArrayList<ResolveResult>();
+        ArrayList<PsiElement> resolvedElements = new ArrayList<PsiElement>();
+
+        JBehaveStepsIndex index = JBehaveStepsIndex.getInstance(myStep.getProject());
+        Collection<JavaStepDefinition> resolvedStepDefinitions = index.findStepDefinitions(myStep);
+
+        for (JavaStepDefinition resolvedStepDefinition : resolvedStepDefinitions) {
+            final PsiElement element = resolvedStepDefinition.getElement();
+            if (element != null && !resolvedElements.contains(element)) {
+                resolvedElements.add(element);
+                result.add(new ResolveResult() {
+                    public PsiElement getElement() {
+                        return element;
+                    }
+
+                    public boolean isValidResult() {
+                        return true;
+                    }
+                });
+            }
+        }
+
+        return result.toArray(new ResolveResult[result.size()]);
     }
 }

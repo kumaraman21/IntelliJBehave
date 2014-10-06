@@ -1,7 +1,7 @@
 package com.github.kumaraman21.intellijbehave.completion;
 
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
-import com.github.kumaraman21.intellijbehave.parser.StepPsiElement;
+import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
 import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionAnnotation;
 import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionIterator;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
@@ -12,6 +12,7 @@ import com.intellij.codeInsight.completion.*;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
@@ -93,13 +94,13 @@ public class StoryCompletionContributor extends CompletionContributor {
                                     PrefixMatcher prefixMatcher,
                                     Consumer<LookupElement> consumer,
                                     LocalizedKeywords keywords) {
-        StepPsiElement stepPsiElement = getStepPsiElement(parameters);
-        if (stepPsiElement == null) {
+        JBehaveStep step = getStepPsiElement(parameters);
+        if (step == null) {
             return;
         }
 
-        StepType stepType = stepPsiElement.getStepType();
-        String actualStepPrefix = stepPsiElement.getActualStepPrefix();
+        StepType stepType = step.getStepType();
+        String actualStepPrefix = step.getActualStepPrefix();
         //
         String textBeforeCaret = CompletionUtil.findReferenceOrAlphanumericPrefix(parameters);
 
@@ -110,8 +111,8 @@ public class StoryCompletionContributor extends CompletionContributor {
                     actualStepPrefix,
                     textBeforeCaret,
                     consumer,
-                    stepPsiElement);
-            ScanUtils.iterateInContextOf(stepPsiElement, stepAnnotationFinder);
+                    step.getProject());
+            ScanUtils.iterateInContextOf(step, stepAnnotationFinder);
         }
     }
 
@@ -122,15 +123,15 @@ public class StoryCompletionContributor extends CompletionContributor {
                 || input.startsWith(keywords.and());
     }
 
-    private static StepPsiElement getStepPsiElement(CompletionParameters parameters) {
+    private static JBehaveStep getStepPsiElement(CompletionParameters parameters) {
         PsiElement position = parameters.getPosition();
         PsiElement positionParent = position.getParent();
-        if (positionParent instanceof StepPsiElement) {
-            return (StepPsiElement) positionParent;
+        if (positionParent instanceof JBehaveStep) {
+            return (JBehaveStep) positionParent;
         } else if (position instanceof StepPsiReference) {
-            return (StepPsiElement) ((StepPsiReference) position).getElement();
-        } else if (position instanceof StepPsiElement) {
-            return (StepPsiElement) position;
+            return ((StepPsiReference) position).getElement();
+        } else if (position instanceof JBehaveStep) {
+            return (JBehaveStep) position;
         } else {
             return null;
         }
@@ -139,7 +140,6 @@ public class StoryCompletionContributor extends CompletionContributor {
     private static class StepSuggester extends StepDefinitionIterator {
 
         private final PrefixMatcher prefixMatcher;
-        private final StepType stepType;
         private final String actualStepPrefix;
         private final String textBeforeCaret;
         private final Consumer<LookupElement> consumer;
@@ -149,10 +149,9 @@ public class StoryCompletionContributor extends CompletionContributor {
                               String actualStepPrefix,
                               String textBeforeCaret,
                               Consumer<LookupElement> consumer,
-                              StepPsiElement storyRef) {
-            super(null, storyRef);
+                              Project project) {
+            super(stepType, project);
             this.prefixMatcher = prefixMatcher;
-            this.stepType = stepType;
             this.actualStepPrefix = actualStepPrefix;
             this.textBeforeCaret = textBeforeCaret;
             this.consumer = consumer;
@@ -161,7 +160,7 @@ public class StoryCompletionContributor extends CompletionContributor {
         @Override
         public boolean processStepDefinition(StepDefinitionAnnotation stepDefinitionAnnotation) {
             StepType annotationStepType = stepDefinitionAnnotation.getStepType();
-            if (annotationStepType != stepType) {
+            if (annotationStepType != getStepType()) {
                 return true;
             }
             String annotationText = stepDefinitionAnnotation.getAnnotationText();

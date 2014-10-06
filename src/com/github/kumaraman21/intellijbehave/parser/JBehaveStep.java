@@ -16,27 +16,28 @@
 package com.github.kumaraman21.intellijbehave.parser;
 
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
-import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.intellij.extapi.psi.ASTWrapperPsiElement;
 import com.intellij.lang.ASTNode;
+import com.intellij.psi.PsiReference;
+import com.intellij.psi.impl.source.resolve.reference.ReferenceProvidersRegistry;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import static org.apache.commons.lang.StringUtils.trim;
 
-public class StepPsiElement extends ASTWrapperPsiElement {
+public class JBehaveStep extends ASTWrapperPsiElement {
     private StepType stepType;
 
-    public StepPsiElement(@NotNull ASTNode node, StepType stepType) {
+    public JBehaveStep(@NotNull ASTNode node, StepType stepType) {
         super(node);
         this.stepType = stepType;
     }
 
     @Override
     @NotNull
-    public StepPsiReference getReference() {
-        return new StepPsiReference(this);
+    public PsiReference[] getReferences() {
+        return ReferenceProvidersRegistry.getReferencesFromProviders(this);
     }
 
     public StepType getStepType() {
