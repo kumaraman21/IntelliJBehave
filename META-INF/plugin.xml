@@ -29,6 +29,7 @@
         <li><a href="https://github.com/jarosite">https://github.com/jarosite</a></li>
         <li><a href="https://github.com/Arnauld">https://github.com/Arnauld</a></li>
         <li><a href="https://github.com/harley84">https://github.com/harley84</a></li>
+        <li><a href="https://github.com/dmalch">https://github.com/dmalch</a></li>
     </ul>
     And <a href="https://github.com/witspirit/IntelliJBehave/graphs/contributors">others</a>.
     </p>
@@ -51,6 +52,7 @@
     <li> Comment/uncomment lines in story files</li>
     <li> Code inspections to report unused steps definitions and undefined step usages </li>
     <li> Run *.story files</li>
+    <li> Finding usages of steps methods </li>
     </ul>
 
     <p>
@@ -66,6 +68,7 @@
         New in version 1.5:
     </p>
     <ul>
+        <li>Ability to find usages of a step method</li>
         <li>Inspections speed has been increased</li>
         <li>JBehave icon has been updated</li>
     </ul>

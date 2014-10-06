@@ -21,7 +21,7 @@
         <dependency>
             <groupId>org.jbehave</groupId>
             <artifactId>jbehave-core</artifactId>
-            <version>3.9.1</version>
+            <version>3.9.4</version>
         </dependency>
         <dependency>
             <groupId>org.hamcrest</groupId>
@@ -31,7 +31,7 @@
         <dependency>
             <groupId>com.google.guava</groupId>
             <artifactId>guava</artifactId>
-            <version>16.0.1</version>
+            <version>18.0</version>
         </dependency>
         <dependency>
             <groupId>junit</groupId>
