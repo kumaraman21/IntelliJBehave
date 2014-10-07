@@ -16,6 +16,7 @@
 package com.github.kumaraman21.intellijbehave.resolver;
 
 import com.google.common.base.Objects;
+import com.intellij.openapi.project.Project;
 import com.intellij.openapi.roots.ContentIterator;
 import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.*;
@@ -28,17 +29,21 @@ public abstract class StepDefinitionIterator implements ContentIterator {
 
     private final StepDefinitionAnnotationConverter stepDefinitionAnnotationConverter = new StepDefinitionAnnotationConverter();
     private StepType stepType;
-  private PsiElement storyRef;
+    private Project project;
 
-  public StepDefinitionIterator(@Nullable StepType stepType, PsiElement storyRef) {
+    public StepDefinitionIterator(@Nullable StepType stepType, Project project) {
         this.stepType = stepType;
-        this.storyRef = storyRef;
+        this.project = project;
+    }
+
+    public StepType getStepType() {
+        return stepType;
     }
 
     @Override
     public boolean processFile(VirtualFile virtualFile) {
 
-        PsiFile psiFile = PsiManager.getInstance(storyRef.getProject()).findFile(virtualFile);
+        PsiFile psiFile = PsiManager.getInstance(project).findFile(virtualFile);
         if (psiFile instanceof PsiClassOwner) {
             // System.out.println("Virtual File that is a PsiClassOwner: "+virtualFile);
 
