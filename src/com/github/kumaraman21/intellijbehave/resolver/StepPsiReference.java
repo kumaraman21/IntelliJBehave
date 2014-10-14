@@ -20,6 +20,7 @@ import com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex;
 import com.github.kumaraman21.intellijbehave.service.JavaStepDefinition;
 import com.intellij.openapi.util.TextRange;
 import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiPolyVariantReference;
 import com.intellij.psi.ResolveResult;
 import com.intellij.util.ArrayUtil;
@@ -29,6 +30,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 public class StepPsiReference implements PsiPolyVariantReference {
     private final JBehaveStep myStep;
@@ -97,8 +99,8 @@ public class StepPsiReference implements PsiPolyVariantReference {
 
     @Nullable
     public JavaStepDefinition resolveToDefinition() {
-        Collection definitions = resolveToDefinitions();
-        return definitions.isEmpty() ? null : (JavaStepDefinition) definitions.iterator().next();
+        Collection<JavaStepDefinition> definitions = resolveToDefinitions();
+        return definitions.isEmpty() ? null : definitions.iterator().next();
     }
 
     @NotNull
@@ -110,19 +112,19 @@ public class StepPsiReference implements PsiPolyVariantReference {
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        ArrayList<ResolveResult> result = new ArrayList<ResolveResult>();
-        ArrayList<PsiElement> resolvedElements = new ArrayList<PsiElement>();
+        List<ResolveResult> result = new ArrayList<ResolveResult>();
+        List<PsiMethod> resolvedElements = new ArrayList<PsiMethod>();
 
         JBehaveStepsIndex index = JBehaveStepsIndex.getInstance(myStep.getProject());
         Collection<JavaStepDefinition> resolvedStepDefinitions = index.findStepDefinitions(myStep);
 
         for (JavaStepDefinition resolvedStepDefinition : resolvedStepDefinitions) {
-            final PsiElement element = resolvedStepDefinition.getElement();
-            if (element != null && !resolvedElements.contains(element)) {
-                resolvedElements.add(element);
+            final PsiMethod method = resolvedStepDefinition.getAnnotatedMethod();
+            if (method != null && !resolvedElements.contains(method)) {
+                resolvedElements.add(method);
                 result.add(new ResolveResult() {
                     public PsiElement getElement() {
-                        return element;
+                        return method;
                     }
 
                     public boolean isValidResult() {

@@ -75,7 +75,7 @@ public class UnusedStepDeclarationInspection extends BaseJavaLocalInspectionTool
                     StepPsiReference reference = (StepPsiReference) references[0];
                     JavaStepDefinition definition = reference.resolveToDefinition();
 
-                    if (definition != null && definition.getElement() != null && definition.getElement().isEquivalentTo(method)) {
+                    if (definition != null && definition.getAnnotatedMethod() != null && definition.getAnnotatedMethod().isEquivalentTo(method)) {
                         return;
                     }
                 }

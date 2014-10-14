@@ -11,6 +11,7 @@ import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.SmartPointerManager;
 import com.intellij.psi.SmartPsiElementPointer;
+import com.intellij.psi.util.PsiTreeUtil;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
 import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;
@@ -21,16 +22,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Set;
 
-import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.getJBehaveStepAnnotation;
 import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
 import static com.google.common.collect.FluentIterable.from;
 
 public class JavaStepDefinition {
-    private final SmartPsiElementPointer<PsiMethod> myElementPointer;
+    private final SmartPsiElementPointer<PsiAnnotation> myElementPointer;
     private final StepPatternParser stepPatternParser = new RegexPrefixCapturingPatternParser();
 
-    public JavaStepDefinition(PsiMethod method) {
-        myElementPointer = SmartPointerManager.getInstance(method.getProject()).createSmartPsiElementPointer(method);
+    public JavaStepDefinition(PsiAnnotation annotation) {
+        myElementPointer = SmartPointerManager.getInstance(annotation.getProject()).createSmartPsiElementPointer(annotation);
     }
 
     public boolean matches(String stepText) {
@@ -64,8 +64,13 @@ public class JavaStepDefinition {
     }
 
     @Nullable
-    public PsiMethod getElement() {
+    private PsiAnnotation getAnnotation() {
         return myElementPointer.getElement();
+    }
+
+    @Nullable
+    public PsiMethod getAnnotatedMethod() {
+        return PsiTreeUtil.getParentOfType(getAnnotation(), PsiMethod.class);
     }
 
     private Set<StepMatcher> getStepMatchers() {
@@ -79,6 +84,15 @@ public class JavaStepDefinition {
                 .transform(toStepMatchers(annotationType)).toSet();
     }
 
+    private Function<String, StepMatcher> toStepMatchers(final StepType annotationType) {
+        return new Function<String, StepMatcher>() {
+            @Override
+            public StepMatcher apply(@Nullable String annotationText) {
+                return stepPatternParser.parseStep(annotationType, annotationText);
+            }
+        };
+    }
+
     private Set<String> getAnnotationTextVariants() {
         final String annotationText = getAnnotationText();
 
@@ -89,43 +103,27 @@ public class JavaStepDefinition {
         return new PatternVariantBuilder(annotationText).allVariants();
     }
 
-    private Function<String, StepMatcher> toStepMatchers(final StepType annotationType) {
-        return new Function<String, StepMatcher>() {
-            @Override
-            public StepMatcher apply(@Nullable String annotationText) {
-                return stepPatternParser.parseStep(annotationType, annotationText);
-            }
-        };
-    }
-
     @Nullable
     public String getAnnotationText() {
-        PsiMethod element = getElement();
+        PsiAnnotation element = getAnnotation();
+
         if (element == null) {
             return null;
         }
 
-        PsiAnnotation stepAnnotation = getJBehaveStepAnnotation(element);
-
-        assert stepAnnotation != null;
-
-        return JBehaveUtil.getAnnotationText(stepAnnotation);
+        return JBehaveUtil.getAnnotationText(element);
     }
 
     @Nullable
     public StepType getAnnotationType() {
-        PsiMethod element = getElement();
+        final PsiAnnotation element = getAnnotation();
         if (element == null) {
             return null;
         }
 
-        final PsiAnnotation stepAnnotation = getJBehaveStepAnnotation(element);
-
-        assert stepAnnotation != null;
-
         String qualifiedName = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
             public String compute() {
-                return stepAnnotation.getQualifiedName();
+                return element.getQualifiedName();
             }
         });
 
@@ -134,16 +132,13 @@ public class JavaStepDefinition {
 
     @NotNull
     public Integer getAnnotationPriority() {
-        PsiMethod element = getElement();
+        PsiAnnotation element = getAnnotation();
+
         if (element == null) {
             return -1;
         }
 
-        PsiAnnotation stepAnnotation = getJBehaveStepAnnotation(element);
-
-        assert stepAnnotation != null;
-
-        return JBehaveUtil.getAnnotationPriority(stepAnnotation);
+        return JBehaveUtil.getAnnotationPriority(element);
     }
 
     public boolean equals(Object o) {

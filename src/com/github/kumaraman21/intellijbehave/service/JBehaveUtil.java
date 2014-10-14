@@ -1,6 +1,7 @@
 package com.github.kumaraman21.intellijbehave.service;
 
 import com.github.kumaraman21.intellijbehave.language.StoryFileType;
+import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.*;
@@ -64,26 +65,16 @@ public class JBehaveUtil {
 
     @Nullable
     public static String getAnnotationText(PsiAnnotation stepAnnotation) {
-        PsiAnnotationMemberValue annotationValue = stepAnnotation.findAttributeValue("value");
-        if (annotationValue != null) {
-            PsiConstantEvaluationHelper evaluationHelper = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper();
-            Object constantValue = evaluationHelper.computeConstantExpression(annotationValue, false);
-            if (constantValue != null) {
-                return constantValue.toString();
-            }
-        }
-
-        return null;
+        return AnnotationUtil.getStringAttributeValue(stepAnnotation, "value");
     }
 
     public static Integer getAnnotationPriority(PsiAnnotation stepAnnotation) {
-        PsiAnnotationMemberValue annotationValue = stepAnnotation.findAttributeValue("priority");
-        if (annotationValue != null) {
-            PsiConstantEvaluationHelper evaluationHelper = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper();
-            Object constantValue = evaluationHelper.computeConstantExpression(annotationValue, false);
-            if (constantValue != null) {
-                return Integer.valueOf(constantValue.toString());
-            }
+        PsiAnnotationMemberValue attrValue = stepAnnotation.findAttributeValue("priority");
+        Object constValue = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper().computeConstantExpression(attrValue);
+        Integer priority = constValue instanceof Integer ? (Integer) constValue : null;
+
+        if (priority != null) {
+            return priority;
         }
 
         return -1;
