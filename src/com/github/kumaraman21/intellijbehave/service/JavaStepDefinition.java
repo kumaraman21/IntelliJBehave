@@ -1,7 +1,9 @@
 package com.github.kumaraman21.intellijbehave.service;
 
 import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
+import com.google.common.base.Function;
 import com.google.common.base.Objects;
+import com.google.common.collect.ImmutableSet;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiAnnotation;
@@ -11,12 +13,16 @@ import com.intellij.psi.SmartPsiElementPointer;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
 import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;
+import org.jbehave.core.steps.PatternVariantBuilder;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Set;
+
 import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.getJBehaveStepAnnotation;
 import static com.github.kumaraman21.intellijbehave.utility.StepTypeMappings.ANNOTATION_TO_STEP_TYPE_MAPPING;
+import static com.google.common.collect.FluentIterable.from;
 
 public class JavaStepDefinition {
     private final SmartPsiElementPointer<PsiMethod> myElementPointer;
@@ -27,8 +33,14 @@ public class JavaStepDefinition {
     }
 
     public boolean matches(String stepName) {
-        StepMatcher stepMatcher = getStepMatcher();
-        return stepMatcher != null && stepMatcher.matches(stepName);
+        Set<StepMatcher> stepMatchers = getStepMatchers();
+        for (StepMatcher stepMatcher : stepMatchers) {
+            if (stepMatcher.matches(stepName)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     @Nullable
@@ -36,14 +48,25 @@ public class JavaStepDefinition {
         return myElementPointer.getElement();
     }
 
-    @Nullable
-    public StepMatcher getStepMatcher() {
-        String annotationText = getAnnotationText();
+    public Set<StepMatcher> getStepMatchers() {
+        final String annotationText = getAnnotationText();
         if (annotationText == null) {
-            return null;
+            return ImmutableSet.of();
         }
 
-        return stepPatternParser.parseStep(getAnnotationType(), annotationText);
+        final StepType annotationType = getAnnotationType();
+
+        return from(new PatternVariantBuilder(annotationText).allVariants())
+                .transform(toStepMatchers(annotationType)).toSet();
+    }
+
+    private Function<String, StepMatcher> toStepMatchers(final StepType annotationType) {
+        return new Function<String, StepMatcher>() {
+            @Override
+            public StepMatcher apply(@Nullable String annotationText) {
+                return stepPatternParser.parseStep(annotationType, annotationText);
+            }
+        };
     }
 
     @Nullable
