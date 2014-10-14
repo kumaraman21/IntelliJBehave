@@ -20,6 +20,7 @@ import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.github.kumaraman21.intellijbehave.service.JavaStepDefinition;
 import com.github.kumaraman21.intellijbehave.utility.ParametrizedString;
+import com.github.kumaraman21.intellijbehave.utility.ParametrizedString.StringToken;
 import com.intellij.codeInspection.*;
 import com.intellij.codeInspection.ex.ProblemDescriptorImpl;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
@@ -73,16 +74,14 @@ public class UndefinedStepInspection extends LocalInspectionTool {
     private void highlightParameters(JBehaveStep step, JavaStepDefinition javaStepDefinition, ProblemsHolder holder) {
         String stepText = step.getStepText();
 
-        ParametrizedString pString = new ParametrizedString(javaStepDefinition.getAnnotationText());
+        String annotationText = javaStepDefinition.getAnnotationTextFor(stepText);
+        ParametrizedString pString = new ParametrizedString(annotationText);
 
         int offset = step.getStepTextOffset();
-        for (ParametrizedString.StringToken token : pString.tokenize(stepText)) {
+        for (StringToken token : pString.tokenize(stepText)) {
             int length = token.getValue().length();
             if (token.isIdentifier()) {
-                registerHiglighting(StorySyntaxHighlighter.TABLE_CELL,
-                        step,
-                        TextRange.from(offset, length),
-                        holder);
+                registerHiglighting(StorySyntaxHighlighter.TABLE_CELL, step, TextRange.from(offset, length), holder);
             }
             offset += length;
         }

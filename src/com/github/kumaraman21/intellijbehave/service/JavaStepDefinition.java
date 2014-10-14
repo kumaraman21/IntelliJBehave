@@ -4,6 +4,7 @@ import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
 import com.google.common.collect.ImmutableSet;
+import com.google.common.collect.Iterables;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiAnnotation;
@@ -32,10 +33,10 @@ public class JavaStepDefinition {
         myElementPointer = SmartPointerManager.getInstance(method.getProject()).createSmartPsiElementPointer(method);
     }
 
-    public boolean matches(String stepName) {
+    public boolean matches(String stepText) {
         Set<StepMatcher> stepMatchers = getStepMatchers();
         for (StepMatcher stepMatcher : stepMatchers) {
-            if (stepMatcher.matches(stepName)) {
+            if (stepMatcher.matches(stepText)) {
                 return true;
             }
         }
@@ -44,20 +45,48 @@ public class JavaStepDefinition {
     }
 
     @Nullable
+    public String getAnnotationTextFor(String stepText) {
+        Set<String> annotationTextVariants = getAnnotationTextVariants();
+
+        if (annotationTextVariants.size() == 1) {//small optimization: it doesn't create matchers if no step variants found
+            return Iterables.getFirst(annotationTextVariants, null);
+        }
+
+        Set<StepMatcher> stepMatchers = getStepMatchers(annotationTextVariants);
+
+        for (StepMatcher stepMatcher : stepMatchers) {
+            if (stepMatcher.matches(stepText)) {
+                return stepMatcher.pattern().annotated();
+            }
+        }
+
+        return null;
+    }
+
+    @Nullable
     public PsiMethod getElement() {
         return myElementPointer.getElement();
     }
 
-    public Set<StepMatcher> getStepMatchers() {
+    private Set<StepMatcher> getStepMatchers() {
+        return getStepMatchers(getAnnotationTextVariants());
+    }
+
+    private Set<StepMatcher> getStepMatchers(Set<String> annotationTextVariants) {
+        final StepType annotationType = getAnnotationType();
+
+        return from(annotationTextVariants)
+                .transform(toStepMatchers(annotationType)).toSet();
+    }
+
+    private Set<String> getAnnotationTextVariants() {
         final String annotationText = getAnnotationText();
+
         if (annotationText == null) {
             return ImmutableSet.of();
         }
 
-        final StepType annotationType = getAnnotationType();
-
-        return from(new PatternVariantBuilder(annotationText).allVariants())
-                .transform(toStepMatchers(annotationType)).toSet();
+        return new PatternVariantBuilder(annotationText).allVariants();
     }
 
     private Function<String, StepMatcher> toStepMatchers(final StepType annotationType) {
