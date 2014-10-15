@@ -2,7 +2,6 @@ package com.github.kumaraman21.intellijbehave.service;
 
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
-import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiMethod;
 import com.intellij.psi.PsiReference;
@@ -11,6 +10,8 @@ import com.intellij.psi.search.searches.ReferencesSearch.SearchParameters;
 import com.intellij.util.Processor;
 import com.intellij.util.QueryExecutor;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.List;
 
 import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.*;
 
@@ -34,16 +35,11 @@ public class JBehaveJavaStepDefinitionSearch implements QueryExecutor<PsiReferen
             return true;
         }
 
-        PsiAnnotation stepAnnotation = ApplicationManager.getApplication().runReadAction(new Computable<PsiAnnotation>() {
-            public PsiAnnotation compute() {
-                return getJBehaveStepAnnotation(method);
+        List<String> stepTexts = ApplicationManager.getApplication().runReadAction(new Computable<List<String>>() {
+            public List<String> compute() {
+                return getAnnotationTexts(method);
             }
         });
-
-        String stepText = getAnnotationText(stepAnnotation);
-        if (stepText == null) {
-            return true;
-        }
 
         SearchScope searchScope = ApplicationManager.getApplication().runReadAction(new Computable<SearchScope>() {
             public SearchScope compute() {
@@ -51,6 +47,16 @@ public class JBehaveJavaStepDefinitionSearch implements QueryExecutor<PsiReferen
             }
         });
 
-        return findJBehaveReferencesToElement(myElement, stepText, consumer, searchScope);
+        boolean result = true;
+
+        for (String stepText : stepTexts) {
+            if (stepText == null) {
+                return true;
+            }
+
+            result &= findJBehaveReferencesToElement(myElement, stepText, consumer, searchScope);
+        }
+
+        return result;
     }
 }

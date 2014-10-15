@@ -15,7 +15,6 @@ import com.intellij.psi.util.PsiTreeUtil;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
 import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;
-import org.jbehave.core.steps.PatternVariantBuilder;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -46,13 +45,13 @@ public class JavaStepDefinition {
 
     @Nullable
     public String getAnnotationTextFor(String stepText) {
-        Set<String> annotationTextVariants = getAnnotationTextVariants();
+        Set<String> annotationTexts = getAnnotationTexts();
 
-        if (annotationTextVariants.size() == 1) {//small optimization: it doesn't create matchers if no step variants found
-            return Iterables.getFirst(annotationTextVariants, null);
+        if (annotationTexts.size() == 1) {//small optimization: it doesn't create matchers if no step variants found
+            return Iterables.getFirst(annotationTexts, null);
         }
 
-        Set<StepMatcher> stepMatchers = getStepMatchers(annotationTextVariants);
+        Set<StepMatcher> stepMatchers = getStepMatchers(annotationTexts);
 
         for (StepMatcher stepMatcher : stepMatchers) {
             if (stepMatcher.matches(stepText)) {
@@ -74,7 +73,7 @@ public class JavaStepDefinition {
     }
 
     private Set<StepMatcher> getStepMatchers() {
-        return getStepMatchers(getAnnotationTextVariants());
+        return getStepMatchers(getAnnotationTexts());
     }
 
     private Set<StepMatcher> getStepMatchers(Set<String> annotationTextVariants) {
@@ -93,25 +92,15 @@ public class JavaStepDefinition {
         };
     }
 
-    private Set<String> getAnnotationTextVariants() {
-        final String annotationText = getAnnotationText();
-
-        if (annotationText == null) {
-            return ImmutableSet.of();
-        }
-
-        return new PatternVariantBuilder(annotationText).allVariants();
-    }
-
-    @Nullable
-    public String getAnnotationText() {
+    @NotNull
+    private Set<String> getAnnotationTexts() {
         PsiAnnotation element = getAnnotation();
 
         if (element == null) {
-            return null;
+            return ImmutableSet.of();
         }
 
-        return JBehaveUtil.getAnnotationText(element);
+        return JBehaveUtil.getAnnotationTexts(element);
     }
 
     @Nullable

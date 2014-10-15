@@ -33,7 +33,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.List;
 import java.util.Set;
 
-import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.getJBehaveStepAnnotation;
 import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.isStepDefinition;
 import static com.google.common.collect.Sets.newHashSet;
 
@@ -80,11 +79,7 @@ public class UnusedStepDeclarationInspection extends BaseJavaLocalInspectionTool
                     }
                 }
 
-                PsiAnnotation annotation = getJBehaveStepAnnotation(method);
-
-                assert annotation != null;
-
-                holder.registerProblem(annotation, "Step <code>#ref</code> is never used");
+                holder.registerProblem(method, "Step <code>#ref</code> is never used");
             }
         };
     }

@@ -1,6 +1,10 @@
 package com.github.kumaraman21.intellijbehave.service;
 
 import com.github.kumaraman21.intellijbehave.language.StoryFileType;
+import com.google.common.base.Function;
+import com.google.common.base.Objects;
+import com.google.common.base.Predicate;
+import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
@@ -9,30 +13,70 @@ import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.TextOccurenceProcessor;
+import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
+import org.jbehave.core.annotations.*;
+import org.jbehave.core.steps.PatternVariantBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
+import java.util.Set;
+
+import static com.google.common.collect.FluentIterable.from;
 import static com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces;
+import static java.util.Arrays.asList;
 
 public class JBehaveUtil {
+    public static final Predicate<PsiAnnotation> JBEHAVE_STEPS_ANNOTATIONS = new Predicate<PsiAnnotation>() {
+        @Override
+        public boolean apply(@Nullable PsiAnnotation annotation) {
+            return annotation != null && isJBehaveStepAnnotation(annotation);
+        }
+    };
+    public static final Predicate<PsiAnnotation> JBEHAVE_ALIAS_ANNOTATION = new Predicate<PsiAnnotation>() {
+        @Override
+        public boolean apply(@Nullable PsiAnnotation annotation) {
+            return annotation != null && isJBehaveAliasAnnotation(annotation);
+        }
+    };
+    public static final Predicate<PsiAnnotation> JBEHAVE_ALIASES_ANNOTATION = new Predicate<PsiAnnotation>() {
+        @Override
+        public boolean apply(@Nullable PsiAnnotation annotation) {
+            return annotation != null && isJBehaveAliasesAnnotation(annotation);
+        }
+    };
+    public static final Function<PsiAnnotation, Set<String>> TO_ANNOTATION_TEXTS = new Function<PsiAnnotation, Set<String>>() {
+        @Override
+        public Set<String> apply(PsiAnnotation stepAnnotation) {
+            return getAnnotationTexts(stepAnnotation);
+        }
+    };
+    public static final Function<String, Set<String>> TO_A_SET_OF_PATTERNS = new Function<String, Set<String>>() {
+        @Override
+        public Set<String> apply(@Nullable String value) {
+            return new PatternVariantBuilder(value).allVariants();
+        }
+    };
+    public static final ImmutableSet<String> JBEHAVE_ANNOTATIONS_SET =
+            ImmutableSet.of(Given.class.getName(), When.class.getName(), Then.class.getName());
+
     public static boolean isJBehaveStepAnnotation(@NotNull PsiAnnotation annotation) {
         String annotationName = getAnnotationName(annotation);
-        if (annotationName == null) {
-            return false;
-        }
 
-        String annotationSuffix = getJBehaveAnnotationSuffix(annotationName);
-
-        return !annotationSuffix.isEmpty();
+        return annotationName != null && JBEHAVE_ANNOTATIONS_SET.contains(annotationName);
     }
 
-    private static String getJBehaveAnnotationSuffix(@NotNull String name) {
-        if (name.startsWith("org.jbehave.core.annotations.")) {
-            return name.substring("org.jbehave.core.annotations.".length());
-        } else {
-            return "";
-        }
+    public static boolean isJBehaveAliasAnnotation(@NotNull PsiAnnotation annotation) {
+        String annotationName = getAnnotationName(annotation);
+
+        return annotationName != null && Objects.equal(annotationName, Alias.class.getName());
+    }
+
+    public static boolean isJBehaveAliasesAnnotation(@NotNull PsiAnnotation annotation) {
+        String annotationName = getAnnotationName(annotation);
+
+        return annotationName != null && Objects.equal(annotationName, Aliases.class.getName());
     }
 
     @Nullable
@@ -45,30 +89,115 @@ public class JBehaveUtil {
         });
     }
 
-    @Nullable
-    public static PsiAnnotation getJBehaveStepAnnotation(PsiMethod method) {
+    @NotNull
+    private static List<PsiAnnotation> getJBehaveStepAnnotations(@NotNull PsiMethod method) {
         PsiAnnotation[] annotations = method.getModifierList().getAnnotations();
 
-        for (PsiAnnotation annotation : annotations) {
-            if (annotation != null && isJBehaveStepAnnotation(annotation)) {
-                return annotation;
-            }
-        }
+        return from(asList(annotations))
+                .filter(JBEHAVE_STEPS_ANNOTATIONS).toList();
+    }
 
-        return null;
+    @Nullable
+    private static PsiAnnotation getJBehaveAliasAnnotation(@NotNull PsiMethod method) {
+        PsiAnnotation[] annotations = method.getModifierList().getAnnotations();
+
+        return from(asList(annotations))
+                .filter(JBEHAVE_ALIAS_ANNOTATION).first().orNull();
+    }
+
+    @Nullable
+    private static PsiAnnotation getJBehaveAliasesAnnotation(@NotNull PsiMethod method) {
+        PsiAnnotation[] annotations = method.getModifierList().getAnnotations();
+
+        return from(asList(annotations))
+                .filter(JBEHAVE_ALIASES_ANNOTATION).first().orNull();
     }
 
     public static boolean isStepDefinition(@NotNull PsiMethod method) {
-        PsiAnnotation stepAnnotation = getJBehaveStepAnnotation(method);
-        return stepAnnotation != null && stepAnnotation.findAttributeValue("value") != null;
+        List<PsiAnnotation> stepAnnotations = getJBehaveStepAnnotations(method);
+
+        for (PsiAnnotation stepAnnotation : stepAnnotations) {
+            if (stepAnnotation.findAttributeValue("value") != null) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
-    @Nullable
-    public static String getAnnotationText(PsiAnnotation stepAnnotation) {
-        return AnnotationUtil.getStringAttributeValue(stepAnnotation, "value");
+    @NotNull
+    public static Set<String> getAnnotationTexts(@NotNull PsiAnnotation stepAnnotation) {
+        ImmutableSet.Builder<String> builder = ImmutableSet.builder();
+        builder.addAll(getStepAnnotationTexts(stepAnnotation));
+
+        PsiMethod method = PsiTreeUtil.getParentOfType(stepAnnotation, PsiMethod.class);
+        if (method != null) {
+            PsiAnnotation aliasAnnotation = getJBehaveAliasAnnotation(method);
+            if (aliasAnnotation != null) {
+                builder.addAll(getAliasAnnotationTexts(aliasAnnotation));
+            }
+
+            PsiAnnotation aliasesAnnotation = getJBehaveAliasesAnnotation(method);
+            if (aliasesAnnotation != null) {
+                builder.addAll(getAliasesAnnotationTexts(aliasesAnnotation));
+            }
+        }
+
+        return builder.build();
     }
 
-    public static Integer getAnnotationPriority(PsiAnnotation stepAnnotation) {
+    @NotNull
+    private static Set<String> getStepAnnotationTexts(@NotNull PsiAnnotation stepAnnotation) {
+        final String annotationText = AnnotationUtil.getStringAttributeValue(stepAnnotation, "value");
+
+        if (annotationText == null) {
+            return ImmutableSet.of();
+        }
+
+        return new PatternVariantBuilder(annotationText).allVariants();
+    }
+
+    @NotNull
+    private static Set<String> getAliasAnnotationTexts(@NotNull PsiAnnotation aliasAnnotation) {
+        final String annotationText = AnnotationUtil.getStringAttributeValue(aliasAnnotation, "value");
+
+        if (annotationText == null) {
+            return ImmutableSet.of();
+        }
+
+        return new PatternVariantBuilder(annotationText).allVariants();
+    }
+
+    @NotNull
+    private static Set<String> getAliasesAnnotationTexts(@NotNull PsiAnnotation aliasAnnotation) {
+        final PsiArrayInitializerMemberValue attrValue = (PsiArrayInitializerMemberValue) aliasAnnotation.findAttributeValue("values");
+
+        if (attrValue == null) {
+            return ImmutableSet.of();
+        }
+
+        final PsiConstantEvaluationHelper constantEvaluationHelper = JavaPsiFacade.getInstance(aliasAnnotation.getProject()).getConstantEvaluationHelper();
+
+        return from(asList(attrValue.getInitializers()))
+                .transform(new Function<PsiAnnotationMemberValue, String>() {
+                    @Override
+                    public String apply(@Nullable PsiAnnotationMemberValue psiAnnotationMemberValue) {
+                        Object constValue = constantEvaluationHelper.computeConstantExpression(psiAnnotationMemberValue);
+                        return constValue instanceof String ? (String) constValue : null;
+                    }
+                }).transformAndConcat(TO_A_SET_OF_PATTERNS).toSet();
+    }
+
+    @NotNull
+    public static List<String> getAnnotationTexts(@NotNull PsiMethod method) {
+        List<PsiAnnotation> stepAnnotations = getJBehaveStepAnnotations(method);
+
+        return from(stepAnnotations)
+                .transformAndConcat(TO_ANNOTATION_TEXTS).toList();
+    }
+
+    @NotNull
+    public static Integer getAnnotationPriority(@NotNull PsiAnnotation stepAnnotation) {
         PsiAnnotationMemberValue attrValue = stepAnnotation.findAttributeValue("priority");
         Object constValue = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper().computeConstantExpression(attrValue);
         Integer priority = constValue instanceof Integer ? (Integer) constValue : null;
@@ -80,11 +209,7 @@ public class JBehaveUtil {
         return -1;
     }
 
-    public static boolean findJBehaveReferencesToElement(@NotNull PsiElement stepDefinitionElement, @NotNull String stepText, @NotNull Processor<PsiReference> consumer, @NotNull SearchScope effectiveSearchScope) {
-        return findPossibleJBehaveElementUsages(stepDefinitionElement, stepText, new MyReferenceCheckingProcessor(stepDefinitionElement, consumer), effectiveSearchScope);
-    }
-
-    public static boolean findPossibleJBehaveElementUsages(@NotNull PsiElement stepDefinitionElement, @NotNull String stepText, @NotNull TextOccurenceProcessor processor, @NotNull final SearchScope effectiveSearchScope) {
+    public static boolean findJBehaveReferencesToElement(@NotNull PsiElement stepDefinitionElement, @NotNull String stepText, @NotNull Processor<PsiReference> consumer, @NotNull final SearchScope effectiveSearchScope) {
         String word = getTheBiggestWordToSearchByIndex(stepText);
 
         if (isEmptyOrSpaces(word)) {
@@ -98,7 +223,7 @@ public class JBehaveUtil {
         });
 
         PsiSearchHelper instance = PsiSearchHelper.SERVICE.getInstance(stepDefinitionElement.getProject());
-        return instance.processElementsWithWord(processor, searchScope, word, (short) 5, true);
+        return instance.processElementsWithWord(new MyReferenceCheckingProcessor(stepDefinitionElement, consumer), searchScope, word, (short) 5, true);
     }
 
     public static SearchScope restrictScopeToJBehaveFiles(final Computable<SearchScope> originalScopeComputation) {
