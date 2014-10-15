@@ -73,7 +73,7 @@
         <li>JBehave icon has been updated</li>
     </ul>
   ]]></description>
-    <version>1.51</version>
+    <version>1.52</version>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
     <idea-version since-build="133.0"/>
@@ -112,6 +112,8 @@
 
     <extensions defaultExtensionNs="com.intellij">
         <projectConfigurable instance="com.github.kumaraman21.intellijbehave.settings.JBehaveConfigurable"/>
+        <spellchecker.support language="Story"
+                              implementationClass="com.github.kumaraman21.intellijbehave.spellchecker.JBehaveSpellcheckerStrategy"/>
         <fileTypeFactory implementation="com.github.kumaraman21.intellijbehave.language.StoryFileTypeFactory"/>
         <lang.parserDefinition language="Story"
                                implementationClass="com.github.kumaraman21.intellijbehave.parser.StoryParserDefinition"/>
