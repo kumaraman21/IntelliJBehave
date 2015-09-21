@@ -1,5 +1,7 @@
 package com.github.kumaraman21.intellijbehave.service;
 
+import com.github.kumaraman21.intellijbehave.kotlin.KotlinConfigKt;
+import com.github.kumaraman21.intellijbehave.kotlin.support.services.KotlinAnnotationsLoader;
 import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.ServiceManager;
@@ -12,6 +14,7 @@ import com.intellij.psi.PsiClass;
 import com.intellij.psi.impl.java.stubs.index.JavaAnnotationIndex;
 import com.intellij.psi.impl.java.stubs.index.JavaFullClassNameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
+import com.intellij.psi.util.QualifiedName;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
@@ -94,7 +97,16 @@ public class JBehaveStepsIndex {
         return ApplicationManager.getApplication().runReadAction(new Computable<Collection<PsiAnnotation>>() {
             @Override
             public Collection<PsiAnnotation> compute() {
-                return JavaAnnotationIndex.getInstance().get(annClass.getName(), annClass.getProject(), scope);
+                Project project = annClass.getProject();
+                Collection<PsiAnnotation> psiAnnotations = new ArrayList<PsiAnnotation>();
+                if (KotlinConfigKt.getPluginIsEnabled()) {
+                    String qualifiedName = annClass.getQualifiedName();
+                    if (qualifiedName != null) {
+                        psiAnnotations.addAll(KotlinAnnotationsLoader.getInstance().getAnnotations(QualifiedName.fromDottedString(qualifiedName), project, scope));
+                    }
+                }
+                psiAnnotations.addAll(JavaAnnotationIndex.getInstance().get(annClass.getName(), project, scope));
+                return psiAnnotations;
             }
         });
     }
