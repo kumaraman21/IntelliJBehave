@@ -45,3 +45,6 @@ IntelliJBehave.zip
 
 # Atlassian Plugin Configuration
 atlassian-ide-plugin.xml
+
+# Plugins
+/providedLib

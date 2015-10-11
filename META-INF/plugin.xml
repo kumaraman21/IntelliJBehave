@@ -78,6 +78,9 @@
 
     <idea-version since-build="133.0"/>
 
+    <depends>com.intellij.modules.java</depends>
+    <depends optional="true">org.jetbrains.kotlin</depends>
+
     <application-components>
         <component>
             <implementation-class>com.github.kumaraman21.intellijbehave.template.JBehaveTemplateLoaderComponent
