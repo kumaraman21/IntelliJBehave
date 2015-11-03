@@ -13,12 +13,13 @@ import com.intellij.psi.impl.DebugUtil;
 import com.intellij.testFramework.PsiTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
+import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class IntelliJBehaveBaseTestCase extends PsiTestCase {
+public class IntelliJBehaveBaseTestCase extends LightPlatformCodeInsightFixtureTestCase {
 
     private Project myProject;
     protected IdeaProjectTestFixture myFixture;

@@ -199,7 +199,9 @@ public class JBehaveUtil {
     @NotNull
     public static Integer getAnnotationPriority(@NotNull PsiAnnotation stepAnnotation) {
         PsiAnnotationMemberValue attrValue = stepAnnotation.findAttributeValue("priority");
-        Object constValue = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper().computeConstantExpression(attrValue);
+        // TODO test change doesn't break other languages; this change works as a quick fix for Kotlin
+        //Object constValue = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper().computeConstantExpression(attrValue);
+        Object constValue = JavaPsiFacade.getInstance(stepAnnotation.getProject()).getConstantEvaluationHelper().computeConstantExpression(attrValue.getOriginalElement());
         Integer priority = constValue instanceof Integer ? (Integer) constValue : null;
 
         if (priority != null) {
