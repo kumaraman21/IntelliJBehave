@@ -20,7 +20,7 @@ import com.intellij.lang.Commenter;
 public class StoryCommenter implements Commenter {
   @Override
   public String getLineCommentPrefix() {
-    return "!--";
+    return "!-- ";
   }
 
   @Override
