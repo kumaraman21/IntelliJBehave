@@ -20,9 +20,7 @@ class KotlinPsiClassesLoader private constructor() {
     }
 
     fun getPsiClasses(psiFile: PsiFile): List<PsiClass>? = if (psiFile is KtFile) {
-        psiFile.declarations.asSequence()
-                .map({ (it as? KtClass)?.toLightClass() })
-                .filterNotNull().toList()
+        psiFile.classes.toList()
     }
     else null
 }

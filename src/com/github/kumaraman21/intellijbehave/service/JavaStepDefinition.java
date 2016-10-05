@@ -12,6 +12,7 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.SmartPointerManager;
 import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.psi.util.PsiTreeUtil;
+import com.rodrigodev.regex_testing.OptimizedStepMatcher;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
 import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;
@@ -87,7 +88,7 @@ public class JavaStepDefinition {
         return new Function<String, StepMatcher>() {
             @Override
             public StepMatcher apply(@Nullable String annotationText) {
-                return stepPatternParser.parseStep(annotationType, annotationText);
+                return new OptimizedStepMatcher(stepPatternParser.parseStep(annotationType, annotationText));
             }
         };
     }
@@ -133,10 +134,12 @@ public class JavaStepDefinition {
     public boolean equals(Object o) {
         if (this == o) {
             return true;
-        } else if (o != null && getClass() == o.getClass()) {
+        }
+        else if (o != null && getClass() == o.getClass()) {
             JavaStepDefinition that = (JavaStepDefinition) o;
             return myElementPointer.equals(that.myElementPointer);
-        } else {
+        }
+        else {
             return false;
         }
     }
