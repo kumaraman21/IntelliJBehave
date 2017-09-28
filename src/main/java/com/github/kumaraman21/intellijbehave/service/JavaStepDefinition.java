@@ -12,7 +12,6 @@ import com.intellij.psi.PsiMethod;
 import com.intellij.psi.SmartPointerManager;
 import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.psi.util.PsiTreeUtil;
-import com.rodrigodev.regex_testing.OptimizedStepMatcher;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
 import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;

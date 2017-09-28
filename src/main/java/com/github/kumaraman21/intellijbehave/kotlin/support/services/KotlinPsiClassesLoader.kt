@@ -2,8 +2,6 @@ package com.github.kumaraman21.intellijbehave.kotlin.support.services
 
 import com.intellij.psi.PsiClass
 import com.intellij.psi.PsiFile
-import org.jetbrains.kotlin.asJava.toLightClass
-import org.jetbrains.kotlin.psi.KtClass
 import org.jetbrains.kotlin.psi.KtFile
 
 /**

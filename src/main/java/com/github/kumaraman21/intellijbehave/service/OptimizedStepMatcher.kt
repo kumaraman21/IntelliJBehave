@@ -1,6 +1,6 @@
 @file:Suppress("NOTHING_TO_INLINE")
 
-package com.rodrigodev.regex_testing
+package com.github.kumaraman21.intellijbehave.service
 
 import org.jbehave.core.parsers.StepMatcher
 

@@ -20,6 +20,7 @@ file/
 
 
 # building
+/build/
 target/
 bin/
 test-output/
@@ -48,3 +49,10 @@ atlassian-ide-plugin.xml
 
 # Plugins
 /providedLib
+
+# Gradle
+.gradle
+
+# Other files
+/local.properties
+*.jar

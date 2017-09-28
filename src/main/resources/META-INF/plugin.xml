@@ -13,7 +13,7 @@
   ~ See the License for the specific language governing permissions and
   ~ limitations under the License.
   -->
-<idea-plugin version="2" url="https://github.com/witspirit/IntelliJBehave">
+<idea-plugin url="https://github.com/witspirit/IntelliJBehave">
     <name>JBehave Support</name>
     <id>jbehave-support-plugin</id>
     <description><![CDATA[
@@ -76,7 +76,7 @@
     <version>1.52</version>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
-    <idea-version since-build="133.0"/>
+    <idea-version since-build="145.258"/>
 
     <depends>com.intellij.modules.java</depends>
     <depends optional="true">org.jetbrains.kotlin</depends>

@@ -156,7 +156,6 @@ public class StoryLocalizedLexer_SamplesTest {
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.EXAMPLE_TYPE, "Examples:");
         advanceAndAssert(StoryTokenType.WHITE_SPACE);
-        advanceAndAssert(StoryTokenType.WHITE_SPACE);
         advanceAndAssert(StoryTokenType.TABLE_DELIM);
         advanceAndAssert(StoryTokenType.TABLE_CELL, "  login   ");
         advanceAndAssert(StoryTokenType.TABLE_DELIM);

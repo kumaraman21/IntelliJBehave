@@ -330,7 +330,7 @@ public class StoryLocalizedLexer extends LexerBase {
                 }
             }
             case IN_EXAMPLES:
-                if (consume(CRLF)) {
+                if (consume(c -> CRLF.accept(c) || SPACES.accept(c))) {
                     tokenType = StoryTokenType.WHITE_SPACE;
                 } else {
                     CharTree.Entry<JBKeyword> entry = charTree.lookup(buffer, position);
