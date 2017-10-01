@@ -20,6 +20,7 @@ import org.jbehave.core.steps.PatternVariantBuilder;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -55,7 +56,7 @@ public class JBehaveUtil {
     public static final Function<String, Set<String>> TO_A_SET_OF_PATTERNS = new Function<String, Set<String>>() {
         @Override
         public Set<String> apply(@Nullable String value) {
-            return new PatternVariantBuilder(value).allVariants();
+            return value != null ? new PatternVariantBuilder(value).allVariants() : Collections.EMPTY_SET;
         }
     };
     public static final ImmutableSet<String> JBEHAVE_ANNOTATIONS_SET =
