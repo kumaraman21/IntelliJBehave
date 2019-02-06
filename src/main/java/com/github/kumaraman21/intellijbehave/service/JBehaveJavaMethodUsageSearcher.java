@@ -20,8 +20,10 @@ import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.getTheBi
 import static com.intellij.openapi.util.text.StringUtil.isNotEmpty;
 
 public class JBehaveJavaMethodUsageSearcher extends QueryExecutorBase<PsiReference, SearchParameters> {
-    public void processQuery(@NotNull SearchParameters searchParameters, @NotNull Processor<PsiReference> consumer) {
-        final PsiMethod method = searchParameters.getMethod();
+
+    @Override
+    public void processQuery(@NotNull SearchParameters queryParameters, @NotNull Processor<? super PsiReference> consumer) {
+        final PsiMethod method = queryParameters.getMethod();
 
         List<String> stepTexts = ApplicationManager.getApplication().runReadAction(new Computable<List<String>>() {
             public List<String> compute() {
@@ -32,9 +34,9 @@ public class JBehaveJavaMethodUsageSearcher extends QueryExecutorBase<PsiReferen
         for (String stepText : stepTexts) {
             String word = getTheBiggestWordToSearchByIndex(stepText);
             if (isNotEmpty(word)) {
-                if (searchParameters.getScope() instanceof GlobalSearchScope) {
-                    GlobalSearchScope restrictedScope = GlobalSearchScope.getScopeRestrictedByFileTypes((GlobalSearchScope) searchParameters.getScope(), StoryFileType.STORY_FILE_TYPE);
-                    Query<PsiReference> query = ReferencesSearch.search(new ReferencesSearch.SearchParameters(method, restrictedScope, false, searchParameters.getOptimizer()));
+                if (queryParameters.getScope() instanceof GlobalSearchScope) {
+                    GlobalSearchScope restrictedScope = GlobalSearchScope.getScopeRestrictedByFileTypes((GlobalSearchScope) queryParameters.getScope(), StoryFileType.STORY_FILE_TYPE);
+                    Query<PsiReference> query = ReferencesSearch.search(new ReferencesSearch.SearchParameters(method, restrictedScope, false, queryParameters.getOptimizer()));
                     query.forEach(consumer);
                 }
             }

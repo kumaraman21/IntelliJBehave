@@ -56,3 +56,4 @@ atlassian-ide-plugin.xml
 # Other files
 /local.properties
 *.jar
+!gradle/wrapper/gradle-wrapper.jar

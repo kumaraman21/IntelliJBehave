@@ -212,7 +212,7 @@ public class JBehaveUtil {
         return -1;
     }
 
-    public static boolean findJBehaveReferencesToElement(@NotNull PsiElement stepDefinitionElement, @NotNull String stepText, @NotNull Processor<PsiReference> consumer, @NotNull final SearchScope effectiveSearchScope) {
+    public static boolean findJBehaveReferencesToElement(@NotNull PsiElement stepDefinitionElement, @NotNull String stepText, @NotNull Processor<? super PsiReference> consumer, @NotNull final SearchScope effectiveSearchScope) {
         String word = getTheBiggestWordToSearchByIndex(stepText);
 
         if (isEmptyOrSpaces(word)) {
@@ -284,9 +284,9 @@ public class JBehaveUtil {
         @NotNull
         private final PsiElement myElementToFind;
         @NotNull
-        private final Processor<PsiReference> myConsumer;
+        private final Processor<? super PsiReference> myConsumer;
 
-        private MyReferenceCheckingProcessor(@NotNull PsiElement elementToFind, @NotNull Processor<PsiReference> consumer) {
+        private MyReferenceCheckingProcessor(@NotNull PsiElement elementToFind, @NotNull Processor<? super PsiReference> consumer) {
             myElementToFind = elementToFind;
             myConsumer = consumer;
         }

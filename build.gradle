@@ -5,12 +5,12 @@ buildscript {
 }
 
 plugins {
-    id 'org.jetbrains.intellij' version '0.2.17'
-    id 'org.jetbrains.kotlin.jvm' version '1.1.50'
+    id 'org.jetbrains.intellij' version '0.4.2'
+    id 'org.jetbrains.kotlin.jvm' version '1.3.20'
 }
 
 ext {
-    kotlinVersion = '1.1.50'
+    kotlinVersion = '1.3.20'
     jBehaveVersion = '4.0.5'
     hamcrestVersion = '1.3'
     guavaVersion = '18.0'
@@ -27,10 +27,11 @@ repositories {
 apply plugin: 'java'
 apply plugin: 'kotlin'
 apply plugin: 'org.jetbrains.intellij'
+apply plugin: 'idea'
 
 intellij {
-    version '2016.1'
-    plugins = ['org.jetbrains.kotlin:1.0.4-release-IJ2016.1-112']
+    version '2018.3.4'
+    plugins = ['org.jetbrains.kotlin:1.3.20-release-IJ2018.3-1']
     pluginName 'JBehave Support'
     updateSinceUntilBuild false
 }

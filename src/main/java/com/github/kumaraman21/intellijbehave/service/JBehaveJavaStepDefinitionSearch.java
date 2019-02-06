@@ -1,5 +1,13 @@
 package com.github.kumaraman21.intellijbehave.service;
 
+import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.findJBehaveReferencesToElement;
+import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.getAnnotationTexts;
+import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.isStepDefinition;
+
+import java.util.List;
+
+import org.jetbrains.annotations.NotNull;
+
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
 import com.intellij.psi.PsiElement;
@@ -9,14 +17,11 @@ import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.searches.ReferencesSearch.SearchParameters;
 import com.intellij.util.Processor;
 import com.intellij.util.QueryExecutor;
-import org.jetbrains.annotations.NotNull;
-
-import java.util.List;
-
-import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.*;
 
 public class JBehaveJavaStepDefinitionSearch implements QueryExecutor<PsiReference, SearchParameters> {
-    public boolean execute(@NotNull final SearchParameters queryParameters, @NotNull Processor<PsiReference> consumer) {
+
+    @Override
+    public boolean execute(@NotNull SearchParameters queryParameters, @NotNull Processor<? super PsiReference> consumer) {
         PsiElement myElement = queryParameters.getElementToSearch();
 
         if (!(myElement instanceof PsiMethod)) {
