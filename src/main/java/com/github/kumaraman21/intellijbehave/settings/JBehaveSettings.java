@@ -22,12 +22,13 @@ import org.jetbrains.annotations.NotNull;
 @State(
         name = "JBehaveSettings",
         storages = {@Storage(
-                id = "main",
                 file = "$APP_CONFIG$/jbehave_settings.xml"
         )}
 )
 public class JBehaveSettings implements ApplicationComponent, PersistentStateComponent<JBehaveSettings> {
+
     private String storyRunner;
+    private boolean storyAutoCompletion;
 
     public static JBehaveSettings getInstance() {
         return ServiceManager.getService(JBehaveSettings.class);
@@ -49,6 +50,14 @@ public class JBehaveSettings implements ApplicationComponent, PersistentStateCom
 
     public void setStoryRunner(String storyRunner) {
         this.storyRunner = storyRunner;
+    }
+
+    public boolean isStoryAutoCompletion() {
+        return storyAutoCompletion;
+    }
+
+    public void setStoryAutoCompletion(boolean storyAutoCompletion) {
+        this.storyAutoCompletion = storyAutoCompletion;
     }
 
     @Override

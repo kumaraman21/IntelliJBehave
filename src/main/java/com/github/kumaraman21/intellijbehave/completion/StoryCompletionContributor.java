@@ -1,35 +1,45 @@
 package com.github.kumaraman21.intellijbehave.completion;
 
+import org.jbehave.core.i18n.LocalizedKeywords;
+import org.jbehave.core.steps.StepType;
+
 import com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType;
 import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
 import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionAnnotation;
 import com.github.kumaraman21.intellijbehave.resolver.StepDefinitionIterator;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
+import com.github.kumaraman21.intellijbehave.settings.JBehaveSettings;
 import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.github.kumaraman21.intellijbehave.utility.ParametrizedString;
 import com.github.kumaraman21.intellijbehave.utility.ScanUtils;
-import com.intellij.codeInsight.completion.*;
+import com.intellij.codeInsight.completion.CompletionContributor;
+import com.intellij.codeInsight.completion.CompletionParameters;
+import com.intellij.codeInsight.completion.CompletionResultSet;
+import com.intellij.codeInsight.completion.CompletionType;
+import com.intellij.codeInsight.completion.CompletionUtil;
+import com.intellij.codeInsight.completion.PrefixMatcher;
 import com.intellij.codeInsight.lookup.LookupElement;
 import com.intellij.codeInsight.lookup.LookupElementBuilder;
 import com.intellij.lang.ASTNode;
+import com.intellij.openapi.application.Application;
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.util.text.StringUtil;
 import com.intellij.psi.PsiAnnotation;
 import com.intellij.psi.PsiElement;
 import com.intellij.util.Consumer;
-import org.jbehave.core.i18n.LocalizedKeywords;
-import org.jbehave.core.steps.StepType;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class StoryCompletionContributor extends CompletionContributor {
+
     public StoryCompletionContributor() {
     }
 
     @Override
     public void fillCompletionVariants(CompletionParameters parameters, final CompletionResultSet _result) {
-        if (parameters.getCompletionType() == CompletionType.BASIC) {
+        if (parameters.getCompletionType() == CompletionType.BASIC && getIsStoryAutoCompletion()) {
             String prefix = CompletionUtil.findReferenceOrAlphanumericPrefix(parameters);
             CompletionResultSet result = _result.withPrefixMatcher(prefix);
 
@@ -42,6 +52,13 @@ public class StoryCompletionContributor extends CompletionContributor {
                     consumer,
                     keywords);
         }
+    }
+
+    private boolean getIsStoryAutoCompletion() {
+        Application application = ApplicationManager.getApplication();
+        JBehaveSettings component = application.getComponent(JBehaveSettings.class);
+
+        return component.isStoryAutoCompletion();
     }
 
     private LocalizedKeywords lookupLocalizedKeywords(CompletionParameters parameters) {

@@ -35,6 +35,7 @@ import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Objects;
 
 public class JBehaveSettingsPanel {
 
@@ -43,6 +44,7 @@ public class JBehaveSettingsPanel {
     private JPanel contentPane;
     private JLabel storyRunnerLabel;
     private TextFieldWithBrowseButton storyRunnerField;
+    private JCheckBox enableCodeCompletionInCheckBox;
 
     private JBehaveSettings jBehaveSettings;
 
@@ -53,14 +55,18 @@ public class JBehaveSettingsPanel {
 
     public void apply() {
         jBehaveSettings.setStoryRunner(storyRunnerField.getText());
+        jBehaveSettings.setStoryAutoCompletion(enableCodeCompletionInCheckBox.isSelected());
     }
 
     public void reset() {
         storyRunnerField.setText(jBehaveSettings.getStoryRunner());
+        enableCodeCompletionInCheckBox.setSelected(jBehaveSettings.isStoryAutoCompletion());
     }
 
     public boolean isModified() {
-        return !storyRunnerField.getText().equals(jBehaveSettings.getStoryRunner());
+	    boolean storyRunnerChanged = !storyRunnerField.getText().equals(jBehaveSettings.getStoryRunner());
+	    boolean storyCodeCompletionChanged = !Objects.equals(enableCodeCompletionInCheckBox.isSelected(), jBehaveSettings.isStoryAutoCompletion());
+	    return storyRunnerChanged || storyCodeCompletionChanged;
     }
 
     {
