@@ -1,5 +1,22 @@
 package com.github.kumaraman21.intellijbehave.service;
 
+import static com.google.common.collect.FluentIterable.from;
+import static com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces;
+import static java.util.Arrays.asList;
+
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import org.jbehave.core.annotations.Alias;
+import org.jbehave.core.annotations.Aliases;
+import org.jbehave.core.annotations.Given;
+import org.jbehave.core.annotations.Then;
+import org.jbehave.core.annotations.When;
+import org.jbehave.core.steps.PatternVariantBuilder;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+
 import com.github.kumaraman21.intellijbehave.language.StoryFileType;
 import com.google.common.base.Function;
 import com.google.common.base.Objects;
@@ -8,25 +25,20 @@ import com.google.common.collect.ImmutableSet;
 import com.intellij.codeInsight.AnnotationUtil;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.util.Computable;
-import com.intellij.psi.*;
+import com.intellij.psi.JavaPsiFacade;
+import com.intellij.psi.PsiAnnotation;
+import com.intellij.psi.PsiAnnotationMemberValue;
+import com.intellij.psi.PsiArrayInitializerMemberValue;
+import com.intellij.psi.PsiConstantEvaluationHelper;
+import com.intellij.psi.PsiElement;
+import com.intellij.psi.PsiMethod;
+import com.intellij.psi.PsiReference;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.search.PsiSearchHelper;
 import com.intellij.psi.search.SearchScope;
 import com.intellij.psi.search.TextOccurenceProcessor;
 import com.intellij.psi.util.PsiTreeUtil;
 import com.intellij.util.Processor;
-import org.jbehave.core.annotations.*;
-import org.jbehave.core.steps.PatternVariantBuilder;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-
-import static com.google.common.collect.FluentIterable.from;
-import static com.intellij.openapi.util.text.StringUtil.isEmptyOrSpaces;
-import static java.util.Arrays.asList;
 
 public class JBehaveUtil {
     public static final Predicate<PsiAnnotation> JBEHAVE_STEPS_ANNOTATIONS = new Predicate<PsiAnnotation>() {
@@ -171,7 +183,13 @@ public class JBehaveUtil {
 
     @NotNull
     private static Set<String> getAliasesAnnotationTexts(@NotNull PsiAnnotation aliasAnnotation) {
-        final PsiArrayInitializerMemberValue attrValue = (PsiArrayInitializerMemberValue) aliasAnnotation.findAttributeValue("values");
+        PsiAnnotationMemberValue values = aliasAnnotation.findAttributeValue("values");
+
+        if (!(values instanceof PsiArrayInitializerMemberValue)) {
+            return ImmutableSet.of();
+        }
+
+        final PsiArrayInitializerMemberValue attrValue = (PsiArrayInitializerMemberValue) values;
 
         if (attrValue == null) {
             return ImmutableSet.of();
