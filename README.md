@@ -12,6 +12,8 @@ Most of the original code has been retained, but several improvements have been 
 * https://github.com/jarosite
 * https://github.com/Arnauld
 * https://github.com/harley84
+* https://github.com/RodrigoQuesadaDev
+* https://github.com/JenoDK
     
 Features
 --------
@@ -28,3 +30,17 @@ Known limitations
 -----------------
 * Searches complete module classpath, no configuration available to limit scope
 * Does not take into account any custom JBehave configuration
+
+Contribute
+--------
+* Setup:
+```
+git clone <URL>
+./gradlew idea
+```
+In IntelliJ just 'Open' that folder and everything should be ready.
+* Run:
+```
+./gradlew runIde
+```
+You can do this from whitin IntelliJ if you enable gradle on the project.
