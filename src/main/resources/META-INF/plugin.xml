@@ -17,30 +17,6 @@
     <name>JBehave Support</name>
     <id>jbehave-support-plugin</id>
     <description><![CDATA[
-    <h1>IntelliJ IDEA Plugin for JBehave</h1>
-    <p>
-    This plugin provides some support for JBehave. <br/>
-    It is a fork of IntelliJBehave, originally created by Aman Kumar. <br/>
-    See <a href="https://github.com/kumaraman21/IntelliJBehave/wiki">https://github.com/kumaraman21/IntelliJBehave/wiki</a>
-    <br/>
-
-    Most of the original code has been retained, but several improvements have been incorporated by various contributors:
-    <ul>
-        <li><a href="https://github.com/jarosite">https://github.com/jarosite</a></li>
-        <li><a href="https://github.com/Arnauld">https://github.com/Arnauld</a></li>
-        <li><a href="https://github.com/harley84">https://github.com/harley84</a></li>
-        <li><a href="https://github.com/dmalch">https://github.com/dmalch</a></li>
-    </ul>
-    And <a href="https://github.com/witspirit/IntelliJBehave/graphs/contributors">others</a>.
-    </p>
-
-    <p>
-        JBehave icon comes from
-        <a href="https://github.com/jbehave/jbehave-eclipse/blob/master/org.jbehave.eclipse/icons/bdd-jb-orange-red-green.png">
-            https://github.com/jbehave/jbehave-eclipse/blob/master/org.jbehave.eclipse/icons/bdd-jb-orange-red-green.png
-        </a>.
-    </p>
-
     <p>
     The plugin provides the following features:
     </p>
@@ -72,8 +48,8 @@
         <li>Inspections speed has been increased</li>
         <li>JBehave icon has been updated</li>
     </ul>
+    <p>See <a href="https://github.com/witspirit/IntelliJBehave">the github</a> for more info</p>
   ]]></description>
-    <version>1.52</version>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
     <idea-version since-build="145.258"/>

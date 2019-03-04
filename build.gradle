@@ -50,3 +50,12 @@ dependencies {
     testCompile "org.easytesting:fest-assert-core:$easyTestingAssertCoreVersion"
     testCompile "org.mockito:mockito-all:$mockitoVersion"
 }
+
+patchPluginXml {
+    version '1.53'
+    changeNotes """
+      Some small bug fixes to prevent errors"""
+}
+publishPlugin {
+    token intellijPublishToken
+}

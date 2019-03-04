@@ -51,7 +51,8 @@ atlassian-ide-plugin.xml
 /providedLib
 
 # Gradle
-.gradle
+.gradle/
+gradle.properties
 
 # Other files
 /local.properties
