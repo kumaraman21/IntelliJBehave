@@ -20,12 +20,10 @@ import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
 
 @State(
-        name = "JBehaveSettings",
-        storages = {@Storage(
-                file = "$APP_CONFIG$/jbehave_settings.xml"
-        )}
+    name = "JBehaveSettings",
+    storages = @Storage("$APP_CONFIG$/jbehave_settings.xml")
 )
-public class JBehaveSettings implements ApplicationComponent, PersistentStateComponent<JBehaveSettings> {
+public class JBehaveSettings implements PersistentStateComponent<JBehaveSettings> {
 
     private String storyRunner;
     private boolean storyAutoCompletion;
@@ -40,7 +38,7 @@ public class JBehaveSettings implements ApplicationComponent, PersistentStateCom
     }
 
     @Override
-    public void loadState(JBehaveSettings jBehaveSettings) {
+    public void loadState(@NotNull JBehaveSettings jBehaveSettings) {
         XmlSerializerUtil.copyBean(jBehaveSettings, this);
     }
 
@@ -58,21 +56,5 @@ public class JBehaveSettings implements ApplicationComponent, PersistentStateCom
 
     public void setStoryAutoCompletion(boolean storyAutoCompletion) {
         this.storyAutoCompletion = storyAutoCompletion;
-    }
-
-    @Override
-    public void initComponent() {
-
-    }
-
-    @Override
-    public void disposeComponent() {
-
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return "JBehaveSettings";
     }
 }

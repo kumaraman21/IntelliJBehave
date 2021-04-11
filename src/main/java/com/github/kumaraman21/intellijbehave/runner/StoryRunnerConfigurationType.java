@@ -15,14 +15,17 @@
  */
 package com.github.kumaraman21.intellijbehave.runner;
 
+import com.github.kumaraman21.intellijbehave.language.JBehaveIcons;
 import com.intellij.execution.application.ApplicationConfigurationType;
-import com.intellij.openapi.components.ApplicationComponent;
 import org.jetbrains.annotations.NotNull;
 
-public class StoryRunnerConfigurationType extends ApplicationConfigurationType implements ApplicationComponent {
+import javax.swing.Icon;
+
+public class StoryRunnerConfigurationType extends ApplicationConfigurationType {
 
     public static final String JBEHAVE_STORY_RUNNER = "JBehave Story Runner";
 
+    @NotNull
     @Override
     public String getDisplayName() {
         return JBEHAVE_STORY_RUNNER;
@@ -40,18 +43,7 @@ public class StoryRunnerConfigurationType extends ApplicationConfigurationType i
     }
 
     @Override
-    public void initComponent() {
-
-    }
-
-    @Override
-    public void disposeComponent() {
-
-    }
-
-    @NotNull
-    @Override
-    public String getComponentName() {
-        return getId();
+    public Icon getIcon() {
+        return JBehaveIcons.JB;
     }
 }
