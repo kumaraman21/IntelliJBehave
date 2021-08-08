@@ -74,12 +74,7 @@ public class StoryCompletionContributor extends CompletionContributor {
     }
 
     private static Consumer<LookupElement> newConsumer(final CompletionResultSet result) {
-        return new Consumer<LookupElement>() {
-            @Override
-            public void consume(LookupElement element) {
-                result.addElement(element);
-            }
-        };
+        return element -> result.addElement(element);
     }
 
     private static void addAllKeywords(PrefixMatcher prefixMatcher,

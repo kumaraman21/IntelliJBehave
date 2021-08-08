@@ -10,6 +10,7 @@ import com.intellij.openapi.project.Project;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
 import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.impl.DebugUtil;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
 import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
@@ -18,7 +19,7 @@ import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class IntelliJBehaveBaseTestCase extends LightPlatformCodeInsightFixtureTestCase {
+public class IntelliJBehaveBaseTestCase extends BasePlatformTestCase {
 
     private Project myProject;
     protected IdeaProjectTestFixture myFixture;

@@ -5,17 +5,23 @@ buildscript {
 }
 
 plugins {
-    id 'org.jetbrains.intellij' version '0.4.21'
-    id 'org.jetbrains.kotlin.jvm' version '1.3.72'
+    id "org.jetbrains.intellij" version "1.1.4"
+    //https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
+    id "org.jetbrains.kotlin.jvm" version "1.4.32"
 }
 
 ext {
-    kotlinVersion = '1.3.72'
+    kotlinVersion = '1.4.32'
     jBehaveVersion = '4.0.5'
     guavaVersion = '28.1-jre'
     jUnitVersion = '4.13'
     assertJVersion = '3.14.0'
     mockitoVersion = '3.2.4'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_11
+    targetCompatibility = JavaVersion.VERSION_11
 }
 
 repositories {
@@ -28,30 +34,35 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'idea'
 
 intellij {
-    version '2020.1'
-    plugins = ['org.jetbrains.kotlin:1.3.72-release-IJ2020.1-5', 'java']
-    pluginName 'JBehave Support'
-    updateSinceUntilBuild false
+    version = '2021.1'
+    //https://plugins.jetbrains.com/plugin/6954-kotlin/versions/stable
+    plugins = ['org.jetbrains.kotlin:211-1.4.32-release-IJ6693.72', 'java']
+    pluginName = 'JBehave Support'
+    updateSinceUntilBuild = false
 }
 
 wrapper {
-    gradleVersion '6.1.1'
+    gradleVersion '7.1.1'
 }
 
 dependencies {
-    compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
-    compile "org.jbehave:jbehave-core:$jBehaveVersion"
-    compile "com.google.guava:guava:$guavaVersion"
-    testCompile "junit:junit:$jUnitVersion"
-    testCompile "org.assertj:assertj-core:$assertJVersion"
-    testCompile "org.mockito:mockito-core:$mockitoVersion"
+    implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlinVersion"
+    implementation "org.jbehave:jbehave-core:$jBehaveVersion"
+    implementation "com.google.guava:guava:$guavaVersion"
+    testImplementation "junit:junit:$jUnitVersion"
+    testImplementation "org.assertj:assertj-core:$assertJVersion"
+    testImplementation "org.mockito:mockito-core:$mockitoVersion"
 }
 
 patchPluginXml {
-    version '1.53'
-    changeNotes """
-      Some small bug fixes to prevent errors"""
+    version = provider { '1.54' }
+    changeNotes = provider { """<h4>1.54</h4><ul><li>Upgraded plugin to work with IJ-2021.2.</li><li>Fixed spellchecking support for .story files.</li></ul>""" }
 }
-publishPlugin {
-    token intellijPublishToken
-}
+
+//runPluginVerifier {
+//    ideVersions = ['IC-2021.1']
+//}
+
+//publishPlugin {
+//    token intellijPublishToken
+//}

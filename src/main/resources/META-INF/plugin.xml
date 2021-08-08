@@ -39,20 +39,11 @@
         <li>Does not take into account any custom JBehave configuration</li>
     </ul>
 
-    <h2>Release notes:</h2>
-    <p>
-        New in version 1.5:
-    </p>
-    <ul>
-        <li>Ability to find usages of a step method</li>
-        <li>Inspections speed has been increased</li>
-        <li>JBehave icon has been updated</li>
-    </ul>
     <p>See <a href="https://github.com/witspirit/IntelliJBehave">the github</a> for more info</p>
   ]]></description>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
-    <idea-version since-build="201"/>
+    <idea-version since-build="211"/>
 
     <depends>com.intellij.modules.java</depends>
     <depends optional="true">org.jetbrains.kotlin</depends>
@@ -101,8 +92,7 @@
         <psi.referenceContributor
                 implementation="com.github.kumaraman21.intellijbehave.resolver.StepPsiReferenceContributor"/>
 
-        <projectService serviceInterface="com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex"
-                        serviceImplementation="com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex"/>
+        <projectService serviceImplementation="com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex"/>
         <applicationService serviceImplementation="com.github.kumaraman21.intellijbehave.settings.JBehaveSettings" />
         <applicationService serviceImplementation="com.github.kumaraman21.intellijbehave.runner.StoryRunnerConfigurationType" />
         <!--This Run Configuration type is registered explicitly because otherwise after running a story (run config created),

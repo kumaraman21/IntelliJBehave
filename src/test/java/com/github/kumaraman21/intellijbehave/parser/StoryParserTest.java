@@ -14,7 +14,7 @@ import static org.mockito.Mockito.mock;
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  * @see IntelliJBehaveBaseTestCase
  */
-@Ignore("... need a full plateform initialization!?!")
+@Ignore("... need a full platform initialization!?!")
 public class StoryParserTest {
 
     @Test

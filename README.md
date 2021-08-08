@@ -1,6 +1,8 @@
 JBehave Support for IntelliJ IDEA
 =================================
 
+![JBehave Support](https://img.shields.io/jetbrains/plugin/v/7268-jbehave-support)
+
 IntelliJ IDEA Plugin for JBehave
 
 This plugin provides some support for JBehave.
@@ -25,6 +27,7 @@ The plugin provides the following features:
 * Comment/uncomment lines in story files
 * Code inspections to report unused steps definitions and undefined step usages
 * Run *.story files
+* Spellchecking in .story files
 
 Known limitations
 -----------------
@@ -43,4 +46,4 @@ In IntelliJ just 'Open' that folder and everything should be ready.
 ```
 ./gradlew runIde
 ```
-You can do this from whitin IntelliJ if you enable gradle on the project.
+You can do this from within IntelliJ if you enable gradle on the project.

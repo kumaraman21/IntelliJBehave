@@ -1,6 +1,7 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
 import com.intellij.psi.tree.IElementType;
+import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase4;
 import org.junit.Ignore;
 import org.junit.Test;
 
@@ -11,7 +12,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class StoryLexerTest {
+public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
 
     private StoryLexer storyLexer;
 
