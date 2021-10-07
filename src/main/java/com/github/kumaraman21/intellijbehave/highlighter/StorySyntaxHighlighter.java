@@ -15,10 +15,10 @@
  */
 package com.github.kumaraman21.intellijbehave.highlighter;
 
+import com.intellij.ide.highlighter.JavaHighlightingColors;
 import com.intellij.lexer.Lexer;
 import com.intellij.openapi.editor.DefaultLanguageHighlighterColors;
 import com.intellij.openapi.editor.HighlighterColors;
-import com.intellij.openapi.editor.colors.CodeInsightColors;
 import com.intellij.openapi.editor.colors.TextAttributesKey;
 import com.intellij.openapi.fileTypes.SyntaxHighlighterBase;
 import com.intellij.psi.tree.IElementType;
@@ -74,8 +74,8 @@ public class StorySyntaxHighlighter extends SyntaxHighlighterBase {
     // Registering TextAttributes
     static {
         createKey(STORY_DESCRIPTION_ID, DefaultLanguageHighlighterColors.NUMBER);
-        createKey(SCENARIO_TYPE_ID, CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
-        createKey(SCENARIO_TEXT_ID, CodeInsightColors.STATIC_FIELD_ATTRIBUTES);
+        createKey(SCENARIO_TYPE_ID, JavaHighlightingColors.STATIC_FIELD_ATTRIBUTES);
+        createKey(SCENARIO_TEXT_ID, JavaHighlightingColors.STATIC_FIELD_ATTRIBUTES);
         createKey(STEP_TYPE_ID, DefaultLanguageHighlighterColors.KEYWORD);
         createKey(STEP_TEXT_ID, HighlighterColors.TEXT);
         createKey(TABLE_DELIM_ID, DefaultLanguageHighlighterColors.BRACES);

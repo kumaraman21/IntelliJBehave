@@ -55,7 +55,7 @@ public class CreateStoryAction extends CreateElementActionBase {
   @NotNull
   @Override
   protected PsiElement[] create(@NotNull String newName, PsiDirectory directory) throws Exception {
-    final FileTemplate template = FileTemplateManager.getInstance().getTemplate(STORY_FILE_TYPE.getName());
+    final FileTemplate template = FileTemplateManager.getDefaultInstance().getTemplate(STORY_FILE_TYPE.getName());
 
     String fileName = getFileName(newName);
     Project project = directory.getProject();

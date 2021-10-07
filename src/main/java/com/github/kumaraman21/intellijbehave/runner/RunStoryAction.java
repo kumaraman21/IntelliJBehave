@@ -23,6 +23,7 @@ import com.intellij.execution.impl.RunManagerImpl;
 import com.intellij.execution.impl.RunnerAndConfigurationSettingsImpl;
 import com.intellij.execution.runners.ExecutionEnvironment;
 import com.intellij.execution.runners.ProgramRunner;
+import com.intellij.execution.util.ExecutionErrorDialog;
 import com.intellij.openapi.actionSystem.AnAction;
 import com.intellij.openapi.actionSystem.AnActionEvent;
 import com.intellij.openapi.actionSystem.PlatformDataKeys;
@@ -112,7 +113,7 @@ public class RunStoryAction extends AnAction {
         try {
             runner.execute(environment);
         } catch (ExecutionException e1) {
-            JavaExecutionUtil.showExecutionErrorMessage(e1, "Error", project);
+            ExecutionErrorDialog.show(e1, "Error", project);
         }
     }
 

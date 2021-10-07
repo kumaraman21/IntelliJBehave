@@ -4,8 +4,8 @@ import com.github.kumaraman21.intellijbehave.utility.CharTree;
 import com.github.kumaraman21.intellijbehave.utility.JBKeyword;
 import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.intellij.lexer.LexerBase;
+import com.intellij.openapi.util.text.Strings;
 import com.intellij.psi.tree.IElementType;
-import com.intellij.util.ArrayUtil;
 import org.jbehave.core.i18n.LocalizedKeywords;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,7 +33,7 @@ public class StoryLocalizedLexer extends LexerBase {
     //
     private LocalizedKeywords keywords;
     private CharTree<JBKeyword> charTree;
-    private CharSequence buffer = ArrayUtil.EMPTY_CHAR_SEQUENCE;
+    private CharSequence buffer = Strings.EMPTY_CHAR_SEQUENCE ;
     //private int startOffset;
     private int endOffset;
     private State state = State.YYINITIAL;
