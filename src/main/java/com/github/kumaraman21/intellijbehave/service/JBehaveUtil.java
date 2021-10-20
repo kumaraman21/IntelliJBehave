@@ -243,7 +243,7 @@ public class JBehaveUtil {
             }
         });
 
-        PsiSearchHelper instance = PsiSearchHelper.SERVICE.getInstance(stepDefinitionElement.getProject());
+        PsiSearchHelper instance = PsiSearchHelper.getInstance(stepDefinitionElement.getProject());
         return instance.processElementsWithWord(new MyReferenceCheckingProcessor(stepDefinitionElement, consumer), searchScope, word, (short) 5, true);
     }
 

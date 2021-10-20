@@ -20,7 +20,7 @@ import com.intellij.ide.DataManager;
 import com.intellij.ide.util.ClassFilter;
 import com.intellij.ide.util.TreeJavaClassChooserDialog;
 import com.intellij.openapi.actionSystem.DataContext;
-import com.intellij.openapi.actionSystem.DataKeys;
+import com.intellij.openapi.actionSystem.LangDataKeys;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.TextFieldWithBrowseButton;
 import com.intellij.psi.JavaPsiFacade;
@@ -114,7 +114,7 @@ public class JBehaveSettingsPanel {
 
         public void actionPerformed(ActionEvent e) {
             DataContext dataContext = DataManager.getInstance().getDataContext(JBehaveSettingsPanel.this.contentPane);
-            Project project = DataKeys.PROJECT.getData(dataContext);
+            Project project = LangDataKeys.PROJECT.getData(dataContext);
 
             // TODO: display error message if project is null
 

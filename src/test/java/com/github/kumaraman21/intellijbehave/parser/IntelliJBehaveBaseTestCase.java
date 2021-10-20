@@ -2,6 +2,7 @@ package com.github.kumaraman21.intellijbehave.parser;
 
 import com.github.kumaraman21.intellijbehave.Samples;
 import com.github.kumaraman21.intellijbehave.highlighter.StoryLexerFactory;
+import com.intellij.application.options.CodeStyle;
 import com.intellij.lang.ASTNode;
 import com.intellij.lang.PsiBuilder;
 import com.intellij.lang.impl.PsiBuilderImpl;
@@ -30,7 +31,7 @@ public class IntelliJBehaveBaseTestCase extends BasePlatformTestCase {
     }
 
     protected CodeStyleSettings getSettings() {
-        return CodeStyleSettingsManager.getSettings(myProject);
+        return CodeStyle.getSettings(myProject);
     }
 
 //    protected void setSettings() {

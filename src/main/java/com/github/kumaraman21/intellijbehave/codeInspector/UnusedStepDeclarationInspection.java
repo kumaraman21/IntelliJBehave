@@ -19,7 +19,7 @@ import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
 import com.github.kumaraman21.intellijbehave.parser.StoryFile;
 import com.github.kumaraman21.intellijbehave.resolver.StepPsiReference;
 import com.github.kumaraman21.intellijbehave.service.JavaStepDefinition;
-import com.intellij.codeInspection.BaseJavaLocalInspectionTool;
+import com.intellij.codeInspection.AbstractBaseJavaLocalInspectionTool;
 import com.intellij.codeInspection.ProblemsHolder;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
@@ -36,7 +36,7 @@ import java.util.Set;
 import static com.github.kumaraman21.intellijbehave.service.JBehaveUtil.isStepDefinition;
 import static com.google.common.collect.Sets.newHashSet;
 
-public class UnusedStepDeclarationInspection extends BaseJavaLocalInspectionTool {
+public class UnusedStepDeclarationInspection extends AbstractBaseJavaLocalInspectionTool {
     @NotNull
     @Override
     public String getShortName() {
