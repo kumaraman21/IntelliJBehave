@@ -48,7 +48,7 @@ public class StoryAnnotator implements Annotator {
         if (definition == null) {
             annotationHolder.newAnnotation(HighlightSeverity.ERROR, "No definition found for the step")
                     .range(psiElement)
-                    .createAnnotation();
+                    .create();
         } else {
             annotateParameters(step, definition, annotationHolder);
         }
@@ -65,7 +65,7 @@ public class StoryAnnotator implements Annotator {
             if (token.isIdentifier()) {
                 annotationHolder.newAnnotation(HighlightSeverity.INFORMATION, "Parameter")
                         .range(TextRange.from(offset, length))
-                        .createAnnotation();
+                        .create();
             }
             offset += length;
         }
