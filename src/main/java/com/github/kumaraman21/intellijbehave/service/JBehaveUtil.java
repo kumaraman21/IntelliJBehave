@@ -60,12 +60,7 @@ public class JBehaveUtil {
 
     @Nullable
     private static String getAnnotationName(@NotNull final PsiAnnotation annotation) {
-        return ApplicationManager.getApplication().runReadAction(new Computable<String>() {
-            @Override
-            public String compute() {
-                return annotation.getQualifiedName();
-            }
-        });
+        return ApplicationManager.getApplication().runReadAction((Computable<String>) () -> annotation.getQualifiedName());
     }
 
     @NotNull
@@ -170,25 +165,19 @@ public class JBehaveUtil {
             return true;
         }
 
-        SearchScope searchScope = restrictScopeToJBehaveFiles(new Computable<SearchScope>() {
-            public SearchScope compute() {
-                return effectiveSearchScope;
-            }
-        });
+        SearchScope searchScope = restrictScopeToJBehaveFiles(() -> effectiveSearchScope);
 
         PsiSearchHelper instance = PsiSearchHelper.getInstance(stepDefinitionElement.getProject());
         return instance.processElementsWithWord(new MyReferenceCheckingProcessor(stepDefinitionElement, consumer), searchScope, word, (short) 5, true);
     }
 
     public static SearchScope restrictScopeToJBehaveFiles(final Computable<SearchScope> originalScopeComputation) {
-        return (SearchScope) ApplicationManager.getApplication().runReadAction(new Computable() {
-            public SearchScope compute() {
-                SearchScope originalScope = originalScopeComputation.compute();
-                if (originalScope instanceof GlobalSearchScope) {
-                    return GlobalSearchScope.getScopeRestrictedByFileTypes((GlobalSearchScope) originalScope, StoryFileType.STORY_FILE_TYPE);
-                } else {
-                    return originalScope;
-                }
+        return (SearchScope) ApplicationManager.getApplication().runReadAction((Computable<SearchScope>) () -> {
+            SearchScope originalScope = originalScopeComputation.compute();
+            if (originalScope instanceof GlobalSearchScope) {
+                return GlobalSearchScope.getScopeRestrictedByFileTypes((GlobalSearchScope) originalScope, StoryFileType.STORY_FILE_TYPE);
+            } else {
+                return originalScope;
             }
         });
     }

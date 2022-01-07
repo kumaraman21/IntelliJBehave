@@ -44,13 +44,12 @@ public class StoryCompletionContributor extends CompletionContributor {
             CompletionResultSet result = _result.withPrefixMatcher(prefix);
 
             LocalizedKeywords keywords = lookupLocalizedKeywords(parameters);
-            Consumer<LookupElement> consumer = newConsumer(_result);
 
-            addAllKeywords(result.getPrefixMatcher(), consumer, keywords);
+            addAllKeywords(result.getPrefixMatcher(), result::addElement, keywords);
             addAllSteps(parameters,
-                    result.getPrefixMatcher(),
-                    consumer,
-                    keywords);
+                result.getPrefixMatcher(),
+                result::addElement,
+                keywords);
         }
     }
 
@@ -71,10 +70,6 @@ public class StoryCompletionContributor extends CompletionContributor {
             }
         }
         return new LocalizedStorySupport().getKeywords(locale);
-    }
-
-    private static Consumer<LookupElement> newConsumer(final CompletionResultSet result) {
-        return element -> result.addElement(element);
     }
 
     private static void addAllKeywords(PrefixMatcher prefixMatcher,
@@ -119,20 +114,20 @@ public class StoryCompletionContributor extends CompletionContributor {
         // suggest only if at least the actualStepPrefix is complete
         if (isStepTypeComplete(keywords, textBeforeCaret)) {
             StepSuggester stepAnnotationFinder = new StepSuggester(prefixMatcher,
-                    stepType,
-                    actualStepPrefix,
-                    textBeforeCaret,
-                    consumer,
-                    step.getProject());
+                stepType,
+                actualStepPrefix,
+                textBeforeCaret,
+                consumer,
+                step.getProject());
             ScanUtils.iterateInContextOf(step, stepAnnotationFinder);
         }
     }
 
     private static boolean isStepTypeComplete(LocalizedKeywords keywords, String input) {
         return input.startsWith(keywords.given())
-                || input.startsWith(keywords.when())
-                || input.startsWith(keywords.then())
-                || input.startsWith(keywords.and());
+            || input.startsWith(keywords.when())
+            || input.startsWith(keywords.then())
+            || input.startsWith(keywords.and());
     }
 
     private static JBehaveStep getStepPsiElement(CompletionParameters parameters) {

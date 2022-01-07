@@ -30,27 +30,14 @@ public class JBehaveJavaStepDefinitionSearch implements QueryExecutor<PsiReferen
 
         final PsiMethod method = (PsiMethod) myElement;
 
-        Boolean isStepDefinition = ApplicationManager.getApplication().runReadAction(new Computable<Boolean>() {
-            public Boolean compute() {
-                return isStepDefinition(method);
-            }
-        });
+        Boolean isStepDefinition = ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isStepDefinition(method));
 
         if (!isStepDefinition) {
             return true;
         }
 
-        List<String> stepTexts = ApplicationManager.getApplication().runReadAction(new Computable<List<String>>() {
-            public List<String> compute() {
-                return getAnnotationTexts(method);
-            }
-        });
-
-        SearchScope searchScope = ApplicationManager.getApplication().runReadAction(new Computable<SearchScope>() {
-            public SearchScope compute() {
-                return queryParameters.getEffectiveSearchScope();
-            }
-        });
+        List<String> stepTexts = ApplicationManager.getApplication().runReadAction((Computable<List<String>>) () -> getAnnotationTexts(method));
+        SearchScope searchScope = ApplicationManager.getApplication().runReadAction((Computable<SearchScope>) queryParameters::getEffectiveSearchScope);
 
         boolean result = true;
 

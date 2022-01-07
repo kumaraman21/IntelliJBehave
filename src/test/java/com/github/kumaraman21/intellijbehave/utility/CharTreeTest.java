@@ -17,7 +17,7 @@ public class CharTreeTest {
     @Before
     public void setUp () {
         LocalizedKeywords keywords = new LocalizedKeywords();
-        charTree = new CharTree<JBKeyword>('/', null);
+        charTree = new CharTree<>('/', null);
         for (JBKeyword kw : JBKeyword.values()) {
             String asString = kw.asString(keywords);
             charTree.push(asString, kw);
@@ -26,6 +26,6 @@ public class CharTreeTest {
 
     @Test
     public void narrative_doubleDot() {
-        assertThat(charTree.lookup("Narrative: \n", 0)).isEqualTo(new CharTree.Entry<JBKeyword>(Narrative, 10));
+        assertThat(charTree.lookup("Narrative: \n", 0)).isEqualTo(new CharTree.Entry<>(Narrative, 10));
     }
 }

@@ -15,7 +15,7 @@ public class ParametrizedString {
         return Pattern.compile("(\\" + parameterPrefix + "\\w*)(\\W|\\Z)", Pattern.DOTALL);
     }
 
-    private List<Token> tokens = new ArrayList<Token>();
+    private List<Token> tokens = new ArrayList<>();
     private final String content;
     private final String parameterPrefix;
 
@@ -153,7 +153,7 @@ public class ParametrizedString {
 
     public List<StringToken> tokenize(String stepInput) {
 
-        List<StringToken> stringTokens = new ArrayList<StringToken>();
+        List<StringToken> stringTokens = new ArrayList<>();
 
         WeightChain chain = calculateWeightChain(stepInput);
         List<String> inputTokens = chain.tokenize();
@@ -296,7 +296,7 @@ public class ParametrizedString {
         }
 
         public List<String> tokenize() {
-            List<String> parts = new ArrayList<String>();
+            List<String> parts = new ArrayList<>();
             if (isZero()) {
                 return parts;
             }

@@ -98,12 +98,7 @@ public class JavaStepDefinition {
             return null;
         }
 
-        String qualifiedName = ApplicationManager.getApplication().runReadAction(new Computable<String>() {
-            public String compute() {
-                return element.getQualifiedName();
-            }
-        });
-
+        String qualifiedName = ApplicationManager.getApplication().runReadAction((Computable<String>) element::getQualifiedName);
         return ANNOTATION_TO_STEP_TYPE_MAPPING.get(qualifiedName);
     }
 
@@ -111,11 +106,7 @@ public class JavaStepDefinition {
     public Integer getAnnotationPriority() {
         PsiAnnotation element = getAnnotation();
 
-        if (element == null) {
-            return -1;
-        }
-
-        return JBehaveUtil.getAnnotationPriority(element);
+        return element != null ? JBehaveUtil.getAnnotationPriority(element) : -1;  
     }
 
     public boolean equals(Object o) {

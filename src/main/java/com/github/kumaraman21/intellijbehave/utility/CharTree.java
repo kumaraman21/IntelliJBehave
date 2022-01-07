@@ -6,12 +6,13 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
 public class CharTree<T> {
-    private Map<Integer, CharTree<T>> children = new HashMap<Integer, CharTree<T>>();
+    private final Map<Integer, CharTree<T>> children = new HashMap<>();
     private final int key;
     private T value;
 
@@ -47,24 +48,20 @@ public class CharTree<T> {
                 found = ct.value;
             }
         }
-        return new Entry<T>(found, i - offset);
+        return new Entry<>(found, i - offset);
     }
 
     public void print(int level) {
-        StringBuilder builder = new StringBuilder();
-        for (int i = 0; i < level; i++) {
-            builder.append(" |  ");
-        }
-        System.out.print(builder.toString());
+        System.out.print(" |  ".repeat(Math.max(0, level)));
         System.out.print("[");
         System.out.print((char) key);
         System.out.print("] ");
         System.out.println(value == null ? "n/a" : value);
 
-        List<Integer> keys = new ArrayList<Integer>(children.keySet());
+        List<Integer> keys = new ArrayList<>(children.keySet());
         Collections.sort(keys);
-        for (Integer key : keys) {
-            children.get(key).print(level + 1);
+        for (Integer aKey : keys) {
+            children.get(aKey).print(level + 1);
         }
     }
 
@@ -90,7 +87,7 @@ public class CharTree<T> {
     private CharTree<T> getOrCreate(int c) {
         CharTree<T> cn = children.get(c);
         if (cn == null) {
-            cn = new CharTree<T>(c);
+            cn = new CharTree<>(c);
             children.put(c, cn);
         }
         return cn;
@@ -123,15 +120,7 @@ public class CharTree<T> {
             }
 
             Entry entry = (Entry) o;
-
-            if (length != entry.length) {
-                return false;
-            }
-            if (value != null ? !value.equals(entry.value) : entry.value != null) {
-                return false;
-            }
-
-            return true;
+            return length == entry.length && Objects.equals(value, entry.value);
         }
 
         @Override

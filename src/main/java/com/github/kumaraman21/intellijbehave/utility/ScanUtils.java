@@ -31,7 +31,7 @@ public class ScanUtils {
         boolean shouldContinue = (module != null) && ModuleRootManager.getInstance(module).getFileIndex().iterateContent(iterator);
 
         if (shouldContinue) {
-            HashSet<Module> dependencies = new HashSet<Module>();
+            HashSet<Module> dependencies = new HashSet<>();
             ModuleUtil.getDependencies(module, dependencies);
 
             for (Module dependency : dependencies) {

@@ -9,12 +9,10 @@ import com.intellij.lang.impl.PsiBuilderImpl;
 import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.project.Project;
 import com.intellij.psi.codeStyle.CodeStyleSettings;
-import com.intellij.psi.codeStyle.CodeStyleSettingsManager;
 import com.intellij.psi.impl.DebugUtil;
 import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import com.intellij.testFramework.fixtures.IdeaProjectTestFixture;
 import com.intellij.testFramework.fixtures.IdeaTestFixtureFactory;
-import com.intellij.testFramework.fixtures.LightPlatformCodeInsightFixtureTestCase;
 import com.intellij.testFramework.fixtures.TestFixtureBuilder;
 
 /**
@@ -55,14 +53,12 @@ public class IntelliJBehaveBaseTestCase extends BasePlatformTestCase {
     }
 
     protected void tearDown() {
-        ApplicationManager.getApplication().invokeLater(new Runnable() {
-            public void run() {
-                try {
-                    if(!myFixture.getProject().isDisposed())
-                        myFixture.tearDown();
-                } catch (Exception e) {
-                    // mute
-                }
+        ApplicationManager.getApplication().invokeLater(() -> {
+            try {
+                if(!myFixture.getProject().isDisposed())
+                    myFixture.tearDown();
+            } catch (Exception e) {
+                // mute
             }
         });
     }

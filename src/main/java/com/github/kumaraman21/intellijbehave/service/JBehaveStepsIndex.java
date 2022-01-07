@@ -39,7 +39,7 @@ public class JBehaveStepsIndex {
             return emptyList();
         }
 
-        Map<Class, JavaStepDefinition> definitionsByClass = new HashMap<Class, JavaStepDefinition>();
+        Map<Class, JavaStepDefinition> definitionsByClass = new HashMap<>();
         List<JavaStepDefinition> stepDefinitions = loadStepsFor(module);
         String stepText = step.getStepText();
 
@@ -78,7 +78,7 @@ public class JBehaveStepsIndex {
             return emptyList();
         }
 
-        List<JavaStepDefinition> result = new ArrayList<JavaStepDefinition>();
+        List<JavaStepDefinition> result = new ArrayList<>();
 
         List<PsiClass> stepAnnotations = asList(givenAnnotationClass, whenAnnotationClass, thenAnnotationClass);
         for (PsiClass stepAnnotation : stepAnnotations) {
@@ -94,20 +94,17 @@ public class JBehaveStepsIndex {
 
     @NotNull
     private static Collection<PsiAnnotation> getAllStepAnnotations(@NotNull final PsiClass annClass, @NotNull final GlobalSearchScope scope) {
-        return ApplicationManager.getApplication().runReadAction(new Computable<Collection<PsiAnnotation>>() {
-            @Override
-            public Collection<PsiAnnotation> compute() {
-                Project project = annClass.getProject();
-                Collection<PsiAnnotation> psiAnnotations = new ArrayList<PsiAnnotation>();
-                if (KotlinConfigKt.getPluginIsEnabled()) {
-                    String qualifiedName = annClass.getQualifiedName();
-                    if (qualifiedName != null) {
-                        psiAnnotations.addAll(KotlinAnnotationsLoader.getInstance().getAnnotations(QualifiedName.fromDottedString(qualifiedName), project, scope));
-                    }
+        return ApplicationManager.getApplication().runReadAction((Computable<Collection<PsiAnnotation>>) () -> {
+            Project project = annClass.getProject();
+            Collection<PsiAnnotation> psiAnnotations = new ArrayList<>();
+            if (KotlinConfigKt.getPluginIsEnabled()) {
+                String qualifiedName = annClass.getQualifiedName();
+                if (qualifiedName != null) {
+                    psiAnnotations.addAll(KotlinAnnotationsLoader.getInstance().getAnnotations(QualifiedName.fromDottedString(qualifiedName), project, scope));
                 }
-                psiAnnotations.addAll(JavaAnnotationIndex.getInstance().get(annClass.getName(), project, scope));
-                return psiAnnotations;
             }
+            psiAnnotations.addAll(JavaAnnotationIndex.getInstance().get(annClass.getName(), project, scope));
+            return psiAnnotations;
         });
     }
 

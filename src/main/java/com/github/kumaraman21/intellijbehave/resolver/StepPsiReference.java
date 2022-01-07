@@ -112,8 +112,8 @@ public class StepPsiReference implements PsiPolyVariantReference {
     @NotNull
     @Override
     public ResolveResult[] multiResolve(boolean incompleteCode) {
-        List<ResolveResult> result = new ArrayList<ResolveResult>();
-        List<PsiMethod> resolvedElements = new ArrayList<PsiMethod>();
+        List<ResolveResult> result = new ArrayList<>();
+        List<PsiMethod> resolvedElements = new ArrayList<>();
 
         JBehaveStepsIndex index = JBehaveStepsIndex.getInstance(myStep.getProject());
         Collection<JavaStepDefinition> resolvedStepDefinitions = index.findStepDefinitions(myStep);

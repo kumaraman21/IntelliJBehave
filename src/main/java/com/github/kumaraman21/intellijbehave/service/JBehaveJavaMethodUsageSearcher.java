@@ -25,11 +25,7 @@ public class JBehaveJavaMethodUsageSearcher extends QueryExecutorBase<PsiReferen
     public void processQuery(@NotNull SearchParameters queryParameters, @NotNull Processor<? super PsiReference> consumer) {
         final PsiMethod method = queryParameters.getMethod();
 
-        List<String> stepTexts = ApplicationManager.getApplication().runReadAction(new Computable<List<String>>() {
-            public List<String> compute() {
-                return getAnnotationTexts(method);
-            }
-        });
+        List<String> stepTexts = ApplicationManager.getApplication().runReadAction((Computable<List<String>>) () -> getAnnotationTexts(method));
 
         for (String stepText : stepTexts) {
             String word = getTheBiggestWordToSearchByIndex(stepText);

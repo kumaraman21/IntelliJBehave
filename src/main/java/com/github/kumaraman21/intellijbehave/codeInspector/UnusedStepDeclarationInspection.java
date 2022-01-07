@@ -49,11 +49,7 @@ public class UnusedStepDeclarationInspection extends AbstractBaseJavaLocalInspec
         return new JavaElementVisitor() {
             @Override
             public void visitMethod(final PsiMethod method) {
-                Boolean isStepDefinition = (Boolean) ApplicationManager.getApplication().runReadAction(new Computable() {
-                    public Boolean compute() {
-                        return isStepDefinition(method);
-                    }
-                });
+                Boolean isStepDefinition = ApplicationManager.getApplication().runReadAction((Computable<Boolean>) () -> isStepDefinition(method));
 
                 if (!isStepDefinition) {
                     return;
