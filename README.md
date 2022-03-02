@@ -28,6 +28,7 @@ The plugin provides the following features:
 * Code inspections to report unused steps definitions and undefined step usages
 * Run *.story files
 * Spellchecking in .story files
+* Structure view for .story files (via Ctrl+12 or similar shortcut)
 
 Known limitations
 -----------------

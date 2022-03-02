@@ -1,5 +1,18 @@
 # Release notes
 
+## 1.57
+- Added structure view for .story files that can be triggered via Ctrl+12 or similar shortcut.
+
+## 1.56
+- Upgraded plugin to support IJ-2022.1.
+- Upgraded gradle, gradle-intellij-plugin and JUnit versions.
+
+## 1.55
+- Upgraded plugin to work with IJ-2021.3.
+
+# 1.54a
+- Fixed packaging of the plugin.
+
 ## 1.54
 Important note: This version is no longer available for IntelliJ version prior to 2021.1.
 
