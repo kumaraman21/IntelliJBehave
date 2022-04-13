@@ -35,7 +35,7 @@ apply plugin: 'idea'
 intellij {
     version = '2021.1'
     //https://plugins.jetbrains.com/plugin/6954-kotlin/versions/stable
-    plugins = ['org.jetbrains.kotlin:211-1.4.32-release-IJ6693.72', 'java']
+    plugins = ['Kotlin', 'java']
     pluginName = 'JBehave Support'
     updateSinceUntilBuild = false
 }
