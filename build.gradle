@@ -54,9 +54,10 @@ dependencies {
 
 patchPluginXml {
     version = provider { '1.57' }
-    changeNotes = provider { """<h4>1.57</h4>
+    changeNotes = provider { """<h3>1.57</h3>
         <ul>
         <li>Added structure view for .story files that can be triggered via Ctrl+12 or similar shortcut.</li>
+        <li>Added support for IJ2022.1.</li>
         </ul>""" }
 }
 
