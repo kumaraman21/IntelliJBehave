@@ -34,6 +34,7 @@ Known limitations
 -----------------
 * Searches complete module classpath, no configuration available to limit scope
 * Does not take into account any custom JBehave configuration
+* Lifecycles are currently not supported in the .story file structure view
 
 Contribute
 --------
