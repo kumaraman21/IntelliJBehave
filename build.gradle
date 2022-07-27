@@ -53,16 +53,16 @@ dependencies {
 }
 
 patchPluginXml {
-    version = provider { '1.57' }
-    changeNotes = provider { """<h3>1.57</h3>
+    version = provider { '1.58' }
+    changeNotes = provider { """<h3>1.58</h3>
         <ul>
-        <li>Added structure view for .story files that can be triggered via Ctrl+12 or similar shortcut.</li>
-        <li>Added support for IJ2022.1.</li>
+        <li>Added support for IJ2022.2.</li>
+        <li>Added some run configurations for plugin development.</li>
         </ul>""" }
 }
 
 //runPluginVerifier {
-//    ideVersions = ['IC-2021.1']
+//    ideVersions = ['IC-2022.2']
 //}
 
 //publishPlugin {

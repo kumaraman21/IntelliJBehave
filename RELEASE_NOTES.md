@@ -1,5 +1,9 @@
 # Release notes
 
+## 1.58
+- Upgraded plugin to support IJ-2022.2.
+- Added some run configurations for plugin development.
+
 ## 1.57
 - Added structure view for .story files that can be triggered via Ctrl+12 or similar shortcut.
 
