@@ -40,7 +40,7 @@ public class JBehaveStructureViewElementTest extends BasePlatformTestCase {
 
         String storyText = new JBehaveStructureViewElement(getStoryElement(psiFile)).getPresentableText();
 
-        assertThat(storyText).isEqualTo("Narrative:  this is the narrative");
+        assertThat(storyText).isEqualTo("Story");
     }
 
     public void testStoryItemWithTruncatedText() {
@@ -53,7 +53,7 @@ public class JBehaveStructureViewElementTest extends BasePlatformTestCase {
 
         String storyText = new JBehaveStructureViewElement(getStoryElement(psiFile)).getPresentableText();
 
-        assertThat(storyText).isEqualTo("Narrative:  this is the narrative with a second row of description and with a third row of descripti...");
+        assertThat(storyText).isEqualTo("Story");
 
     }
 

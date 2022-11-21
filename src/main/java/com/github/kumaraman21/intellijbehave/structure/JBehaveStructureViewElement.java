@@ -1,7 +1,5 @@
 package com.github.kumaraman21.intellijbehave.structure;
 
-import static java.util.stream.Collectors.joining;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -34,7 +32,7 @@ import org.jetbrains.annotations.Nullable;
  * Lifecycle elements and steps specified within lifecycle scope are not supported for now due to lack of support on the Story language side.
  */
 public class JBehaveStructureViewElement extends PsiTreeElementBase<PsiElement> {
-    private static final Pattern LIFECYCLE_PREFIX = Pattern.compile("^(Lifecycle|Before|Scope|After|Outcome|):.*");
+    private static final Pattern NON_SCENARIO_DESCRIPTIONS = Pattern.compile("^(Narrative|Composite|Lifecycle):.*");
 
     public JBehaveStructureViewElement(PsiElement root) {
         super(root);
@@ -47,7 +45,10 @@ public class JBehaveStructureViewElement extends PsiTreeElementBase<PsiElement> 
             if (element instanceof StoryFile
                 //Lifecycle steps are not recognized properly by the Story language, thus excluding them for now
                 || (element instanceof JBehaveStep && !isASTWrapperWithType(element.getParent(), StoryElementType.STORY))
-                || isASTWrapperWithAnyType(element, StoryElementType.STORY, StoryElementType.SCENARIO, StoryElementType.EXAMPLES)) {
+                //Composite and Lifecycle Examples tables are excluded because such steps are also excluded
+                || (isASTWrapperWithType(element, StoryElementType.EXAMPLES) && !isASTWrapperWithType(element.getParent(), StoryElementType.STORY))
+                || isASTWrapperWithAnyType(element, StoryElementType.STORY, StoryElementType.SCENARIO)
+                || (isASTWrapperWithAnyType(element, StoryElementType.STORY_DESCRIPTION) && NON_SCENARIO_DESCRIPTIONS.matcher(element.getText()).matches())) {
                 result.add(new JBehaveStructureViewElement(element));
             }
         }
@@ -59,6 +60,14 @@ public class JBehaveStructureViewElement extends PsiTreeElementBase<PsiElement> 
         final PsiElement element = getElement();
         if (element instanceof StoryFile || isASTWrapperWithType(element, StoryElementType.STORY))
             return JBehaveIcons.JB;
+        if (isASTWrapperWithType(element, StoryElementType.STORY_DESCRIPTION)) {
+            if (element.getText().startsWith("Narrative:"))
+                return AllIcons.General.User;
+            if (element.getText().startsWith("Composite:"))
+                return AllIcons.Actions.ListFiles;
+            if (element.getText().startsWith("Lifecycle:"))
+                return AllIcons.Actions.Refresh;
+        }
         if (isASTWrapperWithType(element, StoryElementType.SCENARIO))
             return AllIcons.Nodes.LogFolder;
         if (element instanceof JBehaveStep)
@@ -74,7 +83,8 @@ public class JBehaveStructureViewElement extends PsiTreeElementBase<PsiElement> 
 
         if (element instanceof ASTWrapperPsiElement) {
             IElementType elementType = elementTypeOf(element);
-            if (elementType == StoryElementType.STORY) return getStoryText(element);
+            if (elementType == StoryElementType.STORY) return "Story";
+            if (elementType == StoryElementType.STORY_DESCRIPTION) return getStoryDescriptionText(element);
             if (elementType == StoryElementType.SCENARIO) return getScenarioText(element);
             if (elementType == StoryElementType.EXAMPLES) return "Examples";
         }
@@ -91,14 +101,15 @@ public class JBehaveStructureViewElement extends PsiTreeElementBase<PsiElement> 
      * <p>
      * Lifecycle elements have to be filtered since they are too recognized as story description.
      */
-    private String getStoryText(PsiElement element) {
-        PsiElement[] storyDescriptionParts = PsiTreeUtil.collectElements(element, e -> isASTWrapperWithType(e, StoryElementType.STORY_DESCRIPTION));
-        return storyDescriptionParts.length > 0
-            ? truncate(Arrays.stream(storyDescriptionParts)
-            .map(PsiElement::getText)
-            .filter(text -> !LIFECYCLE_PREFIX.matcher(text).matches())
-            .collect(joining(" ")), 100)
-            : "Story";
+    private String getStoryDescriptionText(PsiElement element) {
+        if (element.getText().startsWith("Narrative:"))
+            return "Narrative";
+        if (element.getText().startsWith("Composite:"))
+            return element.getText();
+        if (element.getText().startsWith("Lifecycle:"))
+            return "Lifecycle";
+
+        return "";
     }
 
     /**
