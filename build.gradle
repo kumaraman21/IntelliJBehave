@@ -5,13 +5,13 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "1.5.2"
+    id "org.jetbrains.intellij" version "1.9.0"
     //https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
-    id "org.jetbrains.kotlin.jvm" version "1.4.32"
+    id "org.jetbrains.kotlin.jvm" version "1.7.21"
 }
 
 ext {
-    kotlinVersion = '1.4.32'
+    kotlinVersion = '1.7.21'
     jBehaveVersion = '4.8.3'
     jUnitVersion = '4.13.2'
     assertJVersion = '3.20.2'
