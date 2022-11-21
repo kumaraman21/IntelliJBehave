@@ -1,6 +1,6 @@
 package com.github.kumaraman21.intellijbehave.kotlin
 
-import com.intellij.ide.plugins.PluginManager
+import com.intellij.ide.plugins.PluginManagerCore
 import com.intellij.openapi.extensions.PluginId
 
 /**
@@ -8,4 +8,4 @@ import com.intellij.openapi.extensions.PluginId
  */
 private val kotlinPluginId = "org.jetbrains.kotlin"
 
-val pluginIsEnabled = PluginManager.getPlugin(PluginId.getId(kotlinPluginId))?.isEnabled ?: false
+val pluginIsEnabled = PluginManagerCore.getPlugin(PluginId.getId(kotlinPluginId))?.isEnabled ?: false

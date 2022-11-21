@@ -15,6 +15,7 @@
  */
 package com.github.kumaraman21.intellijbehave.settings;
 
+import com.intellij.openapi.application.ApplicationManager;
 import com.intellij.openapi.components.*;
 import com.intellij.util.xmlb.XmlSerializerUtil;
 import org.jetbrains.annotations.NotNull;
@@ -29,7 +30,7 @@ public class JBehaveSettings implements PersistentStateComponent<JBehaveSettings
     private boolean storyAutoCompletion;
 
     public static JBehaveSettings getInstance() {
-        return ServiceManager.getService(JBehaveSettings.class);
+        return ApplicationManager.getApplication().getService(JBehaveSettings.class);
     }
 
     @Override
