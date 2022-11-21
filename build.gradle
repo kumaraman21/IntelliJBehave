@@ -53,11 +53,12 @@ dependencies {
 }
 
 patchPluginXml {
-    version = provider { '1.58' }
-    changeNotes = provider { """<h3>1.58</h3>
+    version = provider { '1.59' }
+    changeNotes = provider { """<h3>1.59</h3>
         <ul>
-        <li>Added support for IJ2022.2.</li>
-        <li>Added some run configurations for plugin development.</li>
+        <li>Added support for IJ2022.3.</li>
+        <li>Dropped support for IJ2021.1.</li>
+        <li>Improved the appearance of the Story file structure view.</li>
         </ul>""" }
 }
 

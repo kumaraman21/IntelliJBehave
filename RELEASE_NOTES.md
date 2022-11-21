@@ -1,5 +1,11 @@
 # Release notes
 
+## 1.59
+- Upgraded plugin to support IJ-2022.3.
+- Dropped plugin to support IJ-2021.1.
+- Upgraded kotlin and gradle-intellij-plugin versions.
+- Improved the appearance of the Story file structure view.
+
 ## 1.58
 - Upgraded plugin to support IJ-2022.2.
 - Added some run configurations for plugin development.
