@@ -33,7 +33,7 @@ apply plugin: 'org.jetbrains.intellij'
 apply plugin: 'idea'
 
 intellij {
-    version = '2021.1'
+    version = '2021.2'
     //https://plugins.jetbrains.com/plugin/6954-kotlin/versions/stable
     plugins = ['Kotlin', 'java']
     pluginName = 'JBehave Support'
@@ -62,7 +62,7 @@ patchPluginXml {
 }
 
 //runPluginVerifier {
-//    ideVersions = ['IC-2022.2']
+//    ideVersions = ['IC-2022.2', 'IC-2022.3']
 //}
 
 //publishPlugin {
