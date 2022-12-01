@@ -43,10 +43,10 @@
   ]]></description>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
-    <idea-version since-build="211" until-build="222.*"/>
+    <idea-version since-build="212" until-build="223.*"/>
 
     <depends>com.intellij.modules.java</depends>
-    <depends optional="true">org.jetbrains.kotlin</depends>
+    <depends optional="true" config-file="kotlin-config.xml">org.jetbrains.kotlin</depends>
 
     <actions>
         <action id="IntelliJBehave.NewJBehaveStory"

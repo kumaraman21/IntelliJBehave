@@ -36,7 +36,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class JBehaveStepsIndex {
     public static JBehaveStepsIndex getInstance(Project project) {
-        return ServiceManager.getService(project, JBehaveStepsIndex.class);
+        return project.getService(JBehaveStepsIndex.class);
     }
 
     @NotNull
