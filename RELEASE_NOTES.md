@@ -1,5 +1,8 @@
 # Release notes
 
+## 1.60
+- Added support for IJ-2023.1. 
+
 ## 1.59
 - Upgraded plugin to support IJ-2022.3.
 - Dropped plugin to support IJ-2021.1.

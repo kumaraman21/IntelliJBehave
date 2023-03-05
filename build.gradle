@@ -5,7 +5,7 @@ buildscript {
 }
 
 plugins {
-    id "org.jetbrains.intellij" version "1.10.0"
+    id "org.jetbrains.intellij" version "1.13.1"
     //https://plugins.jetbrains.com/docs/intellij/kotlin.html#kotlin-standard-library
     id "org.jetbrains.kotlin.jvm" version "1.7.21"
 }
@@ -41,7 +41,7 @@ intellij {
 }
 
 wrapper {
-    gradleVersion '7.4'
+    gradleVersion '7.6'
 }
 
 dependencies {
@@ -53,17 +53,15 @@ dependencies {
 }
 
 patchPluginXml {
-    version = provider { '1.59' }
-    changeNotes = provider { """<h3>1.59</h3>
+    version = provider { '1.60' }
+    changeNotes = provider { """<h3>1.60</h3>
         <ul>
-        <li>Added support for IJ2022.3.</li>
-        <li>Dropped support for IJ2021.1.</li>
-        <li>Improved the appearance of the Story file structure view.</li>
+        <li>Added support for IJ-2023.1. </li>
         </ul>""" }
 }
 
 //runPluginVerifier {
-//    ideVersions = ['IC-2022.2', 'IC-2022.3']
+//    ideVersions = ['IC-2023.1']
 //}
 
 //publishPlugin {
