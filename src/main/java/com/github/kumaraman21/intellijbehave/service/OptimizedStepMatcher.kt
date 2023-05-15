@@ -20,7 +20,6 @@ private object StepPatterns {
 internal class OptimizedStepMatcher(stepMatcher: StepMatcher) : StepMatcher by stepMatcher {
 
     private val matchesRegexes: List<Regex>
-    private val findRegexes: List<Regex>
 
     init {
         val patterns = stepMatcher.pattern().resolved().split(StepPatterns.Plain.VARIABLE)
@@ -28,8 +27,6 @@ internal class OptimizedStepMatcher(stepMatcher: StepMatcher) : StepMatcher by s
                 .map { it.replace(StepPatterns.Regex.SPACE, "\\s") }
                 .map(::Regex)
                 .toList()
-
-        findRegexes = patterns.filter(String::isNotEmpty).toRegexes()
 
         matchesRegexes = patterns.toRegexes().mapIndexed { i, regex ->
             when (i) {
@@ -42,11 +39,7 @@ internal class OptimizedStepMatcher(stepMatcher: StepMatcher) : StepMatcher by s
 
     //TODO implement catching optimization strategy
 
-    override fun matches(text: String): Boolean = text.preprocessThenFind(matchesRegexes)
-
-    override fun find(text: String): Boolean = text.preprocessThenFind(findRegexes)
-
-    private inline fun String.preprocessThenFind(regexes: List<Regex>) = trimSpaces().find(regexes)
+    fun matches(text: String): Boolean = text.trimSpaces().find(matchesRegexes)
 
     private fun String.find(regexes: List<Regex>, textIndex: Int = 0, regexIndex: Int = 0)
             : Boolean = regexIndex == regexes.size || textIndex < length && run {

@@ -9,7 +9,6 @@ import com.intellij.psi.SmartPointerManager;
 import com.intellij.psi.SmartPsiElementPointer;
 import com.intellij.psi.util.PsiTreeUtil;
 import org.jbehave.core.parsers.RegexPrefixCapturingPatternParser;
-import org.jbehave.core.parsers.StepMatcher;
 import org.jbehave.core.parsers.StepPatternParser;
 import org.jbehave.core.steps.StepType;
 import org.jetbrains.annotations.NotNull;
@@ -31,14 +30,7 @@ public class JavaStepDefinition {
     }
 
     public boolean matches(String stepText) {
-        Set<StepMatcher> stepMatchers = getStepMatchers();
-        for (StepMatcher stepMatcher : stepMatchers) {
-            if (stepMatcher.matches(stepText)) {
-                return true;
-            }
-        }
-
-        return false;
+        return getStepMatchers(getAnnotationTexts()).stream().anyMatch(stepMatcher -> stepMatcher.matches(stepText));
     }
 
     @Nullable
@@ -49,9 +41,9 @@ public class JavaStepDefinition {
             return annotationTexts.iterator().next();
         }
 
-        Set<StepMatcher> stepMatchers = getStepMatchers(annotationTexts);
+        Set<OptimizedStepMatcher> stepMatchers = getStepMatchers(annotationTexts);
 
-        for (StepMatcher stepMatcher : stepMatchers) {
+        for (OptimizedStepMatcher stepMatcher : stepMatchers) {
             if (stepMatcher.matches(stepText)) {
                 return stepMatcher.pattern().annotated();
             }
@@ -70,11 +62,7 @@ public class JavaStepDefinition {
         return PsiTreeUtil.getParentOfType(getAnnotation(), PsiMethod.class);
     }
 
-    private Set<StepMatcher> getStepMatchers() {
-        return getStepMatchers(getAnnotationTexts());
-    }
-
-    private Set<StepMatcher> getStepMatchers(Set<String> annotationTextVariants) {
+    private Set<OptimizedStepMatcher> getStepMatchers(Set<String> annotationTextVariants) {
         final StepType annotationType = getAnnotationType();
 
         return annotationTextVariants.stream()

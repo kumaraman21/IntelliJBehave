@@ -102,7 +102,7 @@ public class JBehaveStepsIndexTest extends LightJavaCodeInsightFixtureTestCase {
             
             if (loadJBehaveCore) {
                 //See https://plugins.jetbrains.com/docs/intellij/testing-faq.html#how-to-test-a-jvm-language
-                MavenDependencyUtil.addFromMaven(model, "org.jbehave:jbehave-core:4.8.3");
+                MavenDependencyUtil.addFromMaven(model, "org.jbehave:jbehave-core:5.1.1");
             }
         }
     }

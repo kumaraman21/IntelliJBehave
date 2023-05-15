@@ -12,7 +12,7 @@ plugins {
 
 ext {
     kotlinVersion = '1.7.21'
-    jBehaveVersion = '4.8.3'
+    jBehaveVersion = '5.1.1'
     jUnitVersion = '4.13.2'
     assertJVersion = '3.20.2'
     mockitoVersion = '3.11.2'
