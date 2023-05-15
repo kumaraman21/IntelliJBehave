@@ -62,6 +62,10 @@ patchPluginXml {
         </ul>""" }
 }
 
+test {
+    systemProperty('idea.home.path', project.findProperty('idea.home.path'))
+}
+
 //runPluginVerifier {
 //    ideVersions = ['IC-2022.2', 'IC-2022.3']
 //}
