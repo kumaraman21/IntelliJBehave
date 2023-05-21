@@ -41,7 +41,7 @@ intellij {
 }
 
 wrapper {
-    gradleVersion '7.4'
+    gradleVersion '8.1.1'
 }
 
 dependencies {
