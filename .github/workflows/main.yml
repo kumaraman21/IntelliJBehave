@@ -29,15 +29,6 @@ jobs:
       - name: Fetch Sources
         uses: actions/checkout@v3
 
-      # Check out IJ Community
-#      - name: Fetch IntelliJ Community
-#        uses: actions/checkout@v3
-#        with:
-#          repository: JetBrains/intellij-community
-#          # https://plugins.jetbrains.com/docs/intellij/build-number-ranges.html#intellij-platform-based-products-of-recent-ide-versions
-#          ref: 213 or idea/213.7172.25
-#          path: intellij-community
-
       # Validate wrapper
       - name: Gradle Wrapper Validation
         uses: gradle/wrapper-validation-action@v1.0.5

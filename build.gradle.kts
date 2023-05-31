@@ -94,6 +94,5 @@ tasks {
         isScanForTestClasses = false
         include("**/*Test.class")
         exclude("**/StoryLocalizedLexer_FrenchTest.class")
-        systemProperty("idea.home.path", project.findProperty("idea.home.path"))
     }
 }
