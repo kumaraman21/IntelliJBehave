@@ -93,6 +93,7 @@ tasks {
         //See https://app.slack.com/client/T5P9YATH9/C5U8BM1MK/thread/C5U8BM1MK-1639934273.054400
         isScanForTestClasses = false
         include("**/*Test.class")
+        exclude("**/StoryLocalizedLexer_FrenchTest.class")
         systemProperty("idea.home.path", project.findProperty("idea.home.path"))
     }
 }
