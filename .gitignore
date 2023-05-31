@@ -52,7 +52,7 @@ atlassian-ide-plugin.xml
 
 # Gradle
 .gradle/
-gradle.properties
+#gradle.properties
 
 # Other files
 /local.properties
