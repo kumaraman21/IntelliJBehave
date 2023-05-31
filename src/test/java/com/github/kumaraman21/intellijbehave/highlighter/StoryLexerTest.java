@@ -1,24 +1,39 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
-import com.intellij.psi.tree.IElementType;
-import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase4;
-import org.junit.Ignore;
-import org.junit.Test;
-
-import static com.github.kumaraman21.intellijbehave.Samples.*;
-import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.*;
+import static com.github.kumaraman21.intellijbehave.Samples.COMPLEX_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.EXAMPLES_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.LONG_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.META_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.MULTILINE_LONG_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.MULTILINE_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.Samples.SIMPLE_SAMPLE;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.EXAMPLE_TYPE;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.GIVEN_TYPE;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.META;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.META_KEY;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.META_TEXT;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.SCENARIO_TEXT;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.SCENARIO_TYPE;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.STEP_TEXT;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.STORY_DESCRIPTION;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.TABLE_CELL;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.TABLE_DELIM;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.THEN_TYPE;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.WHEN_TYPE;
+import static com.github.kumaraman21.intellijbehave.highlighter.StoryTokenType.WHITE_SPACE;
 import static org.assertj.core.api.Assertions.assertThat;
+
+import com.intellij.psi.tree.IElementType;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
+public class StoryLexerTest extends BasePlatformTestCase {
 
     private StoryLexer storyLexer;
 
-    @Test
-    @Ignore
-    public void traceAll() {
+    public void _testTraceAll() {
         //traceAll(SIMPLE_SAMPLE);
         //traceAll(LONG_SAMPLE);
         //traceAll(META_SAMPLE);
@@ -26,8 +41,7 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
         traceAll(COMPLEX_SAMPLE);
     }
 
-    @Test
-    public void parseSimpleSample() {
+    public void testParseSimpleSample() {
         storyLexer = new StoryLexer();
         storyLexer.start(SIMPLE_SAMPLE);
 
@@ -51,8 +65,7 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
         advanceAndAssert(WHITE_SPACE);
     }
 
-    @Test
-    public void parseMultilineSample() {
+    public void testParseMultilineSample() {
         storyLexer = new StoryLexer();
         storyLexer.start(MULTILINE_SAMPLE);
 
@@ -76,8 +89,7 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
         advanceAndAssert(WHITE_SPACE);
     }
 
-    @Test
-    public void parseMultilineLong() {
+    public void testParseMultilineLong() {
         storyLexer = new StoryLexer();
         storyLexer.start(MULTILINE_LONG_SAMPLE);
 
@@ -182,8 +194,7 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
         advanceAndAssert(WHITE_SPACE);
     }
 
-    @Test
-    public void parseMetaSample() {
+    public void testParseMetaSample() {
         storyLexer = new StoryLexer();
         storyLexer.start(META_SAMPLE);
 
@@ -204,8 +215,7 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
         advanceAndAssert(WHITE_SPACE);
     }
 
-    @Test
-    public void parseLongSample() {
+    public void testParseLongSample() {
         storyLexer = new StoryLexer();
         storyLexer.start(LONG_SAMPLE);
 
@@ -270,8 +280,7 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
         // ...
     }
 
-    @Test
-    public void parseExamples() {
+    public void testParseExamples() {
         storyLexer = new StoryLexer();
         storyLexer.start(EXAMPLES_SAMPLE);
 
@@ -320,8 +329,6 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
         advanceAndAssert(WHITE_SPACE);
 
         // ...
-
-
     }
 
     private void advanceAndAssert(final IElementType storyTokenType) {
@@ -368,6 +375,4 @@ public class StoryLexerTest extends LightJavaCodeInsightFixtureTestCase4 {
     private String escape(final CharSequence tokenSequence) {
         return tokenSequence.toString().replace("\n", "\\n").replace("\r", "\\r");
     }
-
-
 }
