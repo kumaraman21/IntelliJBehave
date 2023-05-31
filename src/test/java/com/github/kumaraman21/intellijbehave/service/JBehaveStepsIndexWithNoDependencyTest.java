@@ -3,17 +3,9 @@ package com.github.kumaraman21.intellijbehave.service;
 import static org.assertj.core.api.Assertions.assertThat;
 
 import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
-import com.intellij.openapi.module.Module;
-import com.intellij.openapi.roots.ContentEntry;
-import com.intellij.openapi.roots.ModifiableRootModel;
-import com.intellij.pom.java.LanguageLevel;
-import com.intellij.psi.PsiSubstitutor;
 import com.intellij.testFramework.LightProjectDescriptor;
 import com.intellij.testFramework.fixtures.LightJavaCodeInsightFixtureTestCase;
-import com.intellij.testFramework.fixtures.MavenDependencyUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.jps.model.java.JavaResourceRootType;
-import org.jetbrains.jps.model.java.JavaSourceRootType;
 
 /**
  * Functional test for {@link JBehaveStepsIndex}.
@@ -35,7 +27,7 @@ public class JBehaveStepsIndexWithNoDependencyTest extends LightJavaCodeInsightF
 
     @Override
     protected @NotNull LightProjectDescriptor getProjectDescriptor() {
-        return new JBehaveStepsIndexTest.ContentRootsProjectDescriptor(false);
+        return new JBehaveStepsIndexTest.ContentRootsProjectDescriptor();
     }
 
     public void testFindsNoStepDefinitionDueToNoJBehaveAnnotationsAvailable() {

@@ -9,7 +9,7 @@ syntax: glob
 .DS_Store
 
 # lib'n misc
-lib/
+#lib/
 testLib/
 file/
 
@@ -56,5 +56,5 @@ atlassian-ide-plugin.xml
 
 # Other files
 /local.properties
-*.jar
+#*.jar
 !gradle/wrapper/gradle-wrapper.jar
