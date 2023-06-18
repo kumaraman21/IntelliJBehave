@@ -95,4 +95,8 @@ tasks {
         include("**/*Test.class")
         exclude("**/StoryLocalizedLexer_FrenchTest.class")
     }
+
+//    runPluginVerifier {
+//        ideVersions.set(listOf("IC-232.7754.73"))
+//    }
 }
