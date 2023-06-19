@@ -43,7 +43,7 @@
   ]]></description>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
-    <idea-version since-build="212" until-build="231.*"/>
+    <idea-version since-build="213" until-build="232.*"/>
 
     <depends>com.intellij.modules.java</depends>
     <depends optional="true" config-file="kotlin-config.xml">org.jetbrains.kotlin</depends>
@@ -93,7 +93,6 @@
         <psi.referenceContributor
                 implementation="com.github.kumaraman21.intellijbehave.resolver.StepPsiReferenceContributor"/>
 
-        <projectService serviceImplementation="com.github.kumaraman21.intellijbehave.service.JBehaveStepsIndex"/>
         <applicationService serviceImplementation="com.github.kumaraman21.intellijbehave.settings.JBehaveSettings" />
         <applicationService serviceImplementation="com.github.kumaraman21.intellijbehave.runner.StoryRunnerConfigurationType" />
         <!--This Run Configuration type is registered explicitly because otherwise after running a story (run config created),

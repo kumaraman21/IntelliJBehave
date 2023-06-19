@@ -1,21 +1,21 @@
 package com.github.kumaraman21.intellijbehave.highlighter;
 
+import static org.assertj.core.api.Assertions.assertThat;
+
 import com.github.kumaraman21.intellijbehave.utility.LocalizedStorySupport;
 import com.intellij.psi.tree.IElementType;
+import com.intellij.testFramework.fixtures.BasePlatformTestCase;
 import org.jetbrains.annotations.Nullable;
-import org.junit.Test;
-
-import static org.assertj.core.api.Assertions.assertThat;
 
 /**
  * @author <a href="http://twitter.com/aloyer">@aloyer</a>
  */
-public class StoryLocalizedLexer_FrenchTest {
+public class StoryLocalizedLexer_FrenchTest extends BasePlatformTestCase {
 
     private StoryLocalizedLexer storyLexer;
 
-    @Test
-    public void parse_basicScenario() {
+    //FIXME
+    public void test_parse_basicScenario() {
         storyLexer = new StoryLocalizedLexer(new LocalizedStorySupport());
         storyLexer.changeLocale("fr");
         storyLexer.start("Scénario: une simple sortie\n" +
@@ -37,8 +37,8 @@ public class StoryLocalizedLexer_FrenchTest {
         advanceAndAssert(null);
     }
 
-    @Test
-    public void parse_commentAllowsToSwitchLanguage() {
+    //FIXME
+    public void test_parse_commentAllowsToSwitchLanguage() {
         storyLexer = new StoryLocalizedLexer(new LocalizedStorySupport());
         // make sure one is not in fr by default
         storyLexer.changeLocale("en");
