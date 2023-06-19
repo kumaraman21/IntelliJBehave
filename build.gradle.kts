@@ -50,7 +50,6 @@ intellij {
 changelog {
     groups.set(emptyList())
     repositoryUrl.set(properties("pluginRepositoryUrl"))
-    headerParserRegex.set("\\d+\\.\\d+(\\.\\d+)?")
 }
 
 tasks {
