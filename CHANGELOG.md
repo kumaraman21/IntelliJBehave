@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [1.62.0]
+### Changed
+- New supported IDE version range: 2022.1-2023.3
+
 ## [1.61.0]
 ### Changed
 - Added support for IJ-2023.2 and dropped support for IJ-2021.2.
