@@ -1,6 +1,6 @@
 package com.github.kumaraman21.intellijbehave.utility;
 
-import org.apache.commons.lang.LocaleUtils;
+import org.apache.commons.lang3.LocaleUtils;
 import org.jbehave.core.i18n.LocalizedKeywords;
 import org.jetbrains.annotations.NotNull;
 import java.util.Locale;
