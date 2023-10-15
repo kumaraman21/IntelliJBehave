@@ -3,15 +3,6 @@ package com.github.kumaraman21.intellijbehave.service;
 import static java.util.Arrays.asList;
 import static java.util.Collections.emptyList;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
 import com.github.kumaraman21.intellijbehave.kotlin.KotlinConfigKt;
 import com.github.kumaraman21.intellijbehave.kotlin.support.services.KotlinAnnotationsLoader;
 import com.github.kumaraman21.intellijbehave.parser.JBehaveStep;
@@ -27,18 +18,25 @@ import com.intellij.psi.impl.java.stubs.index.JavaAnnotationIndex;
 import com.intellij.psi.impl.java.stubs.index.JavaFullClassNameIndex;
 import com.intellij.psi.search.GlobalSearchScope;
 import com.intellij.psi.util.QualifiedName;
-import com.intellij.util.ReflectionUtil;
 import org.jbehave.core.annotations.Given;
 import org.jbehave.core.annotations.Then;
 import org.jbehave.core.annotations.When;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
 /**
  * Project service that provides Java step definitions for JBehave Story steps.
  */
 @Service(Service.Level.PROJECT)
 public final class JBehaveStepsIndex {
+
+    //Argument is necessary for project-level service creation
     public JBehaveStepsIndex(Project project) {
     }
 
@@ -119,24 +117,11 @@ public final class JBehaveStepsIndex {
 
     @Nullable
     private PsiClass findStepAnnotation(String stepClass, Module module, GlobalSearchScope dependenciesScope) {
-        Method getPre20221 = ReflectionUtil.getDeclaredMethod(JavaFullClassNameIndex.class, "get", Integer.class, Project.class, GlobalSearchScope.class);
-        Method get20221 = ReflectionUtil.getDeclaredMethod(JavaFullClassNameIndex.class, "get", CharSequence.class, Project.class, GlobalSearchScope.class);
-
-        try {
-            Object javaFullClassNameIndexInstance = JavaFullClassNameIndex.class.getDeclaredMethod("getInstance").invoke(JavaFullClassNameIndex.class);
-            Collection<PsiClass> stepDefAnnotationCandidates = Collections.emptyList();
-            if (getPre20221 != null) {
-                stepDefAnnotationCandidates = (Collection<PsiClass>) getPre20221.invoke(javaFullClassNameIndexInstance, stepClass.hashCode(), module.getProject(), dependenciesScope);
-            } else if (get20221 != null) {
-                stepDefAnnotationCandidates = (Collection<PsiClass>) get20221.invoke(javaFullClassNameIndexInstance, stepClass, module.getProject(), dependenciesScope);
+        var stepDefAnnotationCandidates = JavaFullClassNameIndex.getInstance().get(stepClass, module.getProject(), dependenciesScope);
+        for (PsiClass stepDefAnnotations : stepDefAnnotationCandidates) {
+            if (stepClass.equals(stepDefAnnotations.getQualifiedName())) {
+                return stepDefAnnotations;
             }
-            for (PsiClass stepDefAnnotations : stepDefAnnotationCandidates) {
-                if (stepClass.equals(stepDefAnnotations.getQualifiedName())) {
-                    return stepDefAnnotations;
-                }
-            }
-        } catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
-            //fall through and return null
         }
         return null;
     }
