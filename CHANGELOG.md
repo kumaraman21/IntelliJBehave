@@ -5,6 +5,7 @@
 ## [1.62.0]
 ### Changed
 - New supported IDE version range: 2022.1-2023.3
+- Removed some deprecated API usage, and simplified some related code.
 
 ## [1.61.0]
 ### Changed

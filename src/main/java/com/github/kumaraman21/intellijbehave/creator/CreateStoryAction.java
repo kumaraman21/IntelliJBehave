@@ -15,9 +15,10 @@
  */
 package com.github.kumaraman21.intellijbehave.creator;
 
+import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
+
 import com.intellij.ide.IdeBundle;
 import com.intellij.ide.actions.CreateElementActionBase;
-import com.intellij.ide.fileTemplates.FileTemplate;
 import com.intellij.ide.fileTemplates.FileTemplateManager;
 import com.intellij.ide.highlighter.HtmlFileType;
 import com.intellij.openapi.actionSystem.AnActionEvent;
@@ -28,7 +29,6 @@ import com.intellij.openapi.fileTypes.FileTypeManager;
 import com.intellij.openapi.fileTypes.FileTypes;
 import com.intellij.openapi.project.Project;
 import com.intellij.openapi.ui.Messages;
-import com.intellij.openapi.vfs.VirtualFile;
 import com.intellij.psi.PsiDirectory;
 import com.intellij.psi.PsiElement;
 import com.intellij.psi.PsiFile;
@@ -36,7 +36,7 @@ import com.intellij.psi.PsiFileFactory;
 import com.intellij.psi.codeStyle.CodeStyleManager;
 import org.jetbrains.annotations.NotNull;
 
-import static com.github.kumaraman21.intellijbehave.language.StoryFileType.STORY_FILE_TYPE;
+import java.util.function.Consumer;
 
 public class CreateStoryAction extends CreateElementActionBase {
 
@@ -44,33 +44,30 @@ public class CreateStoryAction extends CreateElementActionBase {
     super("Create New Story File", STORY_FILE_TYPE.getDescription(), STORY_FILE_TYPE.getIcon());
   }
 
-  @NotNull
   @Override
-  protected PsiElement[] invokeDialog(Project project, PsiDirectory directory) {
-    CreateElementActionBase.MyInputValidator validator = new CreateElementActionBase.MyInputValidator(project, directory);
+  protected void invokeDialog(@NotNull Project project, @NotNull PsiDirectory directory, @NotNull Consumer<? super PsiElement[]> elementsConsumer) {
+    var validator = new CreateElementActionBase.MyInputValidator(project, directory);
     Messages.showInputDialog(project, "Enter a new file name:", "New Story File", Messages.getQuestionIcon(), "", validator);
-    return validator.getCreatedElements();
+    elementsConsumer.accept(validator.getCreatedElements());
   }
 
   @NotNull
   @Override
-  protected PsiElement[] create(@NotNull String newName, PsiDirectory directory) throws Exception {
-    final FileTemplate template = FileTemplateManager.getDefaultInstance().getTemplate(STORY_FILE_TYPE.getName());
+  protected PsiElement @NotNull [] create(@NotNull String newName, PsiDirectory directory) throws Exception {
+    final var template = FileTemplateManager.getDefaultInstance().getTemplate(STORY_FILE_TYPE.getName());
 
     String fileName = getFileName(newName);
     Project project = directory.getProject();
 
     directory.checkCreateFile(fileName);
-    PsiFile psiFile = PsiFileFactory.getInstance(project)
-      .createFileFromText(fileName, STORY_FILE_TYPE, template.getText());
+    var psiFile = PsiFileFactory.getInstance(project).createFileFromText(fileName, STORY_FILE_TYPE, template.getText());
 
     if (template.isReformatCode()) {
       CodeStyleManager.getInstance(project).reformat(psiFile);
     }
     psiFile = (PsiFile)directory.add(psiFile);
 
-    final VirtualFile virtualFile = psiFile.getVirtualFile();
-    FileEditorManager.getInstance(project).openFile(virtualFile, true);
+    FileEditorManager.getInstance(project).openFile(psiFile.getVirtualFile(), true);
 
     return new PsiElement[]{psiFile};
   }
@@ -80,27 +77,23 @@ public class CreateStoryAction extends CreateElementActionBase {
     return "Cannot Create Story File";
   }
 
+  @NotNull
   @Override
-  protected String getActionName(PsiDirectory directory, String newName) {
+  protected String getActionName(PsiDirectory directory, @NotNull String newName) {
     return IdeBundle.message("progress.creating.file", STORY_FILE_TYPE.getName(), newName, directory.getName());
   }
 
-  public void update(final AnActionEvent e) {
+  @Override
+  public void update(final @NotNull AnActionEvent e) {
     super.update(e);
     Presentation presentation = e.getPresentation();
-    final FileTypeManager manager = FileTypeManager.getInstance();
-    final FileType fileType = manager.getFileTypeByExtension(HtmlFileType.DOT_DEFAULT_EXTENSION);
+    final FileType fileType = FileTypeManager.getInstance().getFileTypeByExtension(HtmlFileType.DOT_DEFAULT_EXTENSION);
     if (fileType == FileTypes.PLAIN_TEXT) {
-      presentation.setEnabled(false);
-      presentation.setVisible(false);
+      presentation.setEnabledAndVisible(false);
     }
   }
 
   private String getFileName(String name) {
-      if (name.endsWith("." + STORY_FILE_TYPE.getDefaultExtension())) {
-          return name;
-      } else {
-          return name + "." + STORY_FILE_TYPE.getDefaultExtension();
-      }
-    }
+    return name.endsWith("." + STORY_FILE_TYPE.getDefaultExtension()) ? name : name + "." + STORY_FILE_TYPE.getDefaultExtension();
+  }
 }
