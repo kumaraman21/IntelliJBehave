@@ -21,15 +21,15 @@ repositories {
 
 // Set the JVM language level used to build the project. Use Java 11 for 2020.3+, and Java 17 for 2022.2+.
 kotlin {
-    jvmToolchain(11)
+    jvmToolchain(17)
 }
 
 dependencies {
     //https://kotlinlang.org/docs/reflection.html#jvm-dependency
-    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.7.21")
-    implementation("org.jbehave:jbehave-core:5.1.1")
-    testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.7.21")
-    testImplementation("org.assertj:assertj-core:3.20.2")
+    implementation("org.jetbrains.kotlin:kotlin-stdlib:1.9.0")
+    implementation("org.jbehave:jbehave-core:5.2.0")
+    testImplementation("org.jetbrains.kotlin:kotlin-stdlib-jdk8:1.9.0")
+    testImplementation("org.assertj:assertj-core:3.25.2")
     testImplementation("junit:junit:4.13.2")
 }
 
