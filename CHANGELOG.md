@@ -2,6 +2,10 @@
 
 ## [Unreleased]
 
+## [1.63.0]
+### Changed
+- New supported IDE version range: 2022.2.5-2024.1-EAP
+
 ## [1.62.0]
 ### Changed
 - New supported IDE version range: 2022.1-2023.3

@@ -43,7 +43,7 @@
   ]]></description>
     <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
 
-    <idea-version since-build="221" until-build="233.*"/>
+    <idea-version since-build="222.4554.10" until-build="241.*"/>
 
     <depends>com.intellij.modules.java</depends>
     <depends optional="true" config-file="kotlin-config.xml">org.jetbrains.kotlin</depends>
@@ -63,7 +63,7 @@
     </actions>
 
     <extensions defaultExtensionNs="com.intellij">
-        <projectConfigurable instance="com.github.kumaraman21.intellijbehave.settings.JBehaveConfigurable"/>
+        <projectConfigurable instance="com.github.kumaraman21.intellijbehave.settings.JBehaveConfigurable" displayName="JBehave"/>
         <spellchecker.support language="Story"
                               implementationClass="com.github.kumaraman21.intellijbehave.spellchecker.JBehaveSpellcheckerStrategy"/>
         <fileType name="JBehave Story" implementationClass="com.github.kumaraman21.intellijbehave.language.StoryFileType"
@@ -91,6 +91,7 @@
                          groupName="JBehave" enabledByDefault="true" level="WARNING"
                          implementationClass="com.github.kumaraman21.intellijbehave.codeInspector.UndefinedStepInspection"/>
         <psi.referenceContributor
+                language="Story"
                 implementation="com.github.kumaraman21.intellijbehave.resolver.StepPsiReferenceContributor"/>
 
         <applicationService serviceImplementation="com.github.kumaraman21.intellijbehave.settings.JBehaveSettings" />
