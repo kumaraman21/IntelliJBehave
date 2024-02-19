@@ -1,0 +1,60 @@
+# use glob syntax.
+syntax: glob
+*.ser
+*.class
+*~
+*.bak
+*.off
+*.old
+.DS_Store
+
+# lib'n misc
+#lib/
+testLib/
+file/
+
+# eclipse conf file
+.settings
+.classpath
+.project
+
+
+# building
+/build/
+target/
+bin/
+test-output/
+out/
+
+# Exported plugin for deployment
+IntelliJBehave.zip
+
+# other scm
+.svn
+.CVS
+.hg*
+
+# switch to regexp syntax.
+#  syntax: regexp
+#  ^\.pc/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea
+
+# Atlassian Plugin Configuration
+atlassian-ide-plugin.xml
+
+# Plugins
+/providedLib
+
+# Gradle
+.gradle/
+#gradle.properties
+
+# Other files
+/local.properties
+#*.jar
+!gradle/wrapper/gradle-wrapper.jar

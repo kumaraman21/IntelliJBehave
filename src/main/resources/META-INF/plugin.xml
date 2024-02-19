@@ -1,0 +1,110 @@
+<!--
+  ~ Copyright 2011-12 Aman Kumar
+  ~
+  ~ Licensed under the Apache License, Version 2.0 (the "License");
+  ~ you may not use this file except in compliance with the License.
+  ~ You may obtain a copy of the License at
+  ~
+  ~ http://www.apache.org/licenses/LICENSE-2.0
+  ~
+  ~ Unless required by applicable law or agreed to in writing, software
+  ~ distributed under the License is distributed on an "AS IS" BASIS,
+  ~ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+  ~ See the License for the specific language governing permissions and
+  ~ limitations under the License.
+  -->
+<idea-plugin url="https://github.com/witspirit/IntelliJBehave">
+    <name>JBehave Support</name>
+    <id>jbehave-support-plugin</id>
+    <description><![CDATA[
+    <p>
+    The plugin provides the following features:
+    </p>
+    <ul>
+    <li> Basic syntax highlighting for JBehave story files</li>
+    <li> Jump to step definition in Java or Groovy</li>
+    <li> Error Highlighting in story if step was not defined</li>
+    <li> Create new story files from a configurable story template</li>
+    <li> Comment/uncomment lines in story files</li>
+    <li> Code inspections to report unused steps definitions and undefined step usages </li>
+    <li> Run *.story files</li>
+    <li> Finding usages of steps methods </li>
+    </ul>
+
+    <p>
+    Known limitations:
+    </p>
+    <ul>
+        <li>Searches complete module classpath, no configuration available to limit scope</li>
+        <li>Does not take into account any custom JBehave configuration</li>
+    </ul>
+
+    <p>See <a href="https://github.com/witspirit/IntelliJBehave">the github</a> for more info</p>
+  ]]></description>
+    <vendor url="https://github.com/witspirit" email="witspirit@gmail.com">Bert Van Vlerken, Victor Rosenberg</vendor>
+
+    <idea-version since-build="222.4554.10" until-build="241.*"/>
+
+    <depends>com.intellij.modules.java</depends>
+    <depends optional="true" config-file="kotlin-config.xml">org.jetbrains.kotlin</depends>
+
+    <actions>
+        <action id="IntelliJBehave.NewJBehaveStory"
+                class="com.github.kumaraman21.intellijbehave.creator.CreateStoryAction"
+                text="JBehave Story" description="Create New JBehave Story">
+            <add-to-group group-id="NewGroup1" anchor="after" relative-to-action="NewClass"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="ctrl alt S"/>
+        </action>
+        <action id="IntelliJBehave.RunJBehaveStory" class="com.github.kumaraman21.intellijbehave.runner.RunStoryAction"
+                text="Run Story" description="Run JBehave Story">
+            <add-to-group group-id="RunMenu" anchor="first"/>
+            <keyboard-shortcut keymap="$default" first-keystroke="alt shift F8"/>
+        </action>
+    </actions>
+
+    <extensions defaultExtensionNs="com.intellij">
+        <projectConfigurable instance="com.github.kumaraman21.intellijbehave.settings.JBehaveConfigurable" displayName="JBehave"/>
+        <spellchecker.support language="Story"
+                              implementationClass="com.github.kumaraman21.intellijbehave.spellchecker.JBehaveSpellcheckerStrategy"/>
+        <fileType name="JBehave Story" implementationClass="com.github.kumaraman21.intellijbehave.language.StoryFileType"
+                  fieldName="STORY_FILE_TYPE" language="Story" extensions="story"/>
+        <lang.parserDefinition language="Story"
+                               implementationClass="com.github.kumaraman21.intellijbehave.parser.StoryParserDefinition"/>
+        <annotator language="Story"
+                   implementationClass="com.github.kumaraman21.intellijbehave.resolver.StoryAnnotator"/>
+        <lang.commenter language="Story"
+                        implementationClass="com.github.kumaraman21.intellijbehave.commenter.StoryCommenter"/>
+        <colorSettingsPage implementation="com.github.kumaraman21.intellijbehave.highlighter.StoryColorsAndFontsPage"/>
+        <completion.contributor language="Story"
+                                implementationClass="com.github.kumaraman21.intellijbehave.completion.StoryCompletionContributor"/>
+
+        <referencesSearch
+                implementation="com.github.kumaraman21.intellijbehave.service.JBehaveJavaStepDefinitionSearch"/>
+        <methodReferencesSearch
+                implementation="com.github.kumaraman21.intellijbehave.service.JBehaveJavaMethodUsageSearcher"/>
+        
+        <!--code inspections-->
+        <localInspection id="unusedStepDeclaration" language="JAVA" displayName="Unused step declaration"
+                         groupName="JBehave" enabledByDefault="false" level="WARNING"
+                         implementationClass="com.github.kumaraman21.intellijbehave.codeInspector.UnusedStepDeclarationInspection"/>
+        <localInspection id="undefinedStep" language="Story" displayName="Undefined step"
+                         groupName="JBehave" enabledByDefault="true" level="WARNING"
+                         implementationClass="com.github.kumaraman21.intellijbehave.codeInspector.UndefinedStepInspection"/>
+        <psi.referenceContributor
+                language="Story"
+                implementation="com.github.kumaraman21.intellijbehave.resolver.StepPsiReferenceContributor"/>
+
+        <applicationService serviceImplementation="com.github.kumaraman21.intellijbehave.settings.JBehaveSettings" />
+        <applicationService serviceImplementation="com.github.kumaraman21.intellijbehave.runner.StoryRunnerConfigurationType" />
+        <!--This Run Configuration type is registered explicitly because otherwise after running a story (run config created),
+            then restarting IntelliJ, the previously created run config type is not recognized by IntelliJ.
+            By registering it here, it will recognize the run configurations, and also gives the option to users
+            to manually create JBehave Story Runner configurations.
+            Also, since multiple Run Configurations with the same name are not allowed to be saved by IntelliJ,
+            this won't interfere with the default JBehave Story Runner.-->
+        <configurationType implementation="com.github.kumaraman21.intellijbehave.runner.StoryRunnerConfigurationType" />
+        
+        <lang.psiStructureViewFactory language="Story" implementationClass="com.github.kumaraman21.intellijbehave.structure.StoryStructureViewFactory" />
+    </extensions>
+
+</idea-plugin>
